@@ -43,7 +43,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 ### Tests for User Story 1
 
-- [ ] T010 [P] [US1] Add comparison and evidence-provenance unit tests in `tests/unit/medicine-snapshot-comparison`.
+- [x] T010 [P] [US1] Add comparison and evidence-provenance unit tests in `tests/unit/medicine-snapshot-comparison`.
 - [ ] T011 [P] [US1] Add deterministic matching and supported-case creation tests in `tests/unit/review-case-creation`.
 - [ ] T012 [P] [US1] Add case-list contract tests for required status, match, change, and source evidence fields in `tests/contract/open-review-cases`.
 
