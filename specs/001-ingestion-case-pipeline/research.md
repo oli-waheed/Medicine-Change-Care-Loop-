@@ -68,29 +68,36 @@
 
 ## Source identity and ordering
 
-**Decision**: Retain each raw release bundle and its file names/checksums, source identity, source-provided release/order metadata where available, and retrieval time. Use source release metadata to establish chronology; retrieval time records when the prototype fetched the files and is not evidence of when Fimea changed a record.
+**Decision**: Retain each raw XML snapshot and its file name/checksum, source identity, source-provided batch/order metadata where available, and retrieval time. Use source metadata as ordering evidence only when its ordering semantics are established; retrieval time records when the prototype fetched the file and is not evidence of when Fimea changed a record.
 
-**Rationale**: The reviewed public description confirms a twice-monthly release cadence and release comparisons but does not document a per-record last-modified timestamp or full file schema. Honest provenance must preserve the distinction between source chronology and local retrieval time.
+**Rationale**: The selected XML contains `Ajopvm`, `Aineistoera`, `Kkera`, and `Kattavuus`; the available XSD documents `Ajopvm` as the dataset run date and `Aineistoera` as a batch identifier. Only one local snapshot is available, and the XSD schema filename mismatch is unresolved. Honest provenance must preserve the distinction between source chronology and local retrieval time.
 
 **Alternatives considered**:
 
 - **Use retrieval time as the medicine update date**: Rejected because it would falsely imply source update chronology.
 - **Assume an undocumented stable record identifier or API**: Rejected because no public commitment to such an interface was found.
 
-**Validation required before live ingestion**: Verify direct availability and reuse/automation terms; obtain and inspect the current file layout; identify source-provided release identity/order fields; confirm stable product/package identifiers; confirm which fields can support this feature's relevant-change definition. If order cannot be established, keep chronology unknown and do not create verified changes.
+**Validation required before live ingestion**: Verify direct availability and reuse/automation terms; obtain the matching 2022 XSD or source confirmation that the available schema is compatible; inspect additional snapshots to verify ordering and whether `Pakkaustunnus` remains a usable same-package comparison key across releases. If source order cannot be established, keep chronology unknown and do not create verified changes.
 
 ## Change and matching semantics
 
-**Decision**: Compare only explicitly selected fields present in the Basic Register, and use deterministic exact identifier matching at the same product/package granularity. Do not turn an identifier mismatch, missing identifier, or multiple plausible matches into a case.
+**Team decision (T005)**: Use `Pakkaustunnus` as the primary package matching key when comparing two snapshots. `VNR-numero`, when present, is supporting package metadata only and must not be used as the primary identity or as a fallback match key. Preserve the package-to-product relationship from `Pakkaus/@Laakevalmiste-ref` to `Laakevalmiste/@id` within each source document. Do not use `Laakevalmiste/@id` as the cross-release package key; it may be used internally to resolve the linked product record in its own source document.
 
-**Rationale**: Exact deterministic matching is auditable and avoids implying a clinical inference. Fimea identifies MA-number at authorization level and Nordic article number at package level; these are distinct granularities and must not be conflated.
+**Cross-release limitation**: `Pakkaustunnus` was present for all 146,042 package records and unique across those records in the inspected local `Perusrekisteri.xml` only. This verifies uniqueness within that single file, not stability, continuity, or uniqueness across different Fimea snapshots. Retain the source value and evidence; do not describe cross-release stability as verified. If a release pair lacks an unambiguous same-value package identifier, the comparison cannot safely infer identity from VNR, product attributes, or retrieval time.
 
-**Alternatives considered**:
+**Comparison scope**: For each package paired by the selected key, compare the following exact source paths and capture the before/after source values:
 
-- **Fuzzy or AI-based matching**: Excluded from this feature; unclear matches must remain unmatched for human awareness rather than autonomously creating a case.
-- **Treat all source-file differences as clinically relevant**: Rejected because catalog changes are not equivalent to clinical significance. Relevant fields require team/stakeholder confirmation before implementation.
+- Product-level, reached through `Pakkaus/@Laakevalmiste-ref`: `Laakevalmiste/Kauppanimi`, `Laakevalmiste/Vahvuus`, `Laakevalmiste/Laakemuoto`, `Laakevalmiste/ATC-koodi`, and `Laakevalmiste/Antoreitti`.
+- Active-substance-level, reached through each `Pakkaus/Pakkaus_Laakeaine/@Laakeaine-ref`: for every linked `Laakeaine/VaikuttavaAine`, compare `Aine`, `CASnumero`, `Maara`, `Maarayksikko`, and `JakamatonVahvuus`.
+- Package-level: `Pakkaus/Pakkauskokoteksti`, `Pakkaus/Pakkauskoko`, `Pakkaus/Pakkauskokokerroin`, `Pakkaus/Pakkauskokoyksikko`, and `Pakkaus/JulkinenTarkenne`.
+- Package status/availability: `Pakkaus/Kaupanolo/Kaupan`, `Pakkaus/Kaupanolo/Kauppaantulopaiva`, and `Pakkaus/Kaupanolo/Kaupastapoistumispaiva`.
+- Product authorization/registration status: preserve the present branch and compare its `Tila` and date fields: `Myyntilupa/Tila`, `Myyntilupa/Myontamispaiva`, `Myyntilupa/Paattymispaiva`; `Erityislupa/Tila`, `Erityislupa/Myontamispaiva`, `Erityislupa/Paattymispaiva`; or `Rekisterointi/Tila`, `Rekisterointi/Myontamispaiva`, `Rekisterointi/Paattymispaiva`.
 
-**Open prerequisite**: After inspecting the selected XML and XSD, the team must select the exact catalog fields, stable key, and product/package granularity. This is a domain configuration decision; this plan deliberately does not invent clinical relevance criteria.
+`Tila`, `ATC-koodi`, `Laakemuoto`, and other `CT` code-table elements must retain their source attributes (`listname`, `id`, and `value`) as well as element presence/text. Preserve repeated elements such as `Antoreitti` and `VaikuttavaAine` as separate source occurrences; do not flatten them into ambiguous strings. For every compared path, distinguish an absent element from a present-but-empty element, and retain the source value as represented. A change means that one or more of the listed source values or their presence differs between the two paired snapshots; it is a source-data difference only, not a determination of clinical significance.
+
+Exclude `Pakkaustunnus`, `VNR-numero`, XML IDs/IDREFs, batch metadata, and retrieval metadata from the set of change-triggering fields. `Substituutioryhma` is not in scope and must not be used to select or recommend a substitution. The detected change only communicates source evidence for human review; it must not trigger clinical or substitution decisions.
+
+**Ordering prerequisite**: The XML's `Ajopvm` is the documented dataset run date and `Aineistoera` is described by the XSD as a batch identifier, but only one local snapshot is available. Establishing that one snapshot is later than another, including correction/reissue behavior, still requires source evidence; local retrieval time is not a substitute. Do not claim verified release-to-release changes unless source ordering is established.
 
 ## Architecture and workflow boundaries
 

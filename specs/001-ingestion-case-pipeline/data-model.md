@@ -29,10 +29,15 @@ Represents a normalized medicine/package record as captured in a source release.
 | `snapshot_id` | Unique identity for this normalized record in a release | Unique |
 | `release_id` | Source release containing this record | Required reference to `SourceRelease` |
 | `source_record_reference` | File and record/line locator in raw release evidence | Required |
-| `authorization_identifier` | Source identifier at marketing-authorization granularity, such as an MA-number | Preserve source value; do not confuse with package identity |
-| `package_identifier` | Source identifier at package granularity, such as a Nordic article number | Preserve source value; required for package-level match |
-| `normalized_fields` | Selected source fields used for comparison/matching | Each field retains its original source reference |
+| `product_source_reference` | `Pakkaus/@Laakevalmiste-ref` resolved to `Laakevalmiste/@id` in this same source document | Preserve source values and relation; not the cross-release package key |
+| `package_identifier` | `Pakkaus/Pakkaustunnus` | Primary package comparison key by team decision; preserve as source string; unambiguous presence is required to pair records |
+| `supporting_package_reference` | Optional `Pakkaus/VNR-numero` | Supporting source metadata only; never the primary key or fallback match |
+| `normalized_fields` | The team-approved source fields used for package comparison | Retain exact source values, paths, multiplicity, and element state; distinguish absent from present-but-empty |
 | `evidence_class` | Evidence status of normalized values | One of `VERIFIED`, `INFERRED`, `UNKNOWN`, `CONFLICTING` as applicable |
+
+The comparison field set is: product paths `Kauppanimi`, `Vahvuus`, `Laakemuoto`, `ATC-koodi`, `Antoreitti`; linked active-substance paths `VaikuttavaAine/Aine`, `CASnumero`, `Maara`, `Maarayksikko`, `JakamatonVahvuus`; package paths `Pakkauskokoteksti`, `Pakkauskoko`, `Pakkauskokokerroin`, `Pakkauskokoyksikko`, `JulkinenTarkenne`; package-status paths `Kaupanolo/Kaupan`, `Kaupanolo/Kauppaantulopaiva`, `Kaupanolo/Kaupastapoistumispaiva`; and the present authorization/registration branch's `Tila`, `Myontamispaiva`, and `Paattymispaiva` under `Myyntilupa`, `Erityislupa`, or `Rekisterointi`. Product and active-substance paths are resolved through the source document's package IDREFs. For repeated fields, preserve each occurrence and source order. For code-table values, preserve the source element's attributes and text. A difference in one or more selected source values or their element presence is a detected source-data change, not a clinical-significance decision.
+
+`Pakkaustunnus` uniqueness was observed only within the one inspected local XML snapshot. Stability or uniqueness across separate releases is unverified; do not assert it as a verified cross-release property. If same-key pairing is missing or ambiguous between snapshots, do not substitute VNR or `Laakevalmiste/@id` as the cross-release package key.
 
 ### DetectedChange
 
@@ -41,7 +46,7 @@ Represents a difference in an explicitly relevant field between ordered snapshot
 | Field | Meaning | Validation |
 |---|---|---|
 | `change_id` | Stable identity for the release-to-release change | Deterministic for same source records and field |
-| `medicine_key` | Identifier and granularity used to pair the records | Required; ambiguous keys cannot produce verified changes |
+| `medicine_key` | `Pakkaustunnus` and package granularity used to pair the records | Required; ambiguous keys cannot produce verified changes; cross-release stability remains unverified |
 | `field_name` | Changed field | Must be in the agreed relevant-field set |
 | `prior_value` | Value in previous snapshot | Preserve source value and evidence reference |
 | `current_value` | Value in current snapshot | Preserve source value and evidence reference |
@@ -58,8 +63,9 @@ Represents fictional medication use data for matching.
 |---|---|---|
 | `simulated_record_id` | Fictional record reference | Unique and clearly simulated |
 | `simulated_person_reference` | Fictional person reference, if needed to group records | Must not contain real patient identifiers |
-| `authorization_identifier` | Optional fictional authorization-level medicine key | Only match at same granularity |
-| `package_identifier` | Optional fictional package-level medicine key | Only match at same granularity |
+| `authorization_identifier` | Optional simulated product authorization metadata | Supporting display/provenance only; not used for package matching |
+| `package_identifier` | Optional simulated `Pakkaustunnus` at package granularity | Exact same-granularity comparison only; source stability across releases is not assumed |
+| `supporting_package_reference` | Optional simulated `VNR-numero` | Display/provenance only; not used as a match key |
 | `display_fields` | Minimum fictional data needed in the pharmacist view | Must contain no real patient-identifiable information |
 
 ### ReviewCase
@@ -97,4 +103,5 @@ Records an important case status transition, including initial creation in NEW s
 - A unique `(change_id, simulated_record_id)` pair can create at most one case.
 - A case is created in `NEW`; this feature does not define case resolution or clinical escalation.
 - `CaseStatusEvent` records the initial NEW state and any later important status transition, without this feature adding transitions beyond its scope.
-- Failure to establish source order, source identity, or an unambiguous medicine key must be represented as unknown/conflicting evidence, not silently repaired.
+- Failure to establish source order, source identity, or an unambiguous same-value `Pakkaustunnus` pair must be represented as unknown/conflicting evidence, not silently repaired or matched by VNR/product attributes.
+- Package/product field changes communicate source differences only. They do not establish clinical significance or permit diagnosis, treatment, urgency, or substitution decisions.

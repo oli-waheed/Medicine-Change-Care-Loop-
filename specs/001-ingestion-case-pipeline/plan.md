@@ -130,7 +130,7 @@ The Basic Register is a catalog source with package-level release changes; it is
 1. n8n checks for a new official Basic Register release on the agreed schedule and captures the raw release bundle without modifying its contents.
 2. The ingestion boundary records source identity, any source-supplied release/order information, retrieval time, filenames, and content checksums. Retrieval time is not substituted for missing source update information.
 3. The normalizer produces records for fields selected as relevant, retaining each value's source-record reference and evidence classification.
-4. The comparison process pairs records for the same medicine/package using an agreed stable identifier, compares successive ordered snapshots, and emits changes only for agreed relevant fields.
+4. The comparison process pairs package records by the exact `Pakkaustunnus` value selected by the team, resolves product and active-substance references within each source document, compares the T005 field set across successive ordered snapshots, and retains that cross-release key stability is unverified. `VNR-numero` is supporting metadata only.
 5. A deterministic matcher checks each relevant change against simulated medication records at the same identifier granularity. Missing or ambiguous identifiers result in no match and an explicit uncertainty outcome.
 6. A matched change creates one NEW review case per unique change and simulated medication record. Reprocessing the same release is idempotent.
 7. The pharmacist-facing open-case view reads cases and presents their change, simulated match, source evidence, evidence quality, and current status. No case-closing or clinical-decision action is added in this feature.

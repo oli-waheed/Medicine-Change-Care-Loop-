@@ -25,7 +25,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 **Purpose**: Set source/data boundaries and simulated fixtures shared by all stories.
 
 - [x] T004 Inspect the current Fimea Basic Register release files and document selected files, access/reuse constraints, release identity/order evidence, and parsing rules in `specs/001-ingestion-case-pipeline/research.md`.
-- [ ] T005 Agree the exact relevant catalog fields and same-granularity medicine/package matching key with the team; record the decision and examples in `specs/001-ingestion-case-pipeline/research.md`.
+- [x] T005 Agree the exact relevant catalog fields and same-granularity medicine/package matching key with the team; record the decision and examples in `specs/001-ingestion-case-pipeline/research.md`.
 - [ ] T006 [P] Create a clearly fictional medication-record fixture with unique, absent, and ambiguous identifier examples in `tests/fixtures/simulated-medication-records/`.
 - [ ] T007 [P] Create small prior/current synthetic Basic Register release fixtures, including one relevant-field change and malformed/ordering-unknown cases, under `tests/fixtures/fimea-basic-register/`.
 - [ ] T008 Define and validate shared source-release and medicine-snapshot types in `backend/src/domain/source-release` and `backend/src/domain/medicine-snapshot` using the conventions recorded in `plan.md`.
