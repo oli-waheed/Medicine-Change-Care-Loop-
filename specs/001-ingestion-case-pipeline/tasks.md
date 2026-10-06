@@ -15,8 +15,8 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 **Purpose**: Establish the minimum agreed implementation environment before application work.
 
 - [x] T001 Record the team's finalized Python/FastAPI + SQLite/SQLAlchemy backend, React/TypeScript/Vite frontend, local n8n workflow, pytest/Vitest test runners, versions, commands, and file naming conventions in `specs/001-ingestion-case-pipeline/plan.md` and `specs/001-ingestion-case-pipeline/quickstart.md`.
-- [ ] T002 Create the selected backend and frontend app skeletons, n8n workflow directory, and unit/contract/integration test directories under `backend/`, `frontend/`, `workflow/n8n/`, and `tests/`.
-- [ ] T003 [P] Add the selected stack's formatting, linting, and test-runner configuration at repository root and document the commands in `specs/001-ingestion-case-pipeline/quickstart.md`.
+- [x] T002 Create the selected backend and frontend app skeletons, n8n workflow directory, and unit/contract/integration test directories under `backend/`, `frontend/`, `workflow/n8n/`, and `tests/`.
+- [x] T003 [P] Add the selected stack's formatting, linting, and test-runner configuration at repository root and document the commands in `specs/001-ingestion-case-pipeline/quickstart.md`.
 
 ---
 
@@ -24,7 +24,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 **Purpose**: Set source/data boundaries and simulated fixtures shared by all stories.
 
-- [ ] T004 Inspect the current Fimea Basic Register release files and document selected files, access/reuse constraints, release identity/order evidence, and parsing rules in `specs/001-ingestion-case-pipeline/research.md`.
+- [x] T004 Inspect the current Fimea Basic Register release files and document selected files, access/reuse constraints, release identity/order evidence, and parsing rules in `specs/001-ingestion-case-pipeline/research.md`.
 - [ ] T005 Agree the exact relevant catalog fields and same-granularity medicine/package matching key with the team; record the decision and examples in `specs/001-ingestion-case-pipeline/research.md`.
 - [ ] T006 [P] Create a clearly fictional medication-record fixture with unique, absent, and ambiguous identifier examples in `tests/fixtures/simulated-medication-records/`.
 - [ ] T007 [P] Create small prior/current synthetic Basic Register release fixtures, including one relevant-field change and malformed/ordering-unknown cases, under `tests/fixtures/fimea-basic-register/`.

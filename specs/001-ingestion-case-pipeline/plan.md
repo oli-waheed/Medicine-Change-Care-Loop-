@@ -6,19 +6,19 @@
 
 ## Summary
 
-Deliver a small end-to-end prototype slice that imports official Fimea Basic Register releases through a scheduled n8n workflow, retains source snapshots, compares successive releases for relevant catalog-field changes, deterministically matches those changes against simulated medication records, and presents traceable NEW review cases to a pharmacist. Preserve the raw source release and provenance throughout the flow. The Basic Register is updated twice monthly and is catalog-oriented; this plan does not claim to detect leaflet/SPC clinical-content changes or determine clinical significance.
+Deliver a small end-to-end prototype slice that imports the official Fimea Basic Register XML through a scheduled n8n workflow, retains source snapshots, compares successive snapshots for relevant catalog-field changes, deterministically matches those changes against simulated medication records, and presents traceable NEW review cases to a pharmacist. Preserve the raw source and provenance throughout the flow. Fimea describes transferring information to the XML file once daily and says an XSD schema exists; this cadence is not evidence of per-record change timestamps or release ordering. The prototype does not claim to detect leaflet/SPC clinical-content changes or determine clinical significance.
 
-The team has selected Python/FastAPI with SQLite and SQLAlchemy for the backend, React/TypeScript/Vite for the frontend, and local n8n for scheduled workflow automation. Use SQLAlchemy ORM mappings and SQLite-portable features; do not use PostgreSQL-specific SQL/types or database-specific UUID generation. The repository currently has no application code or dependency manifests, so the stack below is a documented baseline for subsequent setup and implementation tasks, not an assertion that the tools are installed.
+The team has selected Python/FastAPI with SQLite and SQLAlchemy for the backend, React/TypeScript/Vite for the frontend, and local n8n for scheduled workflow automation. Use SQLAlchemy ORM mappings and SQLite-portable features; do not use PostgreSQL-specific SQL/types or database-specific UUID generation. The repository now has initial backend/frontend skeletons and pinned dependency manifests; the business pipeline is not yet implemented.
 
 ## Technical Context
 
-**Language/Version**: Python 3.13.x; Node.js 24.x LTS (also satisfies the selected local n8n release's Node.js requirement); TypeScript 7.0.2.
+**Language/Version**: Python 3.13.x; Node.js 24.x LTS (24.15.0 or later for the selected jsdom release; also satisfies the selected local n8n release's Node.js requirement); TypeScript 7.0.2.
 
 **Primary Dependencies**: FastAPI 0.142.2; Uvicorn 0.54.0; SQLAlchemy 2.1.3; React/React DOM 19.3.0; Vite 8.3.3 with `@vitejs/plugin-react` 6.1.2; n8n 2.42.3, run locally.
 
 **Storage**: SQLite 3.x through Python's built-in `sqlite3` module, with SQLAlchemy 2.1.3 declarative ORM models. Record the actual SQLite runtime version during setup. Use portable SQLAlchemy types and application-generated identifiers; avoid JSONB, PostgreSQL-specific SQL, and server/database-specific UUID generation.
 
-**Testing**: pytest 9.1.1 for backend tests; Vitest 5.0.3 with React Testing Library 16.3.3, `@testing-library/jest-dom` 7.0.1, jsdom 30.1.2, and React type declarations `@types/react` and `@types/react-dom` 19.3.0 for frontend tests; manual end-to-end validation of ingestion through pharmacist case review.
+**Testing and quality**: pytest 9.1.1 and Ruff 0.16.10 for backend tests/linting; Vitest 5.0.3 with React Testing Library 16.3.3, `@testing-library/jest-dom` 7.0.1, jsdom 30.1.2, and React type declarations `@types/react` and `@types/react-dom` 19.3.0 for frontend tests; Oxlint 1.87.0 for frontend linting; Prettier 3.9.9 for formatting; manual end-to-end validation of ingestion through pharmacist case review.
 
 **Target Platform**: Prototype environment; production deployment is out of scope.
 
@@ -28,9 +28,9 @@ The team has selected Python/FastAPI with SQLite and SQLAlchemy for the backend,
 
 **Constraints**: Simulated patient and medication data only. Human review is mandatory. No diagnoses, treatment recommendations, substitution selection, urgency decisions, automatic clinically relevant case closure, AI explanations, patient-facing views, communication/follow-up, external clinical systems, or production deployment. Unknown or conflicting source order and ambiguous matches must remain explicit and must not produce verified cases.
 
-**Scale/Scope**: One selected official Fimea Basic Register feed, successive available releases, controlled simulated medication data, and pharmacist-facing open NEW cases. The source is published twice monthly; the prototype may check for releases on a scheduled basis but must not imply that Fimea content changes are available more frequently than the source publishes them.
+**Scale/Scope**: One selected official Fimea Basic Register XML feed, successive available snapshots, controlled simulated medication data, and pharmacist-facing open NEW cases. Fimea describes the XML file as refreshed once per day; the prototype must not imply that each transfer is a new ordered release or that every field changed.
 
-**Version baseline**: Runtime minor lines and exact package versions above were selected/documented on 2026-10-06. Keep exact package pins in dependency manifests/lockfiles when those are introduced; use the latest patch within Python 3.13.x and Node.js 24.x LTS, and record actual runtime versions at setup. SQLite is supplied by the selected Python runtime; verify its version rather than installing a separate database server.
+**Version baseline**: Runtime minor lines and exact package versions above were selected/documented on 2026-10-06. Exact direct package pins are maintained in `backend/pyproject.toml` and `frontend/package.json`, with the npm resolution lockfile committed as `frontend/package-lock.json`. Use the latest patch within Python 3.13.x and Node.js 24.x LTS, and record actual runtime versions at setup. SQLite is supplied by the selected Python runtime; verify its version rather than installing a separate database server.
 
 ### T001 Stack Decision Record
 
@@ -42,9 +42,11 @@ The team finalized the stack for this feature. These versions and commands defin
 | Backend web framework/server | FastAPI 0.142.2; Uvicorn 0.54.0 |
 | ORM and database | SQLAlchemy 2.1.3; SQLite 3.x via Python `sqlite3` |
 | Backend tests | pytest 9.1.1 |
+| Backend lint/format | Ruff 0.16.10 |
 | Frontend runtime | Node.js 24.x LTS with its bundled npm |
 | Frontend | React and React DOM 19.3.0; TypeScript 7.0.2; Vite 8.3.3; `@vitejs/plugin-react` 6.1.2 |
 | Frontend tests | Vitest 5.0.3; React Testing Library 16.3.3; `@testing-library/jest-dom` 7.0.1; jsdom 30.1.2; `@types/react` and `@types/react-dom` 19.3.0 |
+| Frontend lint/format | Oxlint 1.87.0; Prettier 3.9.9 |
 | Workflow automation | n8n 2.42.3, run locally on Node.js 24.x |
 | Data | Synthetic/simulated data only |
 
@@ -52,30 +54,37 @@ Version source: package release metadata from PyPI and the npm registry, checked
 
 ### Commands
 
-Windows PowerShell commands for the backend, after T002 creates the package skeleton:
+Windows PowerShell commands for the backend:
 
 ```powershell
 Set-Location backend
 py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install fastapi==0.142.2 uvicorn==0.54.0 sqlalchemy==2.1.3 pytest==9.1.1
+python -m pip install -e ".[dev]"
 python -c "import sqlite3; print(sqlite3.sqlite_version)"
 python -m uvicorn main:app --app-dir src --reload
 python -m pytest ..\tests
+python -m ruff check src ..\tests
+python -m ruff format --check src ..\tests
 ```
 
-Frontend bootstrap and selected package versions:
+The frontend scaffold was created with `create-vite@9.2.1`; that scaffolding
+CLI version is independent of the pinned Vite application version. The exact
+direct dependency pins and lockfile are in `frontend/package.json` and
+`frontend/package-lock.json`. Install and verify them with:
 
 ```powershell
-npm create vite@8.3.3 frontend -- --template react-ts
 Set-Location frontend
-npm install react@19.3.0 react-dom@19.3.0
-npm install --save-dev typescript@7.0.2 vite@8.3.3 @vitejs/plugin-react@6.1.2 vitest@5.0.3 @testing-library/react@16.3.3 @testing-library/jest-dom@7.0.1 jsdom@30.1.2 @types/react@19.3.0 @types/react-dom@19.3.0
-npm run dev
+npm ci
+npm run build
 npm run test -- --run
+npm run lint
+npm run format:check
+npm run dev
 ```
 
-The frontend `package.json` test script is `vitest`; T003 configures it along with the test environment.
+`npm run format` applies Prettier formatting. Vitest exits unsuccessfully when
+no matching test files exist, which is expected before feature tests are added.
 
 Run the local workflow editor in a separate terminal:
 

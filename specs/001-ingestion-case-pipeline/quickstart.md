@@ -8,7 +8,7 @@ skeletons and test scripts.
 ## Prerequisites
 
 - Python 3.13.x and its `py` launcher.
-- Node.js 24.x LTS and its bundled npm; n8n 2.42.3 requires Node.js 24 or later.
+- Node.js 24.15.0 or later in the 24.x LTS line and its bundled npm; this satisfies jsdom 30.1.2 and n8n 2.42.3 runtime requirements.
 - PowerShell on Windows for the commands below.
 - Dependencies installed at the exact versions in [plan.md](plan.md#t001-stack-decision-record).
 - A captured Fimea Basic Register release fixture, plus a prior release fixture, with source identity and
@@ -22,13 +22,13 @@ skeletons and test scripts.
 
 ### Backend
 
-After T002 creates the backend skeleton, from the repository root:
+From the repository root:
 
 ```powershell
+py -3.13 -m venv backend\.venv
 Set-Location backend
-py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install fastapi==0.142.2 uvicorn==0.54.0 sqlalchemy==2.1.3 pytest==9.1.1
+python -m pip install -e ".[dev]"
 python -c "import sqlite3; print(sqlite3.sqlite_version)"
 python -m uvicorn main:app --app-dir src --reload
 ```
@@ -39,6 +39,8 @@ In another terminal, run the backend tests:
 Set-Location backend
 .\.venv\Scripts\Activate.ps1
 python -m pytest ..\tests
+python -m ruff check src ..\tests
+python -m ruff format --check src ..\tests
 ```
 
 The SQLite version printed is the library included with the installed Python runtime. Use SQLAlchemy
@@ -48,13 +50,16 @@ database-specific UUID generation. The local database file is planned at
 
 ### Frontend
 
-From the repository root, after T002/T003 creates and configures the frontend:
+The React/TypeScript scaffold was created with `create-vite@9.2.1`. This is the
+scaffolding tool version; the application itself uses Vite 8.3.3. From the repository root:
 
 ```powershell
-npm create vite@8.3.3 frontend -- --template react-ts
 Set-Location frontend
-npm install react@19.3.0 react-dom@19.3.0
-npm install --save-dev typescript@7.0.2 vite@8.3.3 @vitejs/plugin-react@6.1.2 vitest@5.0.3 @testing-library/react@16.3.3 @testing-library/jest-dom@7.0.1 jsdom@30.1.2 @types/react@19.3.0 @types/react-dom@19.3.0
+npm ci
+npm run build
+npm run test -- --run
+npm run lint
+npm run format:check
 npm run dev
 ```
 
@@ -65,8 +70,9 @@ Set-Location frontend
 npm run test -- --run
 ```
 
-The frontend `package.json` test script is `vitest`; T003 adds that script and the jsdom test
-environment. Keep dependency versions aligned with the T001 baseline in [plan.md](plan.md).
+Use `npm run format` to apply Prettier formatting. The one-shot Vitest command
+returns a failure if no matching test files exist; this is expected before feature
+tests are added. Keep dependency versions aligned with the T001 baseline in [plan.md](plan.md).
 
 ### Local n8n
 
@@ -77,8 +83,9 @@ npx --yes n8n@2.42.3 start
 ```
 
 Import and run `workflow/n8n/fimea-basic-register-ingestion.json` in the local editor. Configure the
-scheduled trigger for the agreed polling schedule; do not imply that source releases are published
-more frequently than Fimea's stated cadence.
+scheduled trigger for the agreed polling schedule. Fimea describes the XML file as refreshed once
+daily; do not infer source chronology or a new ordered release from the polling interval or local
+retrieval time.
 
 ## Acceptance run
 
