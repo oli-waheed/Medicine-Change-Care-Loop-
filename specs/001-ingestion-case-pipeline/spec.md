@@ -71,7 +71,7 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 
 ### Functional Requirements
 
-- **FR-001**: The system MUST run scheduled ingestion for the selected official Finnish medicine-information source.
+- **FR-001**: The system MUST run scheduled ingestion for Fimea's Basic Register of medicinal products, capturing complete source releases for comparison.
 - **FR-002**: For each successfully ingested source item, the system MUST store a snapshot that identifies the source and medicine and records source update information and retrieval time.
 - **FR-003**: The system MUST normalize the medicine information needed for comparison and matching while preserving enough source evidence to trace normalized information to the source snapshot.
 - **FR-004**: The system MUST compare each new snapshot with the previous snapshot for the same medicine and identify changes in the defined relevant medicine-information fields, using the source update information to establish source order.
@@ -109,9 +109,9 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 
 ## Assumptions
 
-- The selected official Fimea source and the medicine-information fields considered relevant will be identified before implementation.
+- Only catalog fields present in the selected Fimea Basic Register releases are in scope; the team will identify the exact included files and relevant fields before implementation. This source does not establish leaflet/SPC clinical-content change monitoring.
 - Source update information is the primary evidence for ordering snapshots; where it is unavailable or contradictory, the system reports uncertainty instead of guessing.
 - Matching criteria are deterministic and will use medicine identifiers present in both the source information and simulated medication records.
 - An open case for this feature is a case in NEW status; case handling and additional workflow states are outside this feature.
-- The scheduled source fetch and ingestion are orchestrated by the n8n workflow specified in the feature request; the selected Fimea source and relevant fields will be confirmed before implementation.
+- The scheduled source fetch and ingestion are orchestrated by the requested n8n workflow; the exact Basic Register files and relevant catalog fields will be confirmed before implementation.
 - Acceptance data consists exclusively of simulated medication records and controlled source snapshots.
