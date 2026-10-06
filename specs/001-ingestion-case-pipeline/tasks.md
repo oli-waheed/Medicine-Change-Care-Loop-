@@ -6,16 +6,15 @@
 
 **Organization**: Tasks are grouped by user story to enable independent implementation and validation.
 
-**Path note**: The repository has no application stack or file extension convention. T001 records the
-team-selected language, frameworks, storage, test framework, and concrete source/test filenames in
-`specs/001-ingestion-case-pipeline/plan.md`. The path stems below become source/test files using those
-documented conventions; workflow, fixture, and Spec Kit paths are concrete.
+**Path note**: T001's selected stack, versions, commands, and concrete source/test naming conventions
+are recorded in `specs/001-ingestion-case-pipeline/plan.md`. The path stems below become files using
+those documented conventions; workflow, fixture, and Spec Kit paths are concrete.
 
 ## Phase 1: Setup
 
 **Purpose**: Establish the minimum agreed implementation environment before application work.
 
-- [ ] T001 Agree the implementation language, backend/frontend frameworks, persistence choice, and test runner with the team; record versions, commands, and concrete file naming conventions in `specs/001-ingestion-case-pipeline/plan.md`.
+- [x] T001 Record the team's finalized Python/FastAPI + SQLite/SQLAlchemy backend, React/TypeScript/Vite frontend, local n8n workflow, pytest/Vitest test runners, versions, commands, and file naming conventions in `specs/001-ingestion-case-pipeline/plan.md` and `specs/001-ingestion-case-pipeline/quickstart.md`.
 - [ ] T002 Create the selected backend and frontend app skeletons, n8n workflow directory, and unit/contract/integration test directories under `backend/`, `frontend/`, `workflow/n8n/`, and `tests/`.
 - [ ] T003 [P] Add the selected stack's formatting, linting, and test-runner configuration at repository root and document the commands in `specs/001-ingestion-case-pipeline/quickstart.md`.
 
