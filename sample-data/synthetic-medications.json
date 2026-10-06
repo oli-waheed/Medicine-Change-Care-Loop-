@@ -1,0 +1,20 @@
+[
+  {
+    "medicationRecordId": "M001",
+    "patientId": "P001",
+    "medicineName": "Example Medicine A",
+    "productId": "PROD001",
+    "vnr": "123456",
+    "dosage": "1 tablet daily",
+    "status": "active"
+  },
+  {
+    "medicationRecordId": "M002",
+    "patientId": "P002",
+    "medicineName": "Example Medicine B",
+    "productId": "PROD002",
+    "vnr": "654321",
+    "dosage": "1 tablet twice daily",
+    "status": "active"
+  }
+]

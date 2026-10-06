@@ -1,0 +1,14 @@
+[
+  {
+    "patientId": "P001",
+    "name": "Anna Example",
+    "age": 65,
+    "email": "anna@example.com"
+  },
+  {
+    "patientId": "P002",
+    "name": "Mikko Example",
+    "age": 72,
+    "email": "mikko@example.com"
+  }
+]
