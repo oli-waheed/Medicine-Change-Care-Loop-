@@ -33,11 +33,38 @@ Represents a normalized medicine/package record as captured in a source release.
 | `package_identifier` | `Pakkaus/Pakkaustunnus` | Primary package comparison key by team decision; preserve as source string; unambiguous presence is required to pair records |
 | `supporting_package_reference` | Optional `Pakkaus/VNR-numero` | Supporting source metadata only; never the primary key or fallback match |
 | `normalized_fields` | The team-approved source fields used for package comparison | Retain exact source values, paths, multiplicity, and element state; distinguish absent from present-but-empty |
-| `evidence_class` | Evidence status of normalized values | One of `VERIFIED`, `INFERRED`, `UNKNOWN`, `CONFLICTING` as applicable |
+| `evidence_class` | Evidence status of normalized values | One of `VERIFIED`, `INFERRED`, `UNKNOWN`, `CONFLICTING` as applicable; does not indicate clinical significance |
 
 The comparison field set is: product paths `Kauppanimi`, `Vahvuus`, `Laakemuoto`, `ATC-koodi`, `Antoreitti`; linked active-substance paths `VaikuttavaAine/Aine`, `CASnumero`, `Maara`, `Maarayksikko`, `JakamatonVahvuus`; package paths `Pakkauskokoteksti`, `Pakkauskoko`, `Pakkauskokokerroin`, `Pakkauskokoyksikko`, `JulkinenTarkenne`; package-status paths `Kaupanolo/Kaupan`, `Kaupanolo/Kauppaantulopaiva`, `Kaupanolo/Kaupastapoistumispaiva`; and the present authorization/registration branch's `Tila`, `Myontamispaiva`, and `Paattymispaiva` under `Myyntilupa`, `Erityislupa`, or `Rekisterointi`. Product and active-substance paths are resolved through the source document's package IDREFs. For repeated fields, preserve each occurrence and source order. For code-table values, preserve the source element's attributes and text. A difference in one or more selected source values or their element presence is a detected source-data change, not a clinical-significance decision.
 
 `Pakkaustunnus` uniqueness was observed only within the one inspected local XML snapshot. Stability or uniqueness across separate releases is unverified; do not assert it as a verified cross-release property. If same-key pairing is missing or ambiguous between snapshots, do not substitute VNR or `Laakevalmiste/@id` as the cross-release package key.
+
+### EvidenceProvenance
+
+Records the classification and source traceability for a source value or evidence item. It links to
+the `SourceRelease` and its captured-source provenance rather than duplicating or reinterpreting
+release metadata.
+
+| Field | Meaning | Validation |
+|---|---|---|
+| `source_release` | Source release containing the evidence | Required reference to `SourceRelease`; provides source name, release identifier/date when available, and captured-file provenance |
+| `source_record_identifier` | Source record or package identifier, such as `Pakkaustunnus` | Required non-empty source value |
+| `source_record_locator` | File/record locator for the specific source record | Optional; non-empty when supplied |
+| `field_reference` | Source field/path or evidence reference | Optional when evidence applies to a whole record/release; non-empty when supplied |
+| `source_value` | Original source value and element state, if applicable | Optional `SourceField`; preserve missing, empty, and populated states and source attributes |
+| `classification` | Evidence status | Required `VERIFIED`, `INFERRED`, `UNKNOWN`, or `CONFLICTING` |
+| `note` | Brief provenance or uncertainty explanation | Optional; non-empty when supplied; not a clinical interpretation |
+
+Classification rules:
+
+- `VERIFIED`: the value or fact is directly supported by the referenced source evidence and its trace is available. This describes evidence provenance, not clinical truth or significance.
+- `INFERRED`: the value is derived rather than directly stated by the cited source. Record the derivation basis in the note or linked evidence; it is not authoritative by itself.
+- `UNKNOWN`: the value or its provenance cannot be established from available evidence. Preserve absent/empty source states and do not fill the gap with a guess.
+- `CONFLICTING`: relevant source evidence disagrees and the disagreement has not been resolved. Retain the competing source references/values rather than silently selecting one.
+
+Source values, classifications, and notes describe evidence only. They do not diagnose, recommend
+treatment or substitution, set clinical urgency, or decide case status. No evidence classification
+is itself a clinical conclusion.
 
 ### DetectedChange
 

@@ -29,7 +29,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 - [x] T006 [P] Create a clearly fictional medication-record fixture with unique, absent, and ambiguous identifier examples in `tests/fixtures/simulated-medication-records/`.
 - [x] T007 [P] Create small prior/current synthetic Basic Register release fixtures, including one relevant-field change and malformed/ordering-unknown cases, under `tests/fixtures/fimea-basic-register/`.
 - [x] T008 Define and validate shared source-release and medicine-snapshot types in `backend/src/domain/source-release` and `backend/src/domain/medicine-snapshot` using the conventions recorded in `plan.md`.
-- [ ] T009 Define provenance and evidence-classification rules for verified, inferred, unknown, and conflicting values in `specs/001-ingestion-case-pipeline/data-model.md` and `specs/001-ingestion-case-pipeline/contracts/ingestion-and-case-view.md`.
+- [x] T009 Define provenance and evidence-classification rules for verified, inferred, unknown, and conflicting values in `specs/001-ingestion-case-pipeline/data-model.md` and `specs/001-ingestion-case-pipeline/contracts/ingestion-and-case-view.md`.
 
 **Checkpoint**: Stack, source scope, simulated fixtures, and shared provenance rules are agreed before story work.
 

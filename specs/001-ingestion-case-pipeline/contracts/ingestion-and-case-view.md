@@ -49,6 +49,26 @@ Values above illustrate the shape only; they are not Fimea field names or assert
 If the source does not provide an order value that can be verified, the release must not be labeled
 verified chronological evidence.
 
+## Evidence and provenance
+
+Each evidence item is linked to its `SourceRelease`, which supplies the source name, source release
+identifier/date when present, and captured-file provenance. Record/package identifier is required;
+record locator and source field/path are supplied when applicable. Preserve the original source value
+and its missing, empty, or populated state separately from its evidence classification and optional
+note.
+
+Use only these classifications:
+
+| Classification | Meaning |
+|---|---|
+| `VERIFIED` | Directly supported by the referenced source evidence with traceable provenance; not a clinical conclusion |
+| `INFERRED` | Derived rather than directly stated; identify the basis in a note or linked evidence |
+| `UNKNOWN` | Not established from available evidence; do not guess or silently substitute another value |
+| `CONFLICTING` | Relevant evidence disagrees and remains unresolved; retain the competing references/values |
+
+An evidence note explains provenance or uncertainty only. Neither source values nor evidence
+classifications establish clinical significance, diagnosis, treatment, substitution, or urgency.
+
 ## Normalized record and change
 
 Each normalized package snapshot includes a source release reference, raw source-record locator,
