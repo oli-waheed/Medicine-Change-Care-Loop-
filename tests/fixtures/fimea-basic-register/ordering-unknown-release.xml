@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Perusrekisteri>
+  <Versiotiedot>
+    <Kattavuus>1</Kattavuus>
+  </Versiotiedot>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-UNKNOWN">
+    <Pakkaustunnus>SIM-PKG-UNKNOWN-ORDER</Pakkaustunnus>
+    <Pakkauskokoteksti>synthetic order-unknown package</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>0</Kaupan>
+    </Kaupanolo>
+  </Pakkaus>
+  <Laakevalmiste id="SYN-PROD-UNKNOWN">
+    <Kauppanimi>Fictional Product Unordered</Kauppanimi>
+    <ATC-koodi listname="SIM-ATC" id="SIM-U01" value="synthetic category"/>
+    <Vahvuus>synthetic strength U</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-U01" value="fictional form"/>
+  </Laakevalmiste>
+</Perusrekisteri>
