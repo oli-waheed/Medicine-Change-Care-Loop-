@@ -44,14 +44,14 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 ### Tests for User Story 1
 
 - [x] T010 [P] [US1] Add comparison and evidence-provenance unit tests in `tests/unit/medicine-snapshot-comparison`.
-- [ ] T011 [P] [US1] Add deterministic matching and supported-case creation tests in `tests/unit/review-case-creation`.
-- [ ] T012 [P] [US1] Add case-list contract tests for required status, match, change, and source evidence fields in `tests/contract/open-review-cases`.
+- [x] T011 [P] [US1] Add deterministic matching and supported-case creation tests in `tests/unit/review-case-creation`.
+- [x] T012 [P] [US1] Add case-list contract tests for required status, match, change, and source evidence fields in `tests/contract/open-review-cases`.
 
 ### Implementation for User Story 1
 
-- [ ] T013 [P] [US1] Define detected-change, review-case, and case-status-event domain types in `backend/src/domain/detected-change`, `backend/src/domain/review-case`, and `backend/src/domain/case-status-event`.
-- [ ] T014 [US1] Implement ordered snapshot comparison for agreed relevant fields, retaining prior/current snapshot evidence, in `backend/src/services/detect-relevant-changes`.
-- [ ] T015 [US1] Implement exact same-granularity matching against simulated medication records and create a NEW case with its initial status event in `backend/src/services/create-review-cases`.
+- [x] T013 [P] [US1] Define detected-change, review-case, and case-status-event domain types in `backend/src/domain/detected-change`, `backend/src/domain/review-case`, and `backend/src/domain/case-status-event`.
+- [x] T014 [US1] Implement ordered snapshot comparison for agreed relevant fields, retaining prior/current snapshot evidence, in `backend/src/services/detect-relevant-changes`.
+- [x] T015 [US1] Implement exact same-granularity matching against simulated medication records and create a NEW case with its initial status event in `backend/src/services/create-review-cases`.
 - [ ] T016 [US1] Implement the read operation for open NEW cases with change, simulated-record, and source evidence in `backend/src/api/open-review-cases`.
 - [ ] T017 [US1] Implement the pharmacist-facing open-case list and evidence view in `frontend/src/pages/open-review-cases`.
 - [ ] T018 [US1] Connect the snapshot fixture, comparison, matching, case creation, and review view as one end-to-end vertical slice in `backend/src/workflows/ingestion-to-review` and `frontend/src/pages/open-review-cases`.
