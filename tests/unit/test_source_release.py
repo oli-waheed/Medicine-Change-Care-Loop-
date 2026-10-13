@@ -1,5 +1,4 @@
 import pytest
-
 from src.domain.source_field import SourceField, SourceFieldState
 from src.domain.source_release import SourceProvenance, SourceRelease
 
