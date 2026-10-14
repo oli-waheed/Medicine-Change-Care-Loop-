@@ -52,9 +52,9 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 - [x] T013 [P] [US1] Define detected-change, review-case, and case-status-event domain types in `backend/src/domain/detected-change`, `backend/src/domain/review-case`, and `backend/src/domain/case-status-event`.
 - [x] T014 [US1] Implement ordered snapshot comparison for agreed relevant fields, retaining prior/current snapshot evidence, in `backend/src/services/detect-relevant-changes`.
 - [x] T015 [US1] Implement exact same-granularity matching against simulated medication records and create a NEW case with its initial status event in `backend/src/services/create-review-cases`.
-- [ ] T016 [US1] Implement the read operation for open NEW cases with change, simulated-record, and source evidence in `backend/src/api/open-review-cases`.
-- [ ] T017 [US1] Implement the pharmacist-facing open-case list and evidence view in `frontend/src/pages/open-review-cases`.
-- [ ] T018 [US1] Connect the snapshot fixture, comparison, matching, case creation, and review view as one end-to-end vertical slice in `backend/src/workflows/ingestion-to-review` and `frontend/src/pages/open-review-cases`.
+- [x] T016 [US1] Implement the read operation for open NEW cases with change, simulated-record, and source evidence in `backend/src/api/open-review-cases`.
+- [x] T017 [US1] Implement the pharmacist-facing open-case list and evidence view in `frontend/src/pages/open-review-cases`.
+- [x] T018 [US1] Connect the snapshot fixture, comparison, matching, case creation, and review view as one end-to-end vertical slice in `backend/src/workflows/ingestion-to-review` and `frontend/src/pages/open-review-cases`.
 
 **Checkpoint**: User Story 1 is demonstrable using fixtures without requiring live Fimea ingestion.
 
@@ -68,8 +68,8 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 ### Tests for User Story 2
 
-- [ ] T019 [P] [US2] Add parser and normalization tests against the synthetic Basic Register fixtures in `tests/unit/basic-register-normalization`.
-- [ ] T020 [P] [US2] Add ingestion contract tests for complete, partial, malformed, and order-unknown source releases in `tests/contract/source-release-ingestion`.
+- [x] T019 [P] [US2] Add parser and normalization tests against the synthetic Basic Register fixtures in `tests/unit/basic-register-normalization`.
+- [x] T020 [P] [US2] Add ingestion contract tests for complete, partial, malformed, and order-unknown source releases in `tests/contract/source-release-ingestion`.
 - [ ] T021 [P] [US2] Add end-to-end ingestion tests that verify snapshot provenance and failure handling from synthetic release fixtures in `tests/integration/basic-register-to-snapshots`.
 
 ### Implementation for User Story 2
