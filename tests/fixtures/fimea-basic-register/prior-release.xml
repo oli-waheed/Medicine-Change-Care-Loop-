@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Perusrekisteri>
+  <Versiotiedot>
+    <Ajopvm>2099-01-01</Ajopvm>
+    <Aineistoera>SIM-2099-001</Aineistoera>
+    <Kkera>synthetic first batch</Kkera>
+    <Kattavuus>1</Kattavuus>
+  </Versiotiedot>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-100">
+    <Pakkaustunnus>SIM-PKG-100</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-100</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack size A</Pakkauskokoteksti>
+    <Pakkauskokokerroin>1</Pakkauskokokerroin>
+    <Pakkauskoko>10</Pakkauskoko>
+    <Pakkauskokoyksikko listname="SIM-UNIT" id="SIM-COUNT" value="fictional units"/>
+    <Reseptistatus listname="SIM-STATUS" id="SIM-OTC" value="synthetic status"/>
+    <JulkinenTarkenne>synthetic detail A</JulkinenTarkenne>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2098-12-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-100"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-200">
+    <Pakkaustunnus>SIM-PKG-200</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-200</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack size B</Pakkauskokoteksti>
+    <Pakkauskokokerroin>1</Pakkauskokokerroin>
+    <Pakkauskoko>20</Pakkauskoko>
+    <Pakkauskokoyksikko listname="SIM-UNIT" id="SIM-COUNT" value="fictional units"/>
+    <JulkinenTarkenne/>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2098-12-02</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-200"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-300">
+    <Pakkaustunnus>SIM-PKG-300</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-300</VNR-numero>
+    <Pakkauskokoteksti>synthetic prior-only pack</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>0</Kaupan>
+      <Kauppaantulopaiva>2098-11-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva>2098-12-15</Kaupastapoistumispaiva>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-300"/>
+  </Pakkaus>
+  <Laakevalmiste id="SYN-PROD-100">
+    <Kauppanimi>Fictional Product Amber</Kauppanimi>
+    <ATC-koodi listname="SIM-ATC" id="SIM-A01" value="synthetic category"/>
+    <Vahvuus>synthetic strength A</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Antoreitti listname="SIM-ROUTE" id="SIM-R01" value="fictional route"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva>2099-12-31</Paattymispaiva>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-200">
+    <Kauppanimi>Fictional Product Blue</Kauppanimi>
+    <ATC-koodi listname="SIM-ATC" id="SIM-B01" value="synthetic category"/>
+    <Vahvuus>synthetic strength B</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F02" value="fictional form"/>
+    <Antoreitti/>
+    <Rekisterointi>
+      <Tila listname="SIM-REG" id="SIM-REGISTERED" value="synthetic registered"/>
+      <Myontamispaiva>2098-02-01</Myontamispaiva>
+      <Paattymispaiva/>
+    </Rekisterointi>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-300">
+    <Kauppanimi>Fictional Product Cedar</Kauppanimi>
+    <Vahvuus>synthetic strength C</Vahvuus>
+    <Laakemuoto/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-INACTIVE" value="synthetic inactive"/>
+      <Myontamispaiva>2097-03-01</Myontamispaiva>
+      <Paattymispaiva>2098-12-15</Paattymispaiva>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakeaine id="SYN-SUB-100">
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SA01" value="fictional substance amber"/>
+      <CASnumero>SIM-CAS-100</CASnumero>
+      <Maara>1.0</Maara>
+      <Maarayksikko listname="SIM-UNIT" id="SIM-MASS" value="synthetic units"/>
+      <JakamatonVahvuus>synthetic amount A</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+  <Laakeaine id="SYN-SUB-200">
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SB01" value="fictional substance blue"/>
+      <CASnumero>SIM-CAS-200</CASnumero>
+      <Maara>2.0</Maara>
+      <Maarayksikko listname="SIM-UNIT" id="SIM-MASS" value="synthetic units"/>
+      <JakamatonVahvuus>synthetic amount B</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+  <Laakeaine id="SYN-SUB-300">
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SC01" value="fictional substance cedar"/>
+      <CASnumero>SIM-CAS-300</CASnumero>
+      <Maara>3.0</Maara>
+      <Maarayksikko listname="SIM-UNIT" id="SIM-MASS" value="synthetic units"/>
+      <JakamatonVahvuus>synthetic amount C</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+</Perusrekisteri>

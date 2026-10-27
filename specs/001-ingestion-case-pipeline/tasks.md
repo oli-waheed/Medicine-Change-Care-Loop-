@@ -2,109 +2,118 @@
 
 **Input**: Design documents from `specs/001-ingestion-case-pipeline/`
 
-**Prerequisites**: `plan.md`, `spec.md`, `research.md`, `data-model.md`, `contracts/`, `quickstart.md`
+**Prerequisites**: plan.md, spec.md, research.md, data-model.md, contracts/ingestion-and-case-view.md, quickstart.md
 
-**Tests**: Included because the plan and project constitution require automated business-logic/contract tests and manual end-to-end validation.
+**Organization**: Tasks are grouped by user story to enable independent implementation and validation.
 
-**Organization**: Tasks are grouped by the three prioritized user stories. Paths follow the logical `workflow/`, `backend/`, `frontend/`, and `tests/` boundaries in `plan.md`; the team must record its chosen language, framework, storage, and test runner before implementing them.
+**Path note**: T001's selected stack, versions, commands, and concrete source/test naming conventions
+are recorded in `specs/001-ingestion-case-pipeline/plan.md`. The path stems below become files using
+those documented conventions; workflow, fixture, and Spec Kit paths are concrete.
 
-## Phase 1: Setup (Shared Infrastructure)
+## Phase 1: Setup
 
-**Purpose**: Resolve the documented implementation choices and source assumptions before code is started.
+**Purpose**: Establish the minimum agreed implementation environment before application work.
 
-- [ ] T001 [P] Confirm permitted automated access, current Basic Register file layout, source release/order evidence, medicine/package identifiers, and the exact relevant catalog fields; record verified facts and unresolved decisions in `specs/001-ingestion-case-pipeline/research.md`
-- [ ] T002 [P] Select the implementation language, backend/UI frameworks, persistence technology, and test runner; update the concrete module paths and commands in `specs/001-ingestion-case-pipeline/plan.md` and `specs/001-ingestion-case-pipeline/quickstart.md`
+- [x] T001 Record the team's finalized Python/FastAPI + SQLite/SQLAlchemy backend, React/TypeScript/Vite frontend, local n8n workflow, pytest/Vitest test runners, versions, commands, and file naming conventions in `specs/001-ingestion-case-pipeline/plan.md` and `specs/001-ingestion-case-pipeline/quickstart.md`.
+- [x] T002 Create the selected backend and frontend app skeletons, n8n workflow directory, and unit/contract/integration test directories under `backend/`, `frontend/`, `workflow/n8n/`, and `tests/`.
+- [x] T003 [P] Add the selected stack's formatting, linting, and test-runner configuration at repository root and document the commands in `specs/001-ingestion-case-pipeline/quickstart.md`.
 
 ---
 
 ## Phase 2: Foundational (Blocking Prerequisites)
 
-**Purpose**: Establish shared evidence, entity, fixture, and normalization foundations required by all stories.
+**Purpose**: Set source/data boundaries and simulated fixtures shared by all stories.
 
-- [ ] T003 Define and implement persistence models for `SourceRelease`, `MedicineSnapshot`, `DetectedChange`, `SimulatedMedicationRecord`, `ReviewCase`, and `CaseStatusEvent`, including source references, evidence classes, and uniqueness for `(change_id, simulated_record_id)` in `backend/storage/`
-- [ ] T004 [P] Add unit tests for source-record normalization, raw-value/source-locator retention, identifier granularity, and `VERIFIED`/`INFERRED`/`UNKNOWN`/`CONFLICTING` classifications in `tests/unit/normalization/`
-- [ ] T005 [P] Create controlled prior/current Basic Register fixtures and fictional medication records, including missing/conflicting metadata cases, in `tests/fixtures/`; ensure fixtures contain no real patient-identifiable information
-- [ ] T006 Implement normalization for the team-approved Basic Register files and relevant fields, retaining source release and raw-record references plus evidence classifications, in `backend/src/normalization/`
+- [x] T004 Inspect the current Fimea Basic Register release files and document selected files, access/reuse constraints, release identity/order evidence, and parsing rules in `specs/001-ingestion-case-pipeline/research.md`.
+- [x] T005 Agree the exact relevant catalog fields and same-granularity medicine/package matching key with the team; record the decision and examples in `specs/001-ingestion-case-pipeline/research.md`.
+- [x] T006 [P] Create a clearly fictional medication-record fixture with unique, absent, and ambiguous identifier examples in `tests/fixtures/simulated-medication-records/`.
+- [x] T007 [P] Create small prior/current synthetic Basic Register release fixtures, including one relevant-field change and malformed/ordering-unknown cases, under `tests/fixtures/fimea-basic-register/`.
+- [x] T008 Define and validate shared source-release and medicine-snapshot types in `backend/src/domain/source-release` and `backend/src/domain/medicine-snapshot` using the conventions recorded in `plan.md`.
+- [x] T009 Define provenance and evidence-classification rules for verified, inferred, unknown, and conflicting values in `specs/001-ingestion-case-pipeline/data-model.md` and `specs/001-ingestion-case-pipeline/contracts/ingestion-and-case-view.md`.
 
-**Checkpoint**: Entity persistence, evidence rules, simulated fixtures, and normalization are available for independent story work.
+**Checkpoint**: Stack, source scope, simulated fixtures, and shared provenance rules are agreed before story work.
 
 ---
 
-## Phase 3: User Story 1 - Review a case from a medicine-information change (Priority: P1, MVP)
+## Phase 3: User Story 1 - Review a case from a medicine-information change (Priority: P1) 🎯 MVP
 
-**Goal**: Turn ordered snapshots and a unique simulated medication match into a traceable NEW case visible in a pharmacist read-only view.
+**Goal**: Turn a supported change and matching simulated medication record into a traceable NEW case visible to a pharmacist.
 
-**Independent Test**: Load controlled prior/current release fixtures and one exact-granularity matching simulated medication record; verify one NEW case appears with before/after source evidence, simulated-record details, evidence classifications, and its initial status event.
+**Independent Test**: Process prior/current source snapshot fixtures and a unique matching simulated record; verify one NEW case is shown with before/after evidence, source references, matching record, and initial status event.
 
 ### Tests for User Story 1
 
-- [ ] T007 [P] [US1] Add unit tests for baseline snapshots, relevant-field comparisons, ordered prior/current evidence, and unknown/conflicting release order in `tests/unit/change-detection/`
-- [ ] T008 [P] [US1] Add unit tests for exact identifier matching at the same authorization/package granularity and explicit match outcomes in `tests/unit/matching/`
-- [ ] T009 [P] [US1] Add contract tests for the pharmacist case read view and initial NEW status event, including required evidence and source-order fields, in `tests/contract/case-view/`
-- [ ] T010 [P] [US1] Add the fixture-driven happy-path integration test from two normalized releases through case creation to the read-only case view in `tests/integration/ingestion-to-case/`
+- [x] T010 [P] [US1] Add comparison and evidence-provenance unit tests in `tests/unit/medicine-snapshot-comparison`.
+- [x] T011 [P] [US1] Add deterministic matching and supported-case creation tests in `tests/unit/review-case-creation`.
+- [x] T012 [P] [US1] Add case-list contract tests for required status, match, change, and source evidence fields in `tests/contract/open-review-cases`.
 
 ### Implementation for User Story 1
 
-- [ ] T011 [US1] Implement release ordering, baseline handling, and relevant-field change detection with prior/current snapshot references and honest unknown/conflicting outcomes in `backend/src/change-detection/`
-- [ ] T012 [US1] Implement deterministic matching using only the agreed identifier and identical granularity; return explicit `MATCHED`, `NO_MATCH`, or `AMBIGUOUS` outcomes in `backend/src/matching/`
-- [ ] T013 [US1] Create one review case for a unique matched change in `NEW` status and record its initial `CaseStatusEvent` with timestamps and evidence links in `backend/src/cases/`
-- [ ] T014 [US1] Implement a read-only case query that returns medicine identity, simulated match, changed field and before/after values, release/source references, retrieval/order information, evidence classifications, and current status in `backend/src/case-view/`
-- [ ] T015 [US1] Build the pharmacist-facing open-case list and case evidence view with no case-closing or clinical-decision controls in `frontend/src/case-review/`
+- [x] T013 [P] [US1] Define detected-change, review-case, and case-status-event domain types in `backend/src/domain/detected-change`, `backend/src/domain/review-case`, and `backend/src/domain/case-status-event`.
+- [x] T014 [US1] Implement ordered snapshot comparison for agreed relevant fields, retaining prior/current snapshot evidence, in `backend/src/services/detect-relevant-changes`.
+- [x] T015 [US1] Implement exact same-granularity matching against simulated medication records and create a NEW case with its initial status event in `backend/src/services/create-review-cases`.
+- [x] T016 [US1] Implement the read operation for open NEW cases with change, simulated-record, and source evidence in `backend/src/api/open-review-cases`.
+- [x] T017 [US1] Implement the pharmacist-facing open-case list and evidence view in `frontend/src/pages/open-review-cases`.
+- [x] T018 [US1] Connect the snapshot fixture, comparison, matching, case creation, and review view as one end-to-end vertical slice in `backend/src/workflows/ingestion-to-review` and `frontend/src/pages/open-review-cases`.
 
-**Checkpoint**: The controlled happy path is independently testable from normalized release fixtures through the pharmacist's read-only case view.
+**Checkpoint**: User Story 1 is demonstrable using fixtures without requiring live Fimea ingestion.
 
 ---
 
 ## Phase 4: User Story 2 - Ingest and trace an official source snapshot (Priority: P2)
 
-**Goal**: Capture complete Fimea Basic Register releases on an agreed schedule and retain immutable, identifiable source evidence and normalized snapshots.
+**Goal**: Capture complete Fimea Basic Register releases on schedule and expose honest, traceable source snapshots for comparison.
 
-**Independent Test**: Run the scheduled n8n workflow against an approved source fixture; verify complete raw files, filenames/checksums, source identity/order metadata, retrieval time, and normalized snapshots are traceable, while unavailable, malformed, or partial input is visibly incomplete/failed and creates no successful snapshot.
+**Independent Test**: Submit a valid synthetic release using the same ingestion path, verify normalized snapshot provenance and source update/order information; simulate unavailable/malformed/partial input and verify failed or incomplete status with no successful partial snapshot.
 
 ### Tests for User Story 2
 
-- [ ] T016 [P] [US2] Add ingestion contract tests for complete versus failed capture and required source identity, source order, retrieval time, file checksums, and immutable content references in `tests/contract/ingestion/`
-- [ ] T017 [P] [US2] Add ingestion integration tests for successful fixture capture plus unavailable, malformed, and interrupted/partial source responses in `tests/integration/source-ingestion/`
+- [x] T019 [P] [US2] Add parser and normalization tests against the synthetic Basic Register fixtures in `tests/unit/basic-register-normalization`.
+- [x] T020 [P] [US2] Add ingestion contract tests for complete, partial, malformed, and order-unknown source releases in `tests/contract/source-release-ingestion`.
+- [ ] T021 [P] [US2] Add end-to-end ingestion tests that verify snapshot provenance and failure handling from synthetic release fixtures in `tests/integration/basic-register-to-snapshots`.
 
 ### Implementation for User Story 2
 
-- [ ] T018 [US2] Create the n8n scheduled workflow to check for and acquire complete Fimea Basic Register releases using the agreed schedule without implying a cadence faster than the twice-monthly source releases in `workflow/n8n/medicine-basic-register-ingestion.json`
-- [ ] T019 [US2] Implement the ingestion boundary to retain each raw release bundle immutably with filenames, checksums, content references, source-provided release/order evidence, and local retrieval time in `backend/src/ingestion/`
-- [ ] T020 [US2] Validate whole-release completeness before publishing normalized snapshots; record an auditable ingestion-run status event with source/release references, timestamps, outcome, and failure detail, never substitute retrieval time for source chronology, and prevent partial data from appearing successful in `backend/src/ingestion/`
-- [ ] T021 [US2] Connect the n8n workflow to the ingestion boundary and verify that a successful release produces traceable `SourceRelease` and `MedicineSnapshot` records while a failed run produces no case-triggering partial snapshot in `workflow/n8n/medicine-basic-register-ingestion.json`
+- [ ] T022 [P] [US2] Implement a Basic Register file reader and normalizer for the agreed source files and relevant fields in `backend/src/services/normalize-basic-register-release`.
+- [ ] T023 [US2] Implement immutable raw-release capture with source identity, source order/reference, retrieval time, file names, checksums, and record locators in `backend/src/services/capture-source-release`.
+- [ ] T024 [US2] Implement validation and explicit failed/incomplete outcomes for inaccessible, partial, malformed, or unorderable source data in `backend/src/services/ingest-source-release`.
+- [ ] T025 [US2] Implement the n8n scheduled release-check and ingestion workflow with explicit failure reporting in `workflow/n8n/fimea-basic-register-ingestion.json`.
+- [ ] T026 [US2] Connect complete release capture and normalization to the snapshot comparison flow in `backend/src/workflows/ingestion-to-review`.
 
-**Checkpoint**: A source operator can distinguish a successfully captured release from an incomplete or failed ingestion and trace every normalized record to immutable raw evidence.
+**Checkpoint**: User Story 2 is demonstrable with a controlled release fixture and the scheduled workflow's documented trigger.
 
 ---
 
 ## Phase 5: User Story 3 - Avoid unsupported or duplicate review cases (Priority: P3)
 
-**Goal**: Keep unmatched, ambiguous, or uncertain changes out of the case list and make replay idempotent.
+**Goal**: Prevent cases from unsupported matches and ensure repeated processing cannot create duplicate cases.
 
-**Independent Test**: Process a no-match change, an ambiguous identifier, an unknown/conflicting-order change, and a unique match twice; verify only one case exists for the unique match and there are no unsupported cases or duplicate initial status events.
+**Independent Test**: Process a relevant change with no match, an ambiguous match, and one unique match twice; verify no cases for the first two and exactly one traceable NEW case for the unique match.
 
 ### Tests for User Story 3
 
-- [ ] T022 [P] [US3] Add unit tests proving missing, conflicting, or multiple plausible identifiers yield `NO_MATCH`/`AMBIGUOUS` outcomes and never a case in `tests/unit/matching/`
-- [ ] T023 [P] [US3] Add replay integration tests proving identical release evidence and the same change/record pair create no duplicate case or initial status event in `tests/integration/idempotency/`
+- [ ] T027 [P] [US3] Add no-match, ambiguous-match, and replay/idempotency tests for change-to-case processing in `tests/unit/review-case-idempotency`.
+- [ ] T028 [P] [US3] Add integration tests verifying repeat ingestion creates no duplicate cases and preserves the original evidence links in `tests/integration/idempotent-change-to-case`.
 
 ### Implementation for User Story 3
 
-- [ ] T024 [US3] Preserve explicit unmatched and ambiguous processing outcomes with their evidence classifications and suppress case creation unless there is one deterministic same-granularity match in `backend/src/matching/`
-- [ ] T025 [US3] Derive a stable idempotency key from the detected change and simulated medication record, enforce atomic uniqueness during case creation, and leave the existing case/status event unchanged on replay in `backend/src/cases/`
-- [ ] T026 [US3] Make replay and suppressed-case outcomes inspectable in processing results without presenting uncertain changes as verified cases in `backend/src/processing-status/`
+- [ ] T029 [US3] Implement explicit MATCHED, NO_MATCH, and AMBIGUOUS outcomes that preserve evidence classification in `backend/src/services/match-detected-changes`.
+- [ ] T030 [US3] Enforce one case per detected-change and simulated-record pair during repeated processing in `backend/src/services/create-review-cases`.
+- [ ] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change-processing-outcomes`.
 
-**Checkpoint**: Replays are idempotent, and unsupported or uncertain matches remain visible as outcomes without entering the pharmacist case list.
+**Checkpoint**: User Story 3 is demonstrable by replaying the same source fixture and checking all match outcomes.
 
 ---
 
 ## Phase 6: Polish & Cross-Cutting Concerns
 
-**Purpose**: Align operator guidance, acceptance evidence, and safety boundaries across the completed stories.
+**Purpose**: Verify end-to-end quality, scope, and project documentation.
 
-- [ ] T027 [P] Update `specs/001-ingestion-case-pipeline/quickstart.md` and `README.md` with selected stack prerequisites, fixture setup, agreed source/relevant-field assumptions, n8n run instructions, and automated test commands
-- [ ] T028 Run every quickstart acceptance scenario, including source failure, unknown order, ambiguous/no match, replay, and evidence-unavailable display; record results and unresolved issues in `specs/001-ingestion-case-pipeline/acceptance-results.md`
-- [ ] T029 Review `workflow/n8n/`, `backend/`, `frontend/`, and `tests/` against the safety constraints; verify all person/medication data is simulated and no diagnosis, treatment recommendation, substitution, urgency decision, automatic closure, patient view, external clinical integration, or production deployment was added
+- [ ] T032 [P] Update `specs/001-ingestion-case-pipeline/quickstart.md` with the selected stack's prerequisites, runnable commands, and actual expected output.
+- [ ] T033 [P] Verify all seeded/test/demo patient and medication data is simulated and contains no real patient-identifiable information in `tests/fixtures/`.
+- [ ] T034 Run the complete manual end-to-end acceptance flow in `specs/001-ingestion-case-pipeline/quickstart.md` and record results in `specs/001-ingestion-case-pipeline/quickstart.md`.
+- [ ] T035 Verify the pharmacist view and workflow do not diagnose, recommend treatment, select substitutions, determine urgency, autonomously change case status, or automatically close a case in `frontend/src/pages/open-review-cases` and `backend/src/workflows/ingestion-to-review`.
+- [ ] T036 Review and align `specs/001-ingestion-case-pipeline/spec.md`, `specs/001-ingestion-case-pipeline/plan.md`, `specs/001-ingestion-case-pipeline/data-model.md`, and `specs/001-ingestion-case-pipeline/contracts/ingestion-and-case-view.md` with the implemented behavior.
 
 ---
 
@@ -112,55 +121,66 @@
 
 ### Phase Dependencies
 
-- **Setup (Phase 1)**: T001 and T002 can run in parallel; both must finish before implementation foundations are finalized.
-- **Foundational (Phase 2)**: Depends on Setup; T003 and T005 establish shared persistence/fixtures, T004 defines normalization expectations, and T006 implements normalization after its tests and fixtures are ready. This phase blocks all user stories.
-- **User Stories (Phases 3-5)**: US1 and US2 can start after Foundation and can proceed in parallel. US3 depends on the matching and case-creation behavior from US1.
-- **Polish (Phase 6)**: Depends on the stories selected for delivery; full acceptance and safety review require US1, US2, and US3.
+- **Setup (Phase 1)**: No dependencies; T001 must precede app skeleton and tool configuration.
+- **Foundational (Phase 2)**: Depends on Setup; T004-T009 block implementation because source layout, relevant fields, fixtures, and evidence semantics inform all stories.
+- **User Stories (Phase 3+)**: Depend on Foundational completion. US1 is MVP and uses release fixtures; it does not wait for live ingestion.
+- **Polish (Phase 6)**: Depends on all user stories selected for delivery.
 
 ### User Story Dependencies
 
-- **US1 (P1)**: Depends on Foundation; uses controlled normalized fixtures and is independently testable without the scheduled live-source workflow.
-- **US2 (P2)**: Depends on Foundation; exercises scheduled source acquisition and snapshot persistence independently of case matching and UI delivery.
-- **US3 (P3)**: Depends on US1 matching and case creation; adds explicit suppression and replay guarantees to that flow.
+- **US1 (P1)**: Can start after foundational tasks; no dependency on US2. Provides a fixture-driven MVP.
+- **US2 (P2)**: Can start after foundational tasks. T025 integrates its ingestion with the US1 processing path and requires US1's T014/T018.
+- **US3 (P3)**: Extends the US1 matching/case creation path; requires US1's T015 and T018. It can overlap with US2 only on distinct files.
+
+### Task Dependencies
+
+- T001 → T002-T003.
+- T004-T005 and T006-T009 complete before story implementation.
+- US1: T010-T012 before T014-T018; T013 before T015; T014 before T015; T015-T016 before T018; T016 before T017.
+- US2: T019-T021 before T022-T026; T022-T024 before T025; T018 and T025 before T026.
+- US3: T027-T028 before T029-T031; T015/T018 before T030-T031.
+- T032-T036 follow the selected implementation stories.
 
 ### Parallel Opportunities
 
-- **Setup**: T001 and T002 edit separate planning artifacts.
-- **Foundation**: T004 and T005 can proceed in parallel after Setup; T006 follows both and the shared entity foundation.
-- **US1**: T007-T010 are separate test slices and can be authored in parallel; after those tests, change detection (T011) and matching (T012) can proceed in parallel.
-- **US2**: T016 and T017 can be authored in parallel; workflow configuration and backend ingestion work may be split once their boundary contract is agreed.
-- **US3**: T022 and T023 can be authored in parallel; suppression and idempotency implementation touch distinct matching and case modules.
-- **Across stories**: US1 and US2 can be staffed in parallel after Foundation; US3 follows US1.
+- T003 can run parallel with T001 only if tooling selection is independent; otherwise start it after T001.
+- T006 and T007 can run in parallel after fixture conventions are chosen.
+- T010-T012 can be written in parallel because they target separate test files.
+- T019-T020 and T027-T028 can be written in parallel within their phases.
+- After foundational work, US1 and US2 may proceed in parallel on distinct files; US2's integration task T025 waits for the US1 pipeline.
+- US3 tests can be authored alongside US2 work; US3 implementation must avoid concurrent edits to US1 service files.
+- T032-T033 can run in parallel; final acceptance T034-T036 follows completed feature behavior.
 
-### Parallel Example: User Story 1
+## Parallel Example: User Story 1
 
 ```text
-After Foundation, author these independent tests in parallel:
-T007 tests/unit/change-detection/
-T008 tests/unit/matching/
-T009 tests/contract/case-view/
-T010 tests/integration/ingestion-to-case/
-
-After the tests are in place, implement in parallel:
-T011 backend/src/change-detection/
-T012 backend/src/matching/
+Task: T010 comparison/provenance tests in tests/unit/medicine-snapshot-comparison
+Task: T011 supported matching/case tests in tests/unit/review-case-creation
+Task: T012 open-case contract tests in tests/contract/open-review-cases
 ```
-
----
 
 ## Implementation Strategy
 
 ### MVP First (User Story 1 Only)
 
-1. Complete Setup and Foundational phases, including the source-field/order decisions and simulated fixtures.
-2. Complete US1 using controlled prior/current normalized snapshots and a unique simulated medication match.
-3. Validate the one-NEW-case journey, evidence links, read-only pharmacist view, and initial status event independently.
-4. Defer scheduled external acquisition to US2; do not use the fixture-based MVP to imply that live Fimea ingestion is complete.
+1. Complete Setup and Foundational phases, including the source/field/matching decisions and synthetic fixtures.
+2. Complete User Story 1 from prior/current fixtures through one NEW case and the pharmacist-facing evidence view.
+3. Run the independent US1 automated tests and manual fixture-based acceptance flow.
+4. Stop and review the demonstrable vertical slice before adding live scheduled ingestion.
 
 ### Incremental Delivery
 
-1. Complete Setup + Foundation and verify normalization against controlled fixtures.
-2. Deliver US1 as the traceable case-review MVP.
-3. Deliver US2 to add scheduled n8n acquisition of complete official source releases.
-4. Deliver US3 to prove no-match/ambiguous suppression and idempotent replay.
-5. Run the full quickstart acceptance set and safety review before declaring the feature complete.
+1. Add User Story 2 to ingest and retain the selected Basic Register releases.
+2. Add User Story 3 to verify no-match, ambiguous-match, and replay/idempotency behavior.
+3. Complete manual end-to-end, simulated-data, and safety checks in Polish.
+
+### Parallel Team Strategy
+
+Complete source/stack decisions and shared fixtures together first. Then assign US1 fixture-driven case review and US2 release acquisition to separate contributors. Integrate US2 only after US1's processing boundary is available. Assign US3 to a contributor after the case creation contract is stable.
+
+## Notes
+
+- Every task is a checkbox with a sequential ID; `[P]` is used only for independent files, and story labels appear only in user-story phases.
+- Source and test code filenames use the language-specific extensions documented in `plan.md` by T001.
+- Automated business-logic, contract, and integration tests are included because the project constitution requires them; the acceptance flow also includes manual end-to-end testing.
+- Source release access, reuse terms, current file schema, release ordering, relevant fields, and identifier granularity must be verified before live ingestion; never invent source evidence.

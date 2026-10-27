@@ -18,14 +18,30 @@ node_modules/
 # Python
 __pycache__/
 *.pyc
+.venv/
+venv/
+*.egg-info/
 
 # Coverage and build artifacts
 coverage/
 dist/
 build/
+.pytest_cache/
+.ruff_cache/
+
+# Local application data
+backend/data/
+*.sqlite
+*.sqlite3
+*.db
 
 # IntelliJ
 .idea/
 
 # n8n local files
 .n8n/
+n8n_data/
+
+# Local Fimea source files (downloaded for research only)
+Perusrekisteri.xml
+Perusrekisteri_*.xsd
