@@ -70,11 +70,11 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 - [x] T019 [P] [US2] Add parser and normalization tests against the synthetic Basic Register fixtures in `tests/unit/basic-register-normalization`.
 - [x] T020 [P] [US2] Add ingestion contract tests for complete, partial, malformed, and order-unknown source releases in `tests/contract/source-release-ingestion`.
-- [ ] T021 [P] [US2] Add end-to-end ingestion tests that verify snapshot provenance and failure handling from synthetic release fixtures in `tests/integration/basic-register-to-snapshots`.
+- [x] T021 [P] [US2] Add end-to-end ingestion tests that verify snapshot provenance and failure handling from synthetic release fixtures in `tests/integration/basic-register-to-snapshots`.
 
 ### Implementation for User Story 2
 
-- [ ] T022 [P] [US2] Implement a Basic Register file reader and normalizer for the agreed source files and relevant fields in `backend/src/services/normalize-basic-register-release`.
+- [x] T022 [P] [US2] Implement a Basic Register file reader and normalizer for the agreed source files and relevant fields in `backend/src/services/normalize-basic-register-release`.
 - [ ] T023 [US2] Implement immutable raw-release capture with source identity, source order/reference, retrieval time, file names, checksums, and record locators in `backend/src/services/capture-source-release`.
 - [ ] T024 [US2] Implement validation and explicit failed/incomplete outcomes for inaccessible, partial, malformed, or unorderable source data in `backend/src/services/ingest-source-release`.
 - [ ] T025 [US2] Implement the n8n scheduled release-check and ingestion workflow with explicit failure reporting in `workflow/n8n/fimea-basic-register-ingestion.json`.

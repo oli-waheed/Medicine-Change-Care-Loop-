@@ -40,10 +40,13 @@ def test_normalization_resolves_product_and_substance_links_with_source_values()
 
     assert package.product_reference.value == "SYN-PROD-100"
     assert package.product.kauppanimi.value == "Fictional Product Amber Revised"
-    assert package.active_substances[0].aine.value == "fictional substance amber"
+    assert package.active_substances[0].aine.value == ""
+    assert (
+        dict(package.active_substances[0].aine.attributes)["value"] == "fictional substance amber"
+    )
     assert package.active_substances[0].cas_numero.value == "SIM-CAS-100"
     assert package.package.pakkauskoko.value == "10"
-    assert package.package.pakkauskokoyksikko.attributes == (
+    assert package.package.pakkauskoko_yksikko.attributes == (
         ("listname", "SIM-UNIT"),
         ("id", "SIM-COUNT"),
         ("value", "fictional units"),
@@ -59,7 +62,9 @@ def test_normalization_distinguishes_absent_and_empty_fields():
     assert populated_package.package.julkinen_tarkenne.state.value == "value"
     assert package.product.antoreitti[0].state.value == "empty"
     current_release, current_snapshots = _normalize("current-release.xml")
-    missing_package = next(item for item in current_snapshots if item.pakkaustunnus == "SIM-PKG-400")
+    missing_package = next(
+        item for item in current_snapshots if item.pakkaustunnus == "SIM-PKG-400"
+    )
     assert missing_package.package.julkinen_tarkenne.state.value == "missing"
     assert current_release.ajopvm.value == "2099-01-02"
 
@@ -72,7 +77,10 @@ def test_normalization_retains_repeated_source_elements_and_authorization_branch
     assert isinstance(package.product.antoreitti, tuple)
     assert len(package.product.antoreitti) == 1
     assert special_authorized.authorizations[0].branch.value == "Erityislupa"
-    assert special_authorized.authorizations[0].tila.value == "synthetic granted"
+    assert special_authorized.authorizations[0].tila.value == ""
+    assert (
+        dict(special_authorized.authorizations[0].tila.attributes)["value"] == "synthetic granted"
+    )
 
 
 @pytest.mark.parametrize("filename", ["malformed-release.xml"])
