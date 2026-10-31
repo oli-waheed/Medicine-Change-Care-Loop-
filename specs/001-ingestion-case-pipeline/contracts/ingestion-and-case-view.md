@@ -17,7 +17,7 @@ Required logical fields:
 | `sourceReleaseReference` | Source-provided release identifier/date when available; otherwise explicitly unknown |
 | `sourceOrder` | Source-evidenced ordering value when available; never substitute local retrieval time |
 | `retrievedAt` | Local retrieval timestamp |
-| `files[]` | One or more raw files with name, checksum, and retrievable content/reference |
+| `files[]` | One or more immutable raw files with name, checksum, retrievable content/reference, and source record locators when available |
 | `captureStatus` | Complete or failed; partial acquisition cannot be submitted as complete |
 
 Illustrative payload:
@@ -38,7 +38,8 @@ Illustrative payload:
     {
       "name": "source-file-name",
       "checksum": "content-checksum",
-      "contentReference": "immutable-captured-content"
+      "contentReference": "immutable-captured-content",
+      "recordLocators": ["/Perusrekisteri/Pakkaus[1]"]
     }
   ],
   "captureStatus": "COMPLETE"
@@ -131,7 +132,8 @@ clinical urgency, patient-facing communication, or automatic case closure operat
 ## Safety and error behavior
 
 - Incomplete source acquisition returns a failed/incomplete outcome, not a successful snapshot.
-- Unknown source order remains unknown; no verified release-to-release change is asserted.
+- Unknown source order remains unknown. File and snapshot validation may succeed, but chronology
+  eligibility is reported separately as unavailable; no verified release-to-release change is asserted.
 - Malformed or conflicting identifiers cannot be silently normalized into a match.
 - Repeated submission of identical release evidence is idempotent.
 - A unique change and simulated record pair creates at most one `NEW` case.

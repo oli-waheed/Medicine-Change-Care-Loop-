@@ -75,8 +75,8 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 ### Implementation for User Story 2
 
 - [x] T022 [P] [US2] Implement a Basic Register file reader and normalizer for the agreed source files and relevant fields in `backend/src/services/normalize-basic-register-release`.
-- [ ] T023 [US2] Implement immutable raw-release capture with source identity, source order/reference, retrieval time, file names, checksums, and record locators in `backend/src/services/capture-source-release`.
-- [ ] T024 [US2] Implement validation and explicit failed/incomplete outcomes for inaccessible, partial, malformed, or unorderable source data in `backend/src/services/ingest-source-release`.
+- [x] T023 [US2] Implement immutable raw-release capture with source identity, source order/reference, retrieval time, file names, checksums, and record locators in `backend/src/services/capture-source-release`.
+- [x] T024 [US2] Implement validation and explicit failed outcomes for inaccessible, partial, or malformed source data, and report unavailable chronology separately when source order is unverified in `backend/src/services/ingest-source-release`.
 - [ ] T025 [US2] Implement the n8n scheduled release-check and ingestion workflow with explicit failure reporting in `workflow/n8n/fimea-basic-register-ingestion.json`.
 - [ ] T026 [US2] Connect complete release capture and normalization to the snapshot comparison flow in `backend/src/workflows/ingestion-to-review`.
 
