@@ -1,0 +1,360 @@
+{
+  "name": "Fimea Basic Register – Daily Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 6
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -784,
+        -64
+      ],
+      "id": "190a45e4-d0e4-4918-9ce0-c1b98186a329",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "url": "https://data.pilvi.fimea.fi/avoin-data/Perusrekisteri.xml",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "file"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -560,
+        -64
+      ],
+      "id": "5231682d-4319-4d6e-9909-3d1b44a2dbeb",
+      "name": "HTTP Request",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://host.docker.internal:8000/api/source-releases/ingest",
+        "sendBody": true,
+        "contentType": "multipart-form-data",
+        "bodyParameters": {
+          "parameters": [
+            {
+              "parameterType": "formBinaryData",
+              "name": "file",
+              "inputDataFieldName": "data"
+            },
+            {
+              "name": "sourceName",
+              "value": "Fimea Basic Register"
+            },
+            {
+              "name": "sourceReleaseReference",
+              "value": "{\"value\":\"https://data.pilvi.fimea.fi/avoin-data/Perusrekisteri.xml\",\"evidenceClass\":\"VERIFIED\"}"
+            },
+            {
+              "name": "sourceOrder",
+              "value": "{\"value\":null,\"evidenceClass\":\"UNKNOWN\"}"
+            },
+            {
+              "name": "retrievedAt",
+              "value": "={{$now.toISO()}}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -304,
+        -80
+      ],
+      "id": "7b681f60-87b1-4795-903c-2a6e20957799",
+      "name": "Upload and Validate Fimea Release",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "af3e68e1-37c3-4f03-99e6-4ccdff0cb137",
+              "leftValue": "={{ $json.processingStatus }}",
+              "rightValue": "VALIDATED",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -64,
+        -96
+      ],
+      "id": "b665f559-f40d-4249-868e-d77d398e4cb9",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f310598f-52c3-4159-be70-b877eed010cf",
+              "name": "processingStatus",
+              "value": "={{ $json.processingStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "6cc9e980-9404-488b-b6ef-dd3a10b7ea02",
+              "name": "chronologyStatus",
+              "value": "={{ $json.chronologyStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "a7766e53-5d47-4ecf-9464-d1e0f6640033",
+              "name": "failureDetail",
+              "value": "={{ $json.failureDetail }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        144,
+        0
+      ],
+      "id": "e0b42d9a-30bf-4f86-9189-65aa0fc63e0d",
+      "name": "Record Failed Ingestion"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "0df78447-ce80-4137-9d69-f5af2a289958",
+              "name": "processingStatus",
+              "value": "={{ $json.processingStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "1160db4a-3b11-4df0-927c-796f5c95a8cf",
+              "name": "chronologyStatus",
+              "value": "={{ $json.chronologyStatus }}",
+              "type": "string"
+            },
+            {
+              "id": "d3f98976-71c5-4a2d-96eb-259db870a108",
+              "name": "capturedReleaseReference",
+              "value": "={{ $json.capturedReleaseReference }}",
+              "type": "string"
+            },
+            {
+              "id": "81063fac-c42f-4801-a14c-b894136ae132",
+              "name": "failureDetail",
+              "value": "={{ $json.failureDetail }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        144,
+        -208
+      ],
+      "id": "47e87343-a39f-46e8-8603-69b33d01fef6",
+      "name": "Success branch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e961c255-3376-496e-9975-555cfb4424f9",
+              "name": "processingStatus",
+              "value": "FAILED",
+              "type": "string"
+            },
+            {
+              "id": "ed5a30db-9ea4-4dcd-b765-b272b93fa8e7",
+              "name": "=chronologyStatus",
+              "value": "=UNAVAILABLE",
+              "type": "string"
+            },
+            {
+              "id": "4ed39497-7fe8-44ae-846e-82a887c6c737",
+              "name": "failureDetail",
+              "value": "={{ $json.error?.message || $json.message || 'Fimea source download failed' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -496,
+        144
+      ],
+      "id": "3457417d-380b-4ca5-b8ce-5f43a2a59894",
+      "name": "Record Download Failure"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "55050d33-8a7a-4b1f-bdef-f91320f4d602",
+              "name": "processingStatus",
+              "value": "FAILED",
+              "type": "string"
+            },
+            {
+              "id": "fde53b15-2089-4eab-bfd2-a71fe64ef510",
+              "name": "chronologyStatus",
+              "value": "UNAVAILABLE",
+              "type": "string"
+            },
+            {
+              "id": "4b20637e-8974-45a7-b8aa-ab336a855ad8",
+              "name": "=failureDetail",
+              "value": "={{ $json.error?.message || $json.message || 'Backend ingestion API request failed' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -304,
+        -256
+      ],
+      "id": "42f62868-34fe-4d5d-bf4a-1dc86ce5e893",
+      "name": "Record Upload Failure"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Upload and Validate Fimea Release",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Download Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload and Validate Fimea Release": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Upload Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Success branch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Record Failed Ingestion",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record Failed Ingestion": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "timezone": "Europe/Helsinki",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": true
+  },
+  "versionId": "17e06e0b-74f5-4c2c-8256-823b57d6b0a8",
+  "meta": {
+    "instanceId": "379d49617488f9aa90e050c63e1057a7cadfbc35f3cd105f9979ca5a30821bdf"
+  },
+  "nodeGroups": [],
+  "id": "G3wmy9SNzGQ8bGjO",
+  "tags": []
+}
