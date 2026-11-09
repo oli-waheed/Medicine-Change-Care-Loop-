@@ -93,7 +93,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 ### Tests for User Story 3
 
 - [ ] T027 [P] [US3] Add no-match, ambiguous-match, and replay/idempotency tests for change-to-case processing in `tests/unit/review-case-idempotency`.
-- [ ] T028 [P] [US3] Add integration tests verifying repeat ingestion creates no duplicate cases and preserves the original evidence links in `tests/integration/idempotent-change-to-case`.
+- [x] T028 [P] [US3] Add integration tests verifying repeat ingestion creates no duplicate cases and preserves the original evidence links in `tests/integration/idempotent-change-to-case`.
 
 ### Implementation for User Story 3
 
