@@ -61,6 +61,21 @@ def test_duplicate_record_identity_is_rejected(detected_change, medication_recor
     assert create_review_cases((detected_change,), (medication_record, other)) == ()
 
 
+def test_replay_skips_existing_pair_but_creates_new_pair(detected_change, medication_record):
+    original = create_review_cases((detected_change,), (medication_record,))[0]
+    existing_cases = [original]
+    new_change = replace(detected_change, change_id=f"{detected_change.change_id}-next")
+
+    created = create_review_cases(
+        (detected_change, new_change, new_change),
+        (medication_record,),
+        existing_cases=existing_cases,
+    )
+
+    assert [case.change for case in created] == [new_change]
+    assert existing_cases == [original]
+
+
 def test_invalid_case_event_or_classification_is_rejected(detected_change, medication_record):
     case = create_review_cases((detected_change,), (medication_record,))[0]
     with pytest.raises(ValueError):
