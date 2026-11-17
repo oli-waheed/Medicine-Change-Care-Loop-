@@ -10,7 +10,7 @@ from collections import Counter
 from dataclasses import dataclass, fields
 from datetime import UTC, datetime
 
-from ..domain.detected_change import DetectedChange
+from ..domain.detected_change import DetectedChange, PackageChangeKind, PackageChangeSet
 from ..domain.evidence import EvidenceClassification, EvidenceProvenance
 from ..domain.medicine_snapshot import MedicineSnapshot
 from ..domain.source_field import SourceField
@@ -35,12 +35,19 @@ class SourceOrderEvidence:
 
 @dataclass(frozen=True, slots=True)
 class ComparisonResult:
+    """Field-level ``changes`` plus their per-package grouping in ``change_sets``.
+
+    Change sets also include packages that are no longer present in the current
+    release; those have no field-level changes.
+    """
+
     changes: tuple[DetectedChange, ...]
     classification: EvidenceClassification
     notes: tuple[str, ...] = ()
+    change_sets: tuple[PackageChangeSet, ...] = ()
 
 
-def _project(snapshot: MedicineSnapshot) -> dict[str, tuple[SourceField, ...]]:
+def project_snapshot_fields(snapshot: MedicineSnapshot) -> dict[str, tuple[SourceField, ...]]:
     names = {
         "kauppanimi": "Kauppanimi",
         "vahvuus": "Vahvuus",
@@ -180,24 +187,72 @@ def detect_relevant_changes(
     new_counts = Counter(s.pakkaustunnus for s in current)
     old = {s.pakkaustunnus: s for s in prior}
     new = {s.pakkaustunnus: s for s in current}
-    changes, notes = [], []
+    release_identities = [
+        _release_identity(order.prior_release),
+        _release_identity(order.current_release),
+    ]
+    note = (
+        "Source-data difference only; cross-release key stability "
+        "is not established generally."
+    )
+
+    def change_set_id(key, kind):
+        identity = [*release_identities, key, kind.value]
+        return hashlib.sha256(json.dumps(identity, ensure_ascii=False).encode()).hexdigest()
+
+    def record_evidence(snapshot, key):
+        return EvidenceProvenance(
+            source_release=snapshot.source_release,
+            source_record_identifier=key,
+            source_record_locator=snapshot.source_record_locator,
+            classification=EvidenceClassification.VERIFIED,
+            note=note,
+        )
+
+    changes, change_sets, notes = [], [], []
     for key in sorted(old.keys() | new.keys()):
+        if old_counts[key] == 1 and new_counts[key] == 0:
+            change_sets.append(
+                PackageChangeSet(
+                    change_set_id=change_set_id(key, PackageChangeKind.NO_LONGER_PRESENT),
+                    medicine_key=key,
+                    kind=PackageChangeKind.NO_LONGER_PRESENT,
+                    field_changes=(),
+                    prior_snapshot=old[key],
+                    current_snapshot=None,
+                    prior_evidence=record_evidence(old[key], key),
+                    current_evidence=EvidenceProvenance(
+                        source_release=order.current_release,
+                        source_record_identifier=key,
+                        classification=EvidenceClassification.VERIFIED,
+                        note=(
+                            "No Pakkaus with this Pakkaustunnus in this full-coverage "
+                            "release. The source does not state why."
+                        ),
+                    ),
+                    change_evidence_class=EvidenceClassification.VERIFIED,
+                    prior_source_order=order.prior_order,
+                    current_source_order=order.current_order,
+                    source_order_basis=order.basis,
+                    detected_at=timestamp,
+                )
+            )
+            continue
+        if old_counts[key] == 0 and new_counts[key] == 1:
+            notes.append(f"Package {key}: newly present; no review case is created.")
+            continue
         if old_counts[key] != 1 or new_counts[key] != 1:
-            notes.append(f"Package {key}: absent or ambiguous pair; no field change asserted.")
+            notes.append(f"Package {key}: ambiguous pair; no change asserted.")
             continue
         before, after = old[key], new[key]
-        old_fields, new_fields = _project(before), _project(after)
+        old_fields, new_fields = project_snapshot_fields(before), project_snapshot_fields(after)
+        package_changes = []
         for path in sorted(old_fields.keys() | new_fields.keys()):
             old_value = old_fields.get(path, (SourceField.missing(),))
             new_value = new_fields.get(path, (SourceField.missing(),))
             if old_value == new_value:
                 continue
-            identity = [
-                _release_identity(before.source_release),
-                _release_identity(after.source_release),
-                key,
-                path,
-            ]
+            identity = [*release_identities, key, path]
             change_id = hashlib.sha256(
                 json.dumps(identity, ensure_ascii=False).encode()
             ).hexdigest()
@@ -209,13 +264,10 @@ def detect_relevant_changes(
                     source_record_locator=snapshot.source_record_locator,
                     field_reference=path,
                     classification=EvidenceClassification.VERIFIED,
-                    note=(
-                        "Source-data difference only; cross-release key stability "
-                        "is not established generally."
-                    ),
+                    note=note,
                 )
 
-            changes.append(
+            package_changes.append(
                 DetectedChange(
                     change_id,
                     key,
@@ -233,4 +285,26 @@ def detect_relevant_changes(
                     timestamp,
                 )
             )
-    return ComparisonResult(tuple(changes), EvidenceClassification.VERIFIED, tuple(notes))
+        if not package_changes:
+            continue
+        changes.extend(package_changes)
+        change_sets.append(
+            PackageChangeSet(
+                change_set_id=change_set_id(key, PackageChangeKind.FIELDS_CHANGED),
+                medicine_key=key,
+                kind=PackageChangeKind.FIELDS_CHANGED,
+                field_changes=tuple(package_changes),
+                prior_snapshot=before,
+                current_snapshot=after,
+                prior_evidence=record_evidence(before, key),
+                current_evidence=record_evidence(after, key),
+                change_evidence_class=EvidenceClassification.VERIFIED,
+                prior_source_order=order.prior_order,
+                current_source_order=order.current_order,
+                source_order_basis=order.basis,
+                detected_at=timestamp,
+            )
+        )
+    return ComparisonResult(
+        tuple(changes), EvidenceClassification.VERIFIED, tuple(notes), tuple(change_sets)
+    )

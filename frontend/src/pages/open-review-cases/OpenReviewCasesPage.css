@@ -242,3 +242,57 @@
     text-align: left;
   }
 }
+
+.field-changes {
+  display: grid;
+  gap: 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.field-change + .field-change {
+  padding-top: 1rem;
+  border-top: 1px solid #e3eaed;
+}
+
+.field-path {
+  margin: 0 0 0.5rem;
+  color: #142c3b;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.removal-notice {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 4px solid #b4542d;
+  border-radius: 0.35rem;
+  background: #fbf1ec;
+  color: #5b2a16;
+}
+
+.case-evidence .last-known {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.35rem;
+  margin: 0 0 1rem;
+}
+
+.case-evidence .last-known div {
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) 2fr;
+  gap: 0.75rem;
+}
+
+.case-evidence .last-known dt {
+  color: #536675;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.8rem;
+  overflow-wrap: anywhere;
+}
+
+.case-evidence .last-known dd {
+  margin: 0;
+}

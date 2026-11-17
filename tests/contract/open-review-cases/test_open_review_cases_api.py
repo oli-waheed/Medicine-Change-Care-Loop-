@@ -7,11 +7,11 @@ from src.services.pipeline_store import PipelineStore
 
 
 def test_read_api_returns_only_new_cases_with_evidence(
-    tmp_path, detected_change, medication_record
+    tmp_path, change_set, medication_record
 ):
     app = FastAPI()
     app.state.store = PipelineStore(f"sqlite:///{tmp_path / 'cases.sqlite3'}")
-    app.state.store.add_cases(create_review_cases((detected_change,), (medication_record,)))
+    app.state.store.add_cases(create_review_cases((change_set,), (medication_record,)))
     request = Request(
         {
             "type": "http",

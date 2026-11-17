@@ -150,3 +150,34 @@ def test_without_medication_records_releases_are_captured_but_no_cases_created(
 
     assert len(app.state.store.captures()) == 2
     assert _open_cases(app) == []
+
+
+def test_package_missing_from_next_release_opens_a_no_longer_present_case(isolated_app):
+    from src.domain.review_case import SimulatedMedicationRecord
+
+    app = isolated_app
+    app.state.medication_records = (
+        SimulatedMedicationRecord(
+            "SIM-MED-300", "SIM-PERSON-300", "Fictional Product Cedar", "SIM-PKG-300"
+        ),
+        # Only present in the current release: never opens a case.
+        SimulatedMedicationRecord(
+            "SIM-MED-400", "SIM-PERSON-400", "Fictional new pack", "SIM-PKG-400"
+        ),
+    )
+
+    _upload(app, "prior-release.xml", day=3)
+    _upload(app, "current-release.xml", day=4)
+
+    (case,) = _open_cases(app)
+    assert case["matchedRecord"]["recordId"] == "SIM-MED-300"
+    assert case["changeSet"]["kind"] == "NO_LONGER_PRESENT"
+    assert case["changeSet"]["changes"] == []
+    assert case["sources"]["prior"]["fileName"] == "prior-release.xml"
+    assert case["sources"]["current"]["fileName"] == "current-release.xml"
+    assert case["sources"]["current"]["recordLocator"] is None
+    last_known = {f["field"]: f["values"] for f in case["changeSet"]["lastKnownFields"]}
+    assert last_known["Pakkaus/Pakkauskokoteksti"][0]["value"] == "synthetic prior-only pack"
+
+    _upload(app, "current-release.xml", day=4)
+    assert len(_open_cases(app)) == 1

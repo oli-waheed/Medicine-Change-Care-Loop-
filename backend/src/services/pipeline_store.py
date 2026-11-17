@@ -136,18 +136,23 @@ class PipelineStore:
             )
             if duplicate is not None:
                 continue
-            change = case.change
+            change_set = case.change_set
             session.add(
                 ReviewCaseRow(
                     case_id=case.case_id,
                     idempotency_key=case.idempotency_key,
                     status=case.status.value,
                     created_at=_as_utc(case.created_at),
-                    medicine_key=change.medicine_key,
+                    medicine_key=change_set.medicine_key,
                     record_id=case.medication_record.record_id,
-                    change_id=change.change_id,
-                    prior_file_checksum=change.prior_snapshot.source_release.provenance.raw_file_checksum,
-                    current_file_checksum=change.current_snapshot.source_release.provenance.raw_file_checksum,
+                    change_set_id=change_set.change_set_id,
+                    change_kind=change_set.kind.value,
+                    prior_file_checksum=(
+                        change_set.prior_evidence.source_release.provenance.raw_file_checksum
+                    ),
+                    current_file_checksum=(
+                        change_set.current_evidence.source_release.provenance.raw_file_checksum
+                    ),
                     evidence_payload=open_review_case_payload(case),
                 )
             )

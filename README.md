@@ -33,9 +33,9 @@ The source-ingestion and review process follows these main steps:
 3. Validate and normalize the XML data.
 4. Preserve source metadata, provenance, and checksums.
 5. Compare eligible source releases.
-6. Identify changes in medicine package information.
-7. Match relevant changes with simulated medication records.
-8. Create review cases for pharmacist assessment.
+6. Identify changes in medicine package information, grouped per package, including packages that are no longer present in the register.
+7. Match each package's changes with simulated medication records.
+8. Create one review case per package update and matched record for pharmacist assessment.
 9. Present the changes and supporting evidence through the application interface.
 
 A source-data change does not automatically mean that there is a clinically significant change.
@@ -163,9 +163,9 @@ Cases, case status events and the source-release capture history are stored in S
 | `SIMULATED_MEDICATION_RECORDS_PATH` | `backend/seed/simulated-medication-records.json` | Fictional medication records used for matching. Without this file no cases can be created. |
 | `MAX_SOURCE_RELEASE_UPLOAD_BYTES` | `262144000` | Upload size limit. |
 
-`backend/data/` is git-ignored. Delete it to start from an empty state; the schema is created automatically.
+`backend/data/` is git-ignored. Delete it to start from an empty state; the schema is created automatically. The schema is not migrated automatically: after pulling a change to the case model, delete `backend/data/` once.
 
-The seed records match the synthetic test fixtures (`SIM-PKG-100`). To see cases from live Fimea data, add fictional records whose `Pakkaustunnus` is a real public package identifier from the register. Never add real patient data.
+The seed records match the synthetic test fixtures: `SIM-PKG-100` produces a case with several field changes and `SIM-PKG-300` a case for a package that is no longer present in the register. To see cases from live Fimea data, add fictional records whose `Pakkaustunnus` is a real public package identifier from the register. Never add real patient data.
 
 ### Frontend
 
@@ -269,7 +269,7 @@ The current implementation includes source-release ingestion, source-data normal
 
 Local backend and frontend startup, API proxying, frontend tests, and the frontend production build have been verified.
 
-The frontend tests currently include five passing tests covering the open-case interface, source evidence, code-table values, loading errors, and the empty state. A populated review-case workflow has not yet been verified through the browser.
+The frontend tests currently include seven passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, and the empty state. A populated review-case workflow has not yet been verified through the browser.
 
 Further development and validation are tracked in the project specifications and task lists.
 

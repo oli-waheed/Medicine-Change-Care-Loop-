@@ -1,18 +1,22 @@
 import { useEffect, useState } from "react";
 import {
   fetchOpenReviewCases,
+  type FieldChange,
   type OpenReviewCase,
   type SourceEvidence,
 } from "./openReviewCases";
+import { changeSummary } from "./changeSummary";
 import { sourceValue } from "./sourceValue";
 import "./OpenReviewCasesPage.css";
 
 function SourceCard({
   label,
   evidence,
+  recordAbsent = false,
 }: {
   label: string;
   evidence: SourceEvidence;
+  recordAbsent?: boolean;
 }) {
   return (
     <section className="source-card" aria-label={`${label} source evidence`}>
@@ -40,11 +44,10 @@ function SourceCard({
         </div>
         <div>
           <dt>Record locator</dt>
-          <dd>{evidence.recordLocator ?? "Unknown"}</dd>
-        </div>
-        <div>
-          <dt>Field reference</dt>
-          <dd>{evidence.fieldReference ?? "Not field-specific"}</dd>
+          <dd>
+            {evidence.recordLocator ??
+              (recordAbsent ? "Not in this release" : "Unknown")}
+          </dd>
         </div>
         <div>
           <dt>Retrieved at</dt>
@@ -57,6 +60,74 @@ function SourceCard({
       </dl>
       {evidence.note && <p className="evidence-note">{evidence.note}</p>}
     </section>
+  );
+}
+
+function FieldChangeRow({ change }: { change: FieldChange }) {
+  return (
+    <li className="field-change">
+      <p className="field-path">{change.field}</p>
+      <div className="before-after">
+        <div>
+          <h4>Before</h4>
+          {change.before.map((field, index) => (
+            <p key={`before-${index}`}>{sourceValue(field)}</p>
+          ))}
+        </div>
+        <div>
+          <h4>After</h4>
+          {change.after.map((field, index) => (
+            <p key={`after-${index}`}>{sourceValue(field)}</p>
+          ))}
+        </div>
+      </div>
+    </li>
+  );
+}
+
+function ChangeSetEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
+  const { changeSet } = reviewCase;
+  if (changeSet.kind === "NO_LONGER_PRESENT") {
+    return (
+      <>
+        <div className="section-heading">
+          <h3>Package no longer present in the register</h3>
+        </div>
+        <p className="removal-notice">
+          The prior release contained this package. The current release, which
+          covers the whole register, does not. The source does not state why.
+        </p>
+        <h4>Last known values (prior release)</h4>
+        <dl className="last-known">
+          {(changeSet.lastKnownFields ?? []).map((item) => (
+            <div key={item.field}>
+              <dt>{item.field}</dt>
+              <dd>
+                {item.values.length === 0
+                  ? "No occurrences"
+                  : item.values.map(sourceValue).join("; ")}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      </>
+    );
+  }
+  return (
+    <>
+      <div className="section-heading">
+        <h3>Detected source-data changes</h3>
+        <span>
+          {changeSet.changes.length}{" "}
+          {changeSet.changes.length === 1 ? "field" : "fields"}
+        </span>
+      </div>
+      <ul className="field-changes">
+        {changeSet.changes.map((change) => (
+          <FieldChangeRow key={change.changeId} change={change} />
+        ))}
+      </ul>
+    </>
   );
 }
 
@@ -101,24 +172,7 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
       </section>
 
       <section className="change-card" aria-label="Detected source-data change">
-        <div className="section-heading">
-          <h3>Detected source-data change</h3>
-          <span>{reviewCase.change.field}</span>
-        </div>
-        <div className="before-after">
-          <div>
-            <h4>Before</h4>
-            {reviewCase.change.before.map((field, index) => (
-              <p key={`before-${index}`}>{sourceValue(field)}</p>
-            ))}
-          </div>
-          <div>
-            <h4>After</h4>
-            {reviewCase.change.after.map((field, index) => (
-              <p key={`after-${index}`}>{sourceValue(field)}</p>
-            ))}
-          </div>
-        </div>
+        <ChangeSetEvidence reviewCase={reviewCase} />
         <p className="classification-line">
           Source order: {reviewCase.sourceOrder.prior} →{" "}
           {reviewCase.sourceOrder.current} ·{" "}
@@ -129,7 +183,11 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
 
       <section className="sources" aria-label="Source evidence">
         <SourceCard label="Prior" evidence={reviewCase.sources.prior} />
-        <SourceCard label="Current" evidence={reviewCase.sources.current} />
+        <SourceCard
+          label="Current"
+          evidence={reviewCase.sources.current}
+          recordAbsent={reviewCase.changeSet.kind === "NO_LONGER_PRESENT"}
+        />
       </section>
 
       <p className="review-boundary">
@@ -208,7 +266,7 @@ export default function OpenReviewCasesPage() {
                   {reviewCase.matchedRecord.medicineDisplay}
                 </span>
                 <span>{reviewCase.medicineIdentifier}</span>
-                <span>{reviewCase.change.field}</span>
+                <span>{changeSummary(reviewCase)}</span>
                 <span className="case-list-status">{reviewCase.status}</span>
               </button>
             ))}

@@ -51,7 +51,7 @@ def run_ingestion_to_review(
         order=order,
     )
     created = create_review_cases(
-        comparison.changes,
+        comparison.change_sets,
         medication_records,
         created_at=created_at,
         existing_cases=open_cases,

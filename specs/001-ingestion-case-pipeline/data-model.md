@@ -82,6 +82,23 @@ Represents a difference in an explicitly relevant field between ordered snapshot
 | `change_evidence_class` | Certainty of ordering, pairing, and difference | Unknown/conflicting order cannot be labeled verified |
 | `detected_at` | Time comparison was performed | Required; distinct from source update time |
 
+### PackageChangeSet
+
+Groups everything detected for one package (`Pakkaustunnus`) between one ordered release pair. Review cases are created from change sets, so one package update produces one case per matched simulated record.
+
+| Field | Meaning | Validation |
+|---|---|---|
+| `change_set_id` | Stable identity | Deterministic from both release identities, `medicine_key` and `kind` |
+| `medicine_key` | `Pakkaustunnus` | Required |
+| `kind` | `FIELDS_CHANGED` or `NO_LONGER_PRESENT` | Required |
+| `field_changes` | The `DetectedChange` items for this package pair | At least one for `FIELDS_CHANGED`; none for `NO_LONGER_PRESENT`; each field at most once |
+| `prior_snapshot` | Package record in the prior release | Required |
+| `current_snapshot` | Package record in the current release | Required for `FIELDS_CHANGED`; absent for `NO_LONGER_PRESENT` |
+| `prior_evidence` / `current_evidence` | Record-level provenance in each release | For `NO_LONGER_PRESENT`, current evidence names the current release and has no record locator |
+| `change_evidence_class`, source order, `detected_at` | As for `DetectedChange` | Unknown/conflicting order produces no change set |
+
+`NO_LONGER_PRESENT` is created only when the prior release has exactly one `Pakkaus` with the key and the current full-coverage release (`Kattavuus` = 1) has none. It is a source-data difference only: the source does not state whether the package was withdrawn, renumbered or omitted in error, and the case wording must not claim a reason. Packages present only in the current release are recorded as notes and never create cases; packages whose key is duplicated in either release remain ambiguous notes.
+
 ### SimulatedMedicationRecord
 
 Represents fictional medication use data for matching.
@@ -97,17 +114,17 @@ Represents fictional medication use data for matching.
 
 ### ReviewCase
 
-Represents a human-review item created from one detected change and one deterministic simulated-record match.
+Represents a human-review item created from one package change set and one deterministic simulated-record match.
 
 | Field | Meaning | Validation |
 |---|---|---|
 | `case_id` | Unique case identity | Unique |
-| `change_id` | Detected change supporting the case | Required reference |
+| `change_set_id` | Package change set supporting the case | Required reference |
 | `simulated_record_id` | Matched fictional medication record | Required reference |
 | `status` | Current human-review state | New case begins as `NEW` |
 | `created_at` | Case creation time | Required |
 | `evidence_class` | Evidence status shown with the case | Must preserve unknown/conflicting information |
-| `idempotency_key` | Identity derived from change and simulated record | Unique; prevents duplicate cases on reprocessing |
+| `idempotency_key` | Identity derived from change set and simulated record | Unique; prevents duplicate cases on reprocessing |
 
 ### CaseStatusEvent
 
@@ -125,9 +142,10 @@ Records an important case status transition, including initial creation in NEW s
 
 - One `SourceRelease` contains many `MedicineSnapshot` records.
 - A `DetectedChange` references the prior and current snapshots where both exist; a first snapshot is baseline only and does not imply a detected change.
-- A `DetectedChange` may match zero or more simulated medication records only when each match is deterministic and at the same identifier granularity; ambiguous matches create no case.
-- A `ReviewCase` references exactly one detected change and one simulated medication record.
-- A unique `(change_id, simulated_record_id)` pair can create at most one case.
+- A `PackageChangeSet` groups all `DetectedChange` items for one package and release pair, or records that the package is no longer present.
+- A `PackageChangeSet` may match zero or more simulated medication records only when each match is deterministic and at the same identifier granularity; ambiguous matches create no case.
+- A `ReviewCase` references exactly one package change set and one simulated medication record.
+- A unique `(change_set_id, simulated_record_id)` pair can create at most one case. A later release that changes the same package again forms a new change set and therefore a new case.
 - A case is created in `NEW`; this feature does not define case resolution or clinical escalation.
 - `CaseStatusEvent` records the initial NEW state and any later important status transition, without this feature adding transitions beyond its scope.
 - Failure to establish source order, source identity, or an unambiguous same-value `Pakkaustunnus` pair must be represented as unknown/conflicting evidence, not silently repaired or matched by VNR/product attributes.

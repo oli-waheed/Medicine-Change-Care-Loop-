@@ -103,6 +103,14 @@ def detected_change(snapshot_pair):
 
 
 @pytest.fixture
+def change_set(snapshot_pair):
+    """The single package change set for the standard fixture pair."""
+    old, new, order = snapshot_pair
+    (result,) = detect_relevant_changes((old,), (new,), order=order).change_sets
+    return result
+
+
+@pytest.fixture
 def medication_record():
     return SimulatedMedicationRecord(
         "SIM-MED-100", "SIM-PERSON-100", "Fictional Alpha", "SIM-PKG-100", "000123"

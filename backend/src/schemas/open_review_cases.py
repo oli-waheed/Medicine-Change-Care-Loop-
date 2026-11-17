@@ -1,5 +1,6 @@
-"""Read-view serialization contract, ready for the T016 API; no endpoint yet."""
+"""Read-view serialization for one review case and its package change set."""
 
+from ..domain.detected_change import PackageChangeKind
 from ..domain.review_case import ReviewCase
 from ..domain.source_field import SourceField
 
@@ -25,35 +26,56 @@ def _source(evidence):
     }
 
 
+def _last_known_fields(snapshot):
+    # Imported lazily: services depend on schemas through the store.
+    from ..services.detect_relevant_changes import project_snapshot_fields
+
+    return [
+        {"field": path, "values": [_field(v) for v in values]}
+        for path, values in sorted(project_snapshot_fields(snapshot).items())
+    ]
+
+
 def open_review_case_payload(case: ReviewCase):
-    change = case.change
+    change_set = case.change_set
+    removed = change_set.kind is PackageChangeKind.NO_LONGER_PRESENT
     return {
         "caseId": case.case_id,
         "createdAt": case.created_at.isoformat(),
         "status": case.status.value,
-        "medicineIdentifier": change.medicine_key,
+        "medicineIdentifier": change_set.medicine_key,
         "identifierGranularity": "package",
         "matchedRecord": {
             "recordId": case.medication_record.record_id,
             "personReference": case.medication_record.person_reference,
             "medicineDisplay": case.medication_record.medicine_display,
         },
-        "change": {
-            "changeId": change.change_id,
-            "field": change.field_name,
-            "before": [_field(v) for v in change.prior_value],
-            "after": [_field(v) for v in change.current_value],
-            "detectedAt": change.detected_at.isoformat(),
+        "changeSet": {
+            "changeSetId": change_set.change_set_id,
+            "kind": change_set.kind.value,
+            "detectedAt": change_set.detected_at.isoformat(),
+            "changes": [
+                {
+                    "changeId": change.change_id,
+                    "field": change.field_name,
+                    "before": [_field(v) for v in change.prior_value],
+                    "after": [_field(v) for v in change.current_value],
+                }
+                for change in change_set.field_changes
+            ],
+            "lastKnownFields": (
+                _last_known_fields(change_set.prior_snapshot) if removed else None
+            ),
         },
         "sources": {
-            "prior": _source(change.prior_evidence),
-            "current": _source(change.current_evidence),
+            "prior": _source(change_set.prior_evidence),
+            "current": _source(change_set.current_evidence),
         },
         "sourceOrder": {
-            "prior": change.prior_source_order,
-            "current": change.current_source_order,
-            "basis": change.source_order_basis,
-            "evidenceClass": change.change_evidence_class.value,
+            "prior": change_set.prior_source_order,
+            "current": change_set.current_source_order,
+            "basis": change_set.source_order_basis,
+            "evidenceClass": change_set.change_evidence_class.value,
         },
         "evidenceClass": case.evidence_class.value,
         "initialStatusEvent": {

@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from ..case_status_event import CaseStatus, CaseStatusEvent
-from ..detected_change import DetectedChange
+from ..detected_change import PackageChangeSet
 from ..evidence import EvidenceClassification
 
 
@@ -30,7 +30,7 @@ class SimulatedMedicationRecord:
 @dataclass(frozen=True, slots=True)
 class ReviewCase:
     case_id: str
-    change: DetectedChange
+    change_set: PackageChangeSet
     medication_record: SimulatedMedicationRecord
     status: CaseStatus
     created_at: datetime
@@ -43,9 +43,9 @@ class ReviewCase:
             raise ValueError("Case identity and pair identity are required.")
         if self.status is not CaseStatus.NEW:
             raise ValueError("New cases must begin in NEW.")
-        if self.medication_record.package_identifier != self.change.medicine_key:
+        if self.medication_record.package_identifier != self.change_set.medicine_key:
             raise ValueError("Case requires an exact package-level match.")
-        if self.evidence_class is not self.change.change_evidence_class:
+        if self.evidence_class is not self.change_set.change_evidence_class:
             raise ValueError("Case must preserve change evidence classification.")
         if self.created_at.tzinfo is None or self.created_at.utcoffset() is None:
             raise ValueError("Creation time must include a timezone.")

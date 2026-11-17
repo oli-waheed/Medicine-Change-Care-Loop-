@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import OpenReviewCasesPage from "./OpenReviewCasesPage";
 import { sourceValue } from "./sourceValue";
 import type { OpenReviewCase } from "./openReviewCases";
@@ -15,14 +15,21 @@ const caseFixture: OpenReviewCase = {
     personReference: "SIM-PERSON-100",
     medicineDisplay: "Fictional Alpha",
   },
-  change: {
-    changeId: "CHANGE-SIM-100",
-    field: "Laakevalmiste/Kauppanimi",
-    before: [{ state: "value", value: "Fictional Alpha", attributes: {} }],
-    after: [
-      { state: "value", value: "Fictional Alpha Revised", attributes: {} },
-    ],
+  changeSet: {
+    changeSetId: "CHANGESET-SIM-100",
+    kind: "FIELDS_CHANGED",
     detectedAt: "2099-01-03T00:00:00+00:00",
+    changes: [
+      {
+        changeId: "CHANGE-SIM-100",
+        field: "Laakevalmiste/Kauppanimi",
+        before: [{ state: "value", value: "Fictional Alpha", attributes: {} }],
+        after: [
+          { state: "value", value: "Fictional Alpha Revised", attributes: {} },
+        ],
+      },
+    ],
+    lastKnownFields: null,
   },
   sources: {
     prior: {
@@ -37,7 +44,7 @@ const caseFixture: OpenReviewCase = {
       checksum: "synthetic-prior-checksum",
       recordIdentifier: "SIM-PKG-100",
       recordLocator: "/Perusrekisteri/Pakkaus[1]",
-      fieldReference: "Laakevalmiste/Kauppanimi",
+      fieldReference: null,
       evidenceClass: "VERIFIED",
       note: null,
       retrievedAt: null,
@@ -54,7 +61,7 @@ const caseFixture: OpenReviewCase = {
       checksum: "synthetic-current-checksum",
       recordIdentifier: "SIM-PKG-100",
       recordLocator: "/Perusrekisteri/Pakkaus[1]",
-      fieldReference: "Laakevalmiste/Kauppanimi",
+      fieldReference: null,
       evidenceClass: "VERIFIED",
       note: null,
       retrievedAt: null,
@@ -77,6 +84,11 @@ const caseFixture: OpenReviewCase = {
 };
 
 describe("OpenReviewCasesPage", () => {
+  afterEach(() => {
+    cleanup();
+    vi.unstubAllGlobals();
+  });
+
   it("shows the open-case list and source evidence without decision or closure actions", async () => {
     vi.stubGlobal(
       "fetch",
@@ -141,29 +153,34 @@ describe("OpenReviewCasesPage", () => {
   it("shows code-table attribute values instead of 'Present but empty'", async () => {
     const statusChange: OpenReviewCase = {
       ...caseFixture,
-      change: {
-        ...caseFixture.change,
-        field: "Laakevalmiste/Myyntilupa[0]/Tila",
-        before: [
+      changeSet: {
+        ...caseFixture.changeSet,
+        changes: [
           {
-            state: "empty",
-            value: "",
-            attributes: {
-              listname: "SIM-AUTH",
-              id: "SIM-ACTIVE",
-              value: "synthetic active",
-            },
-          },
-        ],
-        after: [
-          {
-            state: "empty",
-            value: "",
-            attributes: {
-              listname: "SIM-AUTH",
-              id: "SIM-REVOKED",
-              value: "synthetic revoked",
-            },
+            changeId: "CHANGE-SIM-STATUS",
+            field: "Laakevalmiste/Myyntilupa[0]/Tila",
+            before: [
+              {
+                state: "empty",
+                value: "",
+                attributes: {
+                  listname: "SIM-AUTH",
+                  id: "SIM-ACTIVE",
+                  value: "synthetic active",
+                },
+              },
+            ],
+            after: [
+              {
+                state: "empty",
+                value: "",
+                attributes: {
+                  listname: "SIM-AUTH",
+                  id: "SIM-REVOKED",
+                  value: "synthetic revoked",
+                },
+              },
+            ],
           },
         ],
       },
@@ -183,6 +200,85 @@ describe("OpenReviewCasesPage", () => {
       screen.getByText("synthetic revoked (code SIM-REVOKED, list SIM-AUTH)"),
     ).toBeVisible();
     expect(screen.queryByText("Present but empty")).toBeNull();
+  });
+
+  it("shows every field change of one package update in a single case", async () => {
+    const multiField: OpenReviewCase = {
+      ...caseFixture,
+      changeSet: {
+        ...caseFixture.changeSet,
+        changes: [
+          ...caseFixture.changeSet.changes,
+          {
+            changeId: "CHANGE-SIM-101",
+            field: "Pakkaus/JulkinenTarkenne",
+            before: [{ state: "empty", value: "", attributes: {} }],
+            after: [{ state: "value", value: "SIM tarkenne", attributes: {} }],
+          },
+        ],
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [multiField] }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(await screen.findByText("Cases (1)")).toBeVisible();
+    expect(screen.getByText("2 field changes")).toBeVisible();
+    expect(screen.getByText("2 fields")).toBeVisible();
+    expect(screen.getByText("Laakevalmiste/Kauppanimi")).toBeVisible();
+    expect(screen.getByText("Pakkaus/JulkinenTarkenne")).toBeVisible();
+    expect(screen.getByText("SIM tarkenne")).toBeVisible();
+  });
+
+  it("shows a package that is no longer present with its last known values", async () => {
+    const removed: OpenReviewCase = {
+      ...caseFixture,
+      changeSet: {
+        changeSetId: "CHANGESET-SIM-300",
+        kind: "NO_LONGER_PRESENT",
+        detectedAt: "2099-01-03T00:00:00+00:00",
+        changes: [],
+        lastKnownFields: [
+          {
+            field: "Laakevalmiste/Kauppanimi",
+            values: [
+              { state: "value", value: "Fictional Cedar", attributes: {} },
+            ],
+          },
+          { field: "Laakevalmiste/Antoreitti", values: [] },
+        ],
+      },
+      sources: {
+        ...caseFixture.sources,
+        current: {
+          ...caseFixture.sources.current,
+          recordLocator: null,
+          note: "No Pakkaus with this Pakkaustunnus in this release.",
+        },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [removed] }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(
+      await screen.findByRole("heading", {
+        name: "Package no longer present in the register",
+      }),
+    ).toBeVisible();
+    expect(screen.getByText("No longer in the register")).toBeVisible();
+    expect(screen.getByText("Fictional Cedar")).toBeVisible();
+    expect(screen.getByText("No occurrences")).toBeVisible();
+    expect(screen.getByText(/does not state why/)).toBeVisible();
+    expect(screen.getByText("Not in this release")).toBeVisible();
+    expect(screen.queryByText("Before")).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /close|resolve|recommend/i }),
+    ).toBeNull();
   });
 });
 

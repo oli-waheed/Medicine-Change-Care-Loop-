@@ -73,7 +73,7 @@ def test_complete_release_ingestion_creates_traceable_review_case(
 
     cases = result.workflow_result.created_cases
     assert any(
-        case.change.medicine_key == "SIM-PKG-100"
+        case.change_set.medicine_key == "SIM-PKG-100"
         and case.medication_record.record_id == "SIM-MED-100"
         and case.status.value == "NEW"
         for case in cases

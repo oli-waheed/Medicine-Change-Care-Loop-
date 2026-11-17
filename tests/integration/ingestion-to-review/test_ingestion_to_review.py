@@ -43,9 +43,10 @@ def test_fixture_comparison_creates_case_visible_in_open_case_read_view(
     assert [case.status.value for case in result.created_cases] == ["NEW"]
     assert len(payload) == 1
     assert payload[0]["matchedRecord"]["recordId"] == "SIM-MED-100"
-    assert payload[0]["change"]["field"] == "Laakevalmiste/Kauppanimi"
-    assert payload[0]["change"]["before"][0]["value"] == "Fictional Alpha"
-    assert payload[0]["change"]["after"][0]["value"] == "Fictional Alpha Updated"
+    (change,) = payload[0]["changeSet"]["changes"]
+    assert change["field"] == "Laakevalmiste/Kauppanimi"
+    assert change["before"][0]["value"] == "Fictional Alpha"
+    assert change["after"][0]["value"] == "Fictional Alpha Updated"
     assert payload[0]["sources"]["prior"]["fileName"] == "prior.xml"
     assert payload[0]["sources"]["current"]["recordLocator"] == current.source_record_locator
     assert payload[0]["sourceOrder"]["evidenceClass"] == EvidenceClassification.VERIFIED
