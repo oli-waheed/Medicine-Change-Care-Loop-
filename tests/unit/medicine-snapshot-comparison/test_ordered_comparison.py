@@ -128,3 +128,116 @@ def test_all_relevant_groups_are_compared(snapshot_pair, area):
     else:
         new = replace(new, package=replace(old.package, pakkauskoko=SourceField.of("30")))
     assert len(detect_relevant_changes((old,), (new,), order=order).changes) == 1
+
+
+def _substance(code, amount, *, cas=None):
+    from src.domain.medicine_snapshot import ActiveSubstanceFields
+
+    return ActiveSubstanceFields(
+        SourceField.empty(attributes=(("listname", "SIM-SUBSTANCE"), ("id", code))),
+        SourceField.of(cas or f"SIM-CAS-{code}"),
+        SourceField.of(amount),
+        SourceField.empty(attributes=(("id", "mg"),)),
+        SourceField.of(f"{amount} mg"),
+    )
+
+
+def _with_substances(snapshot, *substances):
+    return replace(snapshot, active_substances=substances)
+
+
+def test_reordered_substances_are_paired_by_aine_code_not_position(snapshot_pair):
+    old, new, order = snapshot_pair
+    new = replace(new, product=old.product)
+    a, b = _substance("SIM-SA", "10"), _substance("SIM-SB", "20")
+
+    result = detect_relevant_changes(
+        (_with_substances(old, a, b),), (_with_substances(new, b, a),), order=order
+    )
+
+    assert result.changes == ()
+
+
+def test_changed_substance_amount_is_reported_against_the_same_substance(snapshot_pair):
+    old, new, order = snapshot_pair
+    new = replace(new, product=old.product)
+
+    changes = detect_relevant_changes(
+        (_with_substances(old, _substance("SIM-SA", "10"), _substance("SIM-SB", "20")),),
+        (_with_substances(new, _substance("SIM-SB", "20"), _substance("SIM-SA", "15")),),
+        order=order,
+    ).changes
+
+    assert {change.field_name for change in changes} == {
+        "Laakeaine/VaikuttavaAine[Aine=SIM-SA]/Maara",
+        "Laakeaine/VaikuttavaAine[Aine=SIM-SA]/JakamatonVahvuus",
+    }
+    amount = next(c for c in changes if c.field_name.endswith("/Maara"))
+    assert (amount.prior_value[0].value, amount.current_value[0].value) == ("10", "15")
+
+
+def test_added_substance_is_reported_as_newly_present(snapshot_pair):
+    old, new, order = snapshot_pair
+    new = replace(new, product=old.product)
+
+    changes = detect_relevant_changes(
+        (_with_substances(old, _substance("SIM-SA", "10")),),
+        (_with_substances(new, _substance("SIM-SA", "10"), _substance("SIM-SB", "5")),),
+        order=order,
+    ).changes
+
+    assert changes
+    assert all(c.field_name.startswith("Laakeaine/VaikuttavaAine[Aine=SIM-SB]/") for c in changes)
+    assert all(c.prior_value[0].state.value == "missing" for c in changes)
+
+
+def test_substance_without_aine_code_falls_back_to_cas_number(snapshot_pair):
+    from src.domain.medicine_snapshot import ActiveSubstanceFields
+
+    old, new, order = snapshot_pair
+    new = replace(new, product=old.product)
+    uncoded = ActiveSubstanceFields(
+        SourceField.missing(),
+        SourceField.of("SIM-CAS-9"),
+        SourceField.of("1"),
+        SourceField.missing(),
+        SourceField.missing(),
+    )
+    changed = replace(uncoded, maara=SourceField.of("2"))
+
+    changes = detect_relevant_changes(
+        (_with_substances(old, uncoded, _substance("SIM-SA", "10")),),
+        (_with_substances(new, _substance("SIM-SA", "10"), changed),),
+        order=order,
+    ).changes
+
+    assert [c.field_name for c in changes] == ["Laakeaine/VaikuttavaAine[CAS=SIM-CAS-9]/Maara"]
+
+
+def test_authorizations_are_numbered_within_their_branch(snapshot_pair):
+    from src.domain.medicine_snapshot import (
+        AuthorizationBranch,
+        AuthorizationRegistrationFields,
+    )
+
+    old, new, order = snapshot_pair
+    new = replace(new, product=old.product, active_substances=old.active_substances)
+
+    def authorization(branch, status):
+        return AuthorizationRegistrationFields(
+            branch,
+            SourceField.empty(attributes=(("id", status),)),
+            SourceField.of("2099-01-01"),
+            SourceField.missing(),
+        )
+
+    marketing = authorization(AuthorizationBranch.MYYNTILUPA, "SIM-ACTIVE")
+    registration = authorization(AuthorizationBranch.REKISTEROINTI, "SIM-ACTIVE")
+
+    result = detect_relevant_changes(
+        (replace(old, authorizations=(marketing, registration)),),
+        (replace(new, authorizations=(registration, marketing)),),
+        order=order,
+    )
+
+    assert result.changes == ()
