@@ -72,16 +72,61 @@ def _project(snapshot: MedicineSnapshot) -> dict[str, tuple[SourceField, ...]]:
             if isinstance(item, SourceField):
                 result[f"{prefix}/{names[field.name]}"] = (item,)
             elif isinstance(item, tuple):
+                # Repeated values (e.g. Antoreitti) keep source order (data-model.md).
                 result[f"{prefix}/{names[field.name]}"] = item
 
     add("Laakevalmiste", snapshot.product)
-    for i, substance in enumerate(snapshot.active_substances):
-        add(f"Laakeaine/VaikuttavaAine[{i}]", substance)
+    for label, substance in _labelled_substances(snapshot.active_substances):
+        add(f"Laakeaine/VaikuttavaAine[{label}]", substance)
     add("Pakkaus", snapshot.package)
     add("Pakkaus/Kaupanolo", snapshot.package.availability)
-    for i, authorization in enumerate(snapshot.authorizations):
-        add(f"Laakevalmiste/{authorization.branch.value}[{i}]", authorization)
+    per_branch = Counter()
+    for authorization in snapshot.authorizations:
+        branch = authorization.branch.value
+        add(f"Laakevalmiste/{branch}[{per_branch[branch]}]", authorization)
+        per_branch[branch] += 1
     return result
+
+
+def _field_sort_key(field: SourceField):
+    return (field.state.value, field.value or "", field.attributes)
+
+
+def _substance_identity(substance) -> str:
+    """Stable identity used to pair the same active substance across releases.
+
+    Prefer the Aine code (CT attribute ``id``), then the Aine text, then the CAS
+    number. Pairing by list position would compare different substances with
+    each other whenever their order differs, producing false before/after values.
+    Snapshots still keep every occurrence in source order.
+    """
+    aine = substance.aine
+    code = dict(aine.attributes).get("id")
+    if code:
+        return f"Aine={code}"
+    if aine.value:
+        return f"Aine={aine.value}"
+    if substance.cas_numero.value:
+        return f"CAS={substance.cas_numero.value}"
+    return "Aine=unidentified"
+
+
+def _labelled_substances(substances):
+    groups: dict[str, list] = {}
+    for substance in substances:
+        groups.setdefault(_substance_identity(substance), []).append(substance)
+    for identity in sorted(groups):
+        group = groups[identity]
+        if len(group) == 1:
+            yield identity, group[0]
+            continue
+        # The same substance listed more than once: order by content so the pairing
+        # is deterministic. Changes inside such a group are reported per member.
+        ordered = sorted(
+            group, key=lambda item: [_field_sort_key(getattr(item, f.name)) for f in fields(item)]
+        )
+        for n, substance in enumerate(ordered, start=1):
+            yield f"{identity}#{n}", substance
 
 
 def _release_identity(release: SourceRelease):
