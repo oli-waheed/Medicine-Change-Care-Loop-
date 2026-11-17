@@ -1,0 +1,53 @@
+{
+  "dataset": "SIMULATED - fictional medication records for local demo only",
+  "note": "Pakkaustunnus is the only match key. SIM-PKG-100 (field changes) and SIM-PKG-300 (no longer present) match the synthetic fixtures in tests/fixtures/fimea-basic-register. To demo against a live Fimea release, add fictional records whose Pakkaustunnus is a real public package identifier from that release. Never add real patient data.",
+  "records": [
+    {
+      "record_id": "SIM-MED-100",
+      "person_reference": "SIM-PERSON-100",
+      "medicine_display": "Fictional Product Amber",
+      "Pakkaustunnus": "SIM-PKG-100",
+      "VNR-numero": "SIM-VNR-100"
+    },
+    {
+      "record_id": "SIM-MED-300",
+      "person_reference": "SIM-PERSON-300",
+      "medicine_display": "Fictional Product Cedar",
+      "Pakkaustunnus": "SIM-PKG-300",
+      "VNR-numero": "SIM-VNR-300"
+    },
+    {
+      "record_id": "SIM-MED-001",
+      "person_reference": "SIM-PERSON-001",
+      "medicine_display": "Fictional medicine Alpha",
+      "Pakkaustunnus": "SIM-PKG-0001",
+      "VNR-numero": "SIM-VNR-0001"
+    },
+    {
+      "record_id": "SIM-MED-002",
+      "person_reference": "SIM-PERSON-002",
+      "medicine_display": "Fictional medicine Beta",
+      "Pakkaustunnus": "SIM-PKG-0002"
+    },
+    {
+      "record_id": "SIM-MED-003",
+      "person_reference": "SIM-PERSON-003",
+      "medicine_display": "Fictional medicine Gamma",
+      "Pakkaustunnus": "SIM-PKG-0003",
+      "VNR-numero": "SIM-VNR-0003"
+    },
+    {
+      "record_id": "SIM-MED-004",
+      "person_reference": "SIM-PERSON-004",
+      "medicine_display": "Fictional medicine Delta",
+      "Pakkaustunnus": "SIM-PKG-0003",
+      "VNR-numero": "SIM-VNR-0004"
+    },
+    {
+      "record_id": "SIM-MED-005",
+      "person_reference": "SIM-PERSON-005",
+      "medicine_display": "Fictional medicine Epsilon",
+      "VNR-numero": "SIM-VNR-0001"
+    }
+  ]
+}

@@ -1,9 +1,9 @@
-"""Deterministic matching outcomes for detected package changes."""
+"""Deterministic matching outcomes for per-package change sets."""
 
 from dataclasses import dataclass
 from enum import StrEnum
 
-from ..domain.detected_change import DetectedChange
+from ..domain.detected_change import PackageChangeSet
 from ..domain.evidence import EvidenceClassification, EvidenceProvenance
 from ..domain.review_case import SimulatedMedicationRecord
 
@@ -20,7 +20,7 @@ class MatchGranularity(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class MatchResult:
-    change: DetectedChange
+    change_set: PackageChangeSet
     simulated_record_references: tuple[SimulatedMedicationRecord, ...]
     compared_identifier: str
     identifier_granularity: MatchGranularity
@@ -40,12 +40,12 @@ class MatchResult:
 
 
 def match_detected_changes(
-    changes: tuple[DetectedChange, ...],
+    change_sets: tuple[PackageChangeSet, ...],
     records: tuple[SimulatedMedicationRecord, ...],
 ) -> tuple[MatchResult, ...]:
-    """Match changes only against the exact package identifier."""
+    """Match change sets only against the exact package identifier."""
     results = []
-    for change in changes:
+    for change in change_sets:
         matching_records = tuple(
             record for record in records if record.package_identifier == change.medicine_key
         )
@@ -57,7 +57,7 @@ def match_detected_changes(
             status = MatchStatus.AMBIGUOUS
         results.append(
             MatchResult(
-                change=change,
+                change_set=change,
                 simulated_record_references=matching_records,
                 compared_identifier=change.medicine_key,
                 identifier_granularity=MatchGranularity.PACKAGE,

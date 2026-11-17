@@ -79,6 +79,16 @@
 
 **Validation required before live ingestion**: Verify direct availability and reuse/automation terms; obtain the matching 2022 XSD or source confirmation that the available schema is compatible; inspect additional snapshots to verify ordering and whether `Pakkaustunnus` remains a usable same-package comparison key across releases. If source order cannot be established, keep chronology unknown and do not create verified changes.
 
+**Decision update (2026-11-17, needs team confirmation)**: Keeping chronology UNKNOWN for every live release meant the scheduled n8n pipeline could never create a review case. Order is also no longer taken from the caller, because any uploader could declare `VERIFIED` order with arbitrary values. The backend now derives source order itself from each release's `Ajopvm`:
+
+- `VERIFIED` when every file in the release has a valid ISO `Ajopvm` date (`YYYY-MM-DD`); the comparison key is the date as `YYYYMMDD`.
+- `CONFLICTING` when files in one release carry different `Ajopvm` dates.
+- `UNKNOWN` when `Ajopvm` is absent, empty or not an ISO date; such releases are captured but never compared or used as a baseline.
+- A caller-declared `sourceOrder` is optional, stored in the capture manifest for traceability, and ignored for chronology. Retrieval time is still never used.
+- A release is compared only with the stored baseline (the earliest-captured release with the latest `Ajopvm`) and only when strictly newer. Equal-dated reissues and older releases are recorded but not compared.
+
+Remaining validation: the daily captures should be checked for `Ajopvm` monotonicity and equal-date reissues. If `Ajopvm` proves unreliable, revert to UNKNOWN in `derive_source_order` (`backend/src/services/ingest_source_release.py`).
+
 ## Change and matching semantics
 
 **Team decision (T005)**: Use `Pakkaustunnus` as the primary package matching key when comparing two snapshots. `VNR-numero`, when present, is supporting package metadata only and must not be used as the primary identity or as a fallback match key. Preserve the package-to-product relationship from `Pakkaus/@Laakevalmiste-ref` to `Laakevalmiste/@id` within each source document. Do not use `Laakevalmiste/@id` as the cross-release package key; it may be used internally to resolve the linked product record in its own source document.

@@ -35,7 +35,7 @@ Represents a normalized medicine/package record as captured in a source release.
 | `normalized_fields` | The team-approved source fields used for package comparison | Retain exact source values, paths, multiplicity, and element state; distinguish absent from present-but-empty |
 | `evidence_class` | Evidence status of normalized values | One of `VERIFIED`, `INFERRED`, `UNKNOWN`, `CONFLICTING` as applicable; does not indicate clinical significance |
 
-The comparison field set is: product paths `Kauppanimi`, `Vahvuus`, `Laakemuoto`, `ATC-koodi`, `Antoreitti`; linked active-substance paths `VaikuttavaAine/Aine`, `CASnumero`, `Maara`, `Maarayksikko`, `JakamatonVahvuus`; package paths `Pakkauskokoteksti`, `Pakkauskoko`, `Pakkauskokokerroin`, `Pakkauskokoyksikko`, `JulkinenTarkenne`; package-status paths `Kaupanolo/Kaupan`, `Kaupanolo/Kauppaantulopaiva`, `Kaupanolo/Kaupastapoistumispaiva`; and the present authorization/registration branch's `Tila`, `Myontamispaiva`, and `Paattymispaiva` under `Myyntilupa`, `Erityislupa`, or `Rekisterointi`. Product and active-substance paths are resolved through the source document's package IDREFs. For repeated fields, preserve each occurrence and source order. For code-table values, preserve the source element's attributes and text. A difference in one or more selected source values or their element presence is a detected source-data change, not a clinical-significance decision.
+The comparison field set is: product paths `Kauppanimi`, `Vahvuus`, `Laakemuoto`, `ATC-koodi`, `Antoreitti`; linked active-substance paths `VaikuttavaAine/Aine`, `CASnumero`, `Maara`, `Maarayksikko`, `JakamatonVahvuus`; package paths `Pakkauskokoteksti`, `Pakkauskoko`, `Pakkauskokokerroin`, `Pakkauskokoyksikko`, `JulkinenTarkenne`; package-status paths `Kaupanolo/Kaupan`, `Kaupanolo/Kauppaantulopaiva`, `Kaupanolo/Kaupastapoistumispaiva`; and the present authorization/registration branch's `Tila`, `Myontamispaiva`, and `Paattymispaiva` under `Myyntilupa`, `Erityislupa`, or `Rekisterointi`. Product and active-substance paths are resolved through the source document's package IDREFs. For repeated fields, preserve each occurrence and source order. Linked active substances are paired across releases by their `Aine` code (CT `id`), falling back to `Aine` text and then `CASnumero`, never by list position, so a field change is always reported against the same substance (for example `Laakeaine/VaikuttavaAine[Aine=<code>]/Maara`); a pure reordering of substances is not a change. Authorization/registration occurrences are numbered within their own branch. For code-table values, preserve the source element's attributes and text. A difference in one or more selected source values or their element presence is a detected source-data change, not a clinical-significance decision.
 
 `Pakkaustunnus` uniqueness was observed only within the one inspected local XML snapshot. Stability or uniqueness across separate releases is unverified; do not assert it as a verified cross-release property. If same-key pairing is missing or ambiguous between snapshots, do not substitute VNR or `Laakevalmiste/@id` as the cross-release package key.
 
@@ -82,6 +82,23 @@ Represents a difference in an explicitly relevant field between ordered snapshot
 | `change_evidence_class` | Certainty of ordering, pairing, and difference | Unknown/conflicting order cannot be labeled verified |
 | `detected_at` | Time comparison was performed | Required; distinct from source update time |
 
+### PackageChangeSet
+
+Groups everything detected for one package (`Pakkaustunnus`) between one ordered release pair. Review cases are created from change sets, so one package update produces one case per matched simulated record.
+
+| Field | Meaning | Validation |
+|---|---|---|
+| `change_set_id` | Stable identity | Deterministic from both release identities, `medicine_key` and `kind` |
+| `medicine_key` | `Pakkaustunnus` | Required |
+| `kind` | `FIELDS_CHANGED` or `NO_LONGER_PRESENT` | Required |
+| `field_changes` | The `DetectedChange` items for this package pair | At least one for `FIELDS_CHANGED`; none for `NO_LONGER_PRESENT`; each field at most once |
+| `prior_snapshot` | Package record in the prior release | Required |
+| `current_snapshot` | Package record in the current release | Required for `FIELDS_CHANGED`; absent for `NO_LONGER_PRESENT` |
+| `prior_evidence` / `current_evidence` | Record-level provenance in each release | For `NO_LONGER_PRESENT`, current evidence names the current release and has no record locator |
+| `change_evidence_class`, source order, `detected_at` | As for `DetectedChange` | Unknown/conflicting order produces no change set |
+
+`NO_LONGER_PRESENT` is created only when the prior release has exactly one `Pakkaus` with the key and the current full-coverage release (`Kattavuus` = 1) has none. It is a source-data difference only: the source does not state whether the package was withdrawn, renumbered or omitted in error, and the case wording must not claim a reason. Packages present only in the current release are recorded as notes and never create cases; packages whose key is duplicated in either release remain ambiguous notes.
+
 ### SimulatedMedicationRecord
 
 Represents fictional medication use data for matching.
@@ -97,17 +114,17 @@ Represents fictional medication use data for matching.
 
 ### ReviewCase
 
-Represents a human-review item created from one detected change and one deterministic simulated-record match.
+Represents a human-review item created from one package change set and one deterministic simulated-record match.
 
 | Field | Meaning | Validation |
 |---|---|---|
 | `case_id` | Unique case identity | Unique |
-| `change_id` | Detected change supporting the case | Required reference |
+| `change_set_id` | Package change set supporting the case | Required reference |
 | `simulated_record_id` | Matched fictional medication record | Required reference |
 | `status` | Current human-review state | New case begins as `NEW` |
 | `created_at` | Case creation time | Required |
 | `evidence_class` | Evidence status shown with the case | Must preserve unknown/conflicting information |
-| `idempotency_key` | Identity derived from change and simulated record | Unique; prevents duplicate cases on reprocessing |
+| `idempotency_key` | Identity derived from change set and simulated record | Unique; prevents duplicate cases on reprocessing |
 
 ### CaseStatusEvent
 
@@ -125,9 +142,10 @@ Records an important case status transition, including initial creation in NEW s
 
 - One `SourceRelease` contains many `MedicineSnapshot` records.
 - A `DetectedChange` references the prior and current snapshots where both exist; a first snapshot is baseline only and does not imply a detected change.
-- A `DetectedChange` may match zero or more simulated medication records only when each match is deterministic and at the same identifier granularity; ambiguous matches create no case.
-- A `ReviewCase` references exactly one detected change and one simulated medication record.
-- A unique `(change_id, simulated_record_id)` pair can create at most one case.
+- A `PackageChangeSet` groups all `DetectedChange` items for one package and release pair, or records that the package is no longer present.
+- A `PackageChangeSet` may match zero or more simulated medication records only when each match is deterministic and at the same identifier granularity; ambiguous matches create no case.
+- A `ReviewCase` references exactly one package change set and one simulated medication record.
+- A unique `(change_set_id, simulated_record_id)` pair can create at most one case. A later release that changes the same package again forms a new change set and therefore a new case.
 - A case is created in `NEW`; this feature does not define case resolution or clinical escalation.
 - `CaseStatusEvent` records the initial NEW state and any later important status transition, without this feature adding transitions beyond its scope.
 - Failure to establish source order, source identity, or an unambiguous same-value `Pakkaustunnus` pair must be represented as unknown/conflicting evidence, not silently repaired or matched by VNR/product attributes.

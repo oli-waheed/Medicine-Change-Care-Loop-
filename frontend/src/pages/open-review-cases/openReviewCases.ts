@@ -18,6 +18,15 @@ export type SourceEvidence = {
   retrievedAt: string | null;
 };
 
+export type ChangeKind = "FIELDS_CHANGED" | "NO_LONGER_PRESENT";
+
+export type FieldChange = {
+  changeId: string;
+  field: string;
+  before: SourceField[];
+  after: SourceField[];
+};
+
 export type OpenReviewCase = {
   caseId: string;
   createdAt: string;
@@ -29,12 +38,13 @@ export type OpenReviewCase = {
     personReference: string;
     medicineDisplay: string;
   };
-  change: {
-    changeId: string;
-    field: string;
-    before: SourceField[];
-    after: SourceField[];
+  changeSet: {
+    changeSetId: string;
+    kind: ChangeKind;
     detectedAt: string;
+    changes: FieldChange[];
+    // Only for NO_LONGER_PRESENT: the package as it was in the prior release.
+    lastKnownFields: { field: string; values: SourceField[] }[] | null;
   };
   sources: {
     prior: SourceEvidence;
@@ -61,7 +71,9 @@ export async function fetchOpenReviewCases(
 ): Promise<OpenReviewCase[]> {
   const response = await fetch("/api/open-review-cases", { signal });
   if (!response.ok) {
-    throw new Error(`Open cases could not be loaded (HTTP ${response.status}).`);
+    throw new Error(
+      `Open cases could not be loaded (HTTP ${response.status}).`,
+    );
   }
   return (await response.json()) as OpenReviewCase[];
 }

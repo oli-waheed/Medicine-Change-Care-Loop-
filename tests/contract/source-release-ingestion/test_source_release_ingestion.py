@@ -145,9 +145,11 @@ def test_incomplete_xml_fails_without_returning_valid_prefix_snapshots(tmp_path)
 
 @pytest.mark.parametrize(
     ("value", "evidence_class"),
-    [(None, "UNKNOWN"), ("inferred-1", "INFERRED"), ("", "VERIFIED")],
+    [(None, "UNKNOWN"), ("inferred-1", "INFERRED"), ("", "VERIFIED"), ("999", "VERIFIED")],
 )
-def test_unverified_source_order_does_not_block_data_validation(tmp_path, value, evidence_class):
+def test_declared_source_order_is_recorded_but_chronology_comes_from_ajopvm(
+    tmp_path, value, evidence_class
+):
     outcome = _ingest(
         _request(
             "prior-release.xml",
@@ -157,9 +159,80 @@ def test_unverified_source_order_does_not_block_data_validation(tmp_path, value,
     )
 
     assert outcome.processing_status == "VALIDATED"
-    assert outcome.snapshots
-    assert outcome.verified_chronological_order is False
+    assert outcome.declared_source_order.value == value
+    assert outcome.source_order.value == "2099-01-01"
+    assert outcome.source_order.evidence_class == "VERIFIED"
+    assert outcome.chronology_status.value == "AVAILABLE"
+
+
+def test_caller_cannot_claim_verified_order_for_release_without_ajopvm(tmp_path):
+    outcome = _ingest(
+        _request(
+            "ordering-unknown-release.xml",
+            source_order={"value": "5", "evidenceClass": "VERIFIED"},
+        ),
+        tmp_path,
+    )
+
+    assert outcome.processing_status == "VALIDATED"
+    assert outcome.source_order.evidence_class == "UNKNOWN"
     assert outcome.chronology_status.value == "UNAVAILABLE"
+
+
+def test_source_order_is_optional_in_the_request(tmp_path):
+    request = _request("prior-release.xml")
+    del request["sourceOrder"]
+
+    outcome = _ingest(request, tmp_path)
+
+    assert outcome.processing_status == "VALIDATED"
+    assert outcome.declared_source_order is None
+    assert outcome.chronology_status.value == "AVAILABLE"
+
+
+@pytest.mark.parametrize("ajopvm", [b"<Ajopvm/>", b"<Ajopvm>06.10.2026</Ajopvm>", b""])
+def test_absent_empty_or_non_iso_ajopvm_leaves_chronology_unknown(tmp_path, ajopvm):
+    content = (FIXTURE_DIR / "prior-release.xml").read_bytes().replace(
+        b"<Ajopvm>2099-01-01</Ajopvm>", ajopvm
+    )
+    source_path = tmp_path / "variant.xml"
+    source_path.write_bytes(content)
+    request = _request("prior-release.xml")
+    request["files"][0].update(
+        name="variant.xml",
+        checksum=hashlib.sha256(content).hexdigest(),
+        contentReference=str(source_path),
+    )
+
+    outcome = _ingest(request, tmp_path / "captures")
+
+    assert outcome.processing_status == "VALIDATED"
+    assert outcome.source_order.evidence_class == "UNKNOWN"
+    assert outcome.chronology_status.value == "UNAVAILABLE"
+
+
+def test_captured_release_can_be_reloaded_from_disk(tmp_path):
+    from src.services.ingest_source_release import reload_captured_release
+
+    original = _ingest(_request("prior-release.xml"), tmp_path)
+    reloaded = reload_captured_release(original.captured_release.capture_directory)
+
+    assert reloaded.processing_status == "VALIDATED"
+    assert reloaded.snapshots == original.snapshots
+    assert reloaded.source_order == original.source_order
+    assert reloaded.captured_release.release_id == original.captured_release.release_id
+
+
+def test_tampered_capture_is_not_reloaded(tmp_path):
+    from src.services.ingest_source_release import reload_captured_release
+
+    original = _ingest(_request("prior-release.xml"), tmp_path)
+    captured = original.captured_release
+    stored = captured.capture_directory / captured.files[0].content_reference
+    stored.write_bytes(stored.read_bytes() + b"<!-- edited -->")
+
+    with pytest.raises(ValueError, match="checksum"):
+        reload_captured_release(captured.capture_directory)
 
 
 @pytest.mark.parametrize("status", ["PARTIAL", "UNKNOWN"])

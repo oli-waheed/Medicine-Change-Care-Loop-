@@ -101,9 +101,9 @@ product attributes, or retrieval time to assert a verified change.
 
 ## Deterministic match result
 
-Each change-to-record match result identifies:
+Matching runs on package change sets (all field changes for one package between one ordered release pair, or `NO_LONGER_PRESENT` when the package is absent from the current full-coverage release). Each match result identifies:
 
-- the detected change;
+- the package change set;
 - the simulated medication record reference;
 - the identifier and granularity compared;
 - the result: `MATCHED`, `NO_MATCH`, or `AMBIGUOUS`;

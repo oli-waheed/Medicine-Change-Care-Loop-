@@ -6,9 +6,11 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from src.api.open_review_cases import router as review_router
 from src.api.source_release_ingestion import router as ingestion_router
 from src.config import ApplicationConfig
+from src.services.pipeline_store import PipelineStore
 
 FIXTURES = Path(__file__).parents[2] / "fixtures" / "fimea-basic-register"
 
@@ -42,7 +44,7 @@ def test_repeated_ingestion_preserves_original_case_evidence(tmp_path, medicatio
     app.include_router(ingestion_router)
     app.include_router(review_router)
     app.state.source_release_config = ApplicationConfig(tmp_path / "captures", 1024 * 1024)
-    app.state.open_review_cases = []
+    app.state.store = PipelineStore(f"sqlite:///{tmp_path / 'pipeline.sqlite3'}")
     app.state.medication_records = (medication_record,)
 
     with TestClient(app) as client:
@@ -51,17 +53,17 @@ def test_repeated_ingestion_preserves_original_case_evidence(tmp_path, medicatio
 
         _upload(client, "current-release.xml", 2)
         original_cases = _read_cases(client)
-        name_changes = [
-            case for case in original_cases if case["change"]["field"] == "Laakevalmiste/Kauppanimi"
-        ]
-        assert len(name_changes) == 1
-        original_case = name_changes[0]
+        # One case per package update for this record, holding every field change.
+        assert len(original_cases) == 1
+        original_case = original_cases[0]
         assert original_case["status"] == "NEW"
         assert original_case["medicineIdentifier"] == "SIM-PKG-100"
         assert original_case["matchedRecord"]["recordId"] == medication_record.record_id
-        assert original_case["change"]["field"] == "Laakevalmiste/Kauppanimi"
-        assert original_case["change"]["before"][0]["value"] == "Fictional Product Amber"
-        assert original_case["change"]["after"][0]["value"] == ("Fictional Product Amber Revised")
+        assert original_case["changeSet"]["kind"] == "FIELDS_CHANGED"
+        changes = {c["field"]: c for c in original_case["changeSet"]["changes"]}
+        name = changes["Laakevalmiste/Kauppanimi"]
+        assert name["before"][0]["value"] == "Fictional Product Amber"
+        assert name["after"][0]["value"] == "Fictional Product Amber Revised"
 
         for case in original_cases:
             assert case["matchedRecord"]["recordId"] == medication_record.record_id
@@ -77,7 +79,7 @@ def test_repeated_ingestion_preserves_original_case_evidence(tmp_path, medicatio
                 )
                 assert source["recordLocator"] == "/Perusrekisteri/Pakkaus[1]"
                 assert source["recordIdentifier"] == case["medicineIdentifier"]
-                assert source["fieldReference"] == case["change"]["field"]
+                assert source["fieldReference"] is None
                 assert source["evidenceClass"] == "VERIFIED"
 
         _upload(client, "current-release.xml", 2)

@@ -87,13 +87,16 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 - **FR-014**: The system MUST detect and communicate medicine-information changes only. It MUST NOT diagnose, recommend treatment, select medicine substitutions, decide clinical urgency, or automatically close clinically relevant cases.
 - **FR-015**: If ingestion fails, source ordering cannot be established, or required information is ambiguous, the system MUST expose the incomplete or uncertain result and MUST NOT represent it as a verified successful change-to-case flow.
 - **FR-016**: The system MUST NOT include AI explanations, patient-facing views, communication or follow-up workflows, real patient data, Kanta/EHR integration, pharmacy inventory integration, automatic medicine substitution, autonomous clinical decisions, or production deployment in this feature.
+- **FR-017**: All detected differences for one package between one ordered release pair MUST be presented as a single review case per matched simulated medication record, listing every changed field with its own before/after evidence.
+- **FR-018**: When a package present exactly once in the prior release is absent from the current full-coverage release, the system MUST treat this as a detected source-data change ("no longer present in the register") and apply the same matching and case rules, showing the package's last known source values. It MUST NOT state a reason for the absence. Packages present only in the current release MUST NOT create review cases.
 
 ### Key Entities *(include if feature involves data)*
 
 - **Source Snapshot**: A captured version of selected official medicine information, associated with a source, medicine, source update information, and retrieval time.
 - **Detected Change**: A relevant difference between snapshots for the same medicine, with evidence linking to the source information before and after the change.
 - **Simulated Medication Record**: A fictional patient-medication association used only to evaluate whether a detected change should produce a review case.
-- **Review Case**: A human-review item created when a relevant detected change matches a simulated medication record; starts in NEW status and retains its evidence links.
+- **Package Change Set**: All detected differences for one package between two ordered releases, or the package's absence from the newer release.
+- **Review Case**: A human-review item created when a package change set matches a simulated medication record; starts in NEW status and retains its evidence links.
 - **Case Status Transition**: A recorded change to a review case's status, including the case identity and transition information.
 
 ## Success Criteria *(mandatory)*

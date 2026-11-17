@@ -1,5 +1,4 @@
-
-"""Integration tests for the source-release API and review workflow."""
+"""Integration tests for the source-release API, persistence and review workflow."""
 
 import asyncio
 import json
@@ -8,261 +7,177 @@ from io import BytesIO
 from pathlib import Path
 
 from fastapi import UploadFile
+from starlette.requests import Request
+
 from src.api.open_review_cases import get_open_review_cases
 from src.api.source_release_ingestion import ingest_uploaded_source_release
-from src.config import ApplicationConfig
-from src.main import app
-from starlette.requests import Request
+from src.services.pipeline_store import PipelineStore
 
 FIXTURE_DIR = Path(__file__).parents[2] / "fixtures" / "fimea-basic-register"
 
+# What the n8n workflow sends: it cannot know the order, so it declares UNKNOWN.
+N8N_DECLARED_ORDER = {"value": None, "evidenceClass": "UNKNOWN"}
 
-def _request():
+
+def _request(app, method="POST", path="/api/source-releases/ingest"):
     return Request(
         {
             "type": "http",
             "app": app,
             "headers": [],
-            "method": "POST",
-            "path": "/api/source-releases/ingest",
+            "method": method,
+            "path": path,
             "query_string": b"",
         }
     )
 
 
-def _review_request():
-    return Request(
-        {
-            "type": "http",
-            "app": app,
-            "headers": [],
-            "method": "GET",
-            "path": "/api/open-review-cases",
-            "query_string": b"",
-        }
-    )
-
-
-def _upload_release(filename, order, retrieved_at):
+def _upload(app, filename, *, day, declared_order=None):
     content = (FIXTURE_DIR / filename).read_bytes()
-    upload = UploadFile(filename=filename, file=BytesIO(content))
-
     return asyncio.run(
         ingest_uploaded_source_release(
-            _request(),
-            upload,
-            "Fimea Basic Register",
-            json.dumps(
-                {
-                    "value": f"SIM-{filename}",
-                    "evidenceClass": "VERIFIED",
-                }
+            _request(app),
+            UploadFile(filename=filename, file=BytesIO(content)),
+            source_name="Fimea Basic Register",
+            source_release_reference=json.dumps(
+                {"value": f"SIM-{filename}", "evidenceClass": "VERIFIED"}
             ),
-            json.dumps(order),
-            retrieved_at.isoformat(),
+            retrieved_at=datetime(2099, 1, day, tzinfo=UTC).isoformat(),
+            source_order=json.dumps(declared_order or N8N_DECLARED_ORDER),
         )
     )
 
 
-def _prepare_app(tmp_path, medication_record):
-    app.state.source_release_config = ApplicationConfig(
-        tmp_path / "captures", 250 * 1024 * 1024
-    )
-    app.state.open_review_cases = []
+def _open_cases(app):
+    return get_open_review_cases(_request(app, "GET", "/api/open-review-cases"))
+
+
+def test_n8n_style_uploads_create_persisted_cases_and_replay_is_idempotent(
+    isolated_app, medication_record
+):
+    app = isolated_app
     app.state.medication_records = (medication_record,)
-    app.state.source_release_history = []
-    app.state.source_release_comparison_baseline = None
+
+    baseline = _upload(app, "prior-release.xml", day=3)
+    assert baseline["processingStatus"] == "VALIDATED"
+    assert baseline["chronologyStatus"] == "AVAILABLE"
+    assert _open_cases(app) == []
+
+    current = _upload(app, "current-release.xml", day=4)
+    assert current["processingStatus"] == "VALIDATED"
+
+    cases = _open_cases(app)
+    assert cases
+    assert all(case["status"] == "NEW" for case in cases)
+    assert all(case["matchedRecord"]["recordId"] == "SIM-MED-100" for case in cases)
+    assert {case["sourceOrder"]["prior"] for case in cases} == {20990101}
+    assert {case["sourceOrder"]["current"] for case in cases} == {20990102}
+    assert "Ajopvm" in cases[0]["sourceOrder"]["basis"]
+
+    for case in cases:
+        events = app.state.store.status_events(case["caseId"])
+        assert [(e.from_status, e.to_status) for e in events] == [(None, "NEW")]
+
+    # Exact replay, and the same file fetched again on a later day.
+    _upload(app, "current-release.xml", day=4)
+    _upload(app, "current-release.xml", day=5)
+    assert _open_cases(app) == cases
 
 
-def _restore_app(
-    previous_config,
-    previous_cases,
-    previous_records,
-    previous_history,
-    previous_baseline,
+def test_cases_and_baseline_survive_a_restart(isolated_app, medication_record, tmp_path):
+    app = isolated_app
+    app.state.medication_records = (medication_record,)
+    database_url = app.state.store.database_url
+
+    _upload(app, "prior-release.xml", day=3)
+
+    # Simulate a backend restart: a brand-new store on the same database file.
+    app.state.store.dispose()
+    app.state.store = PipelineStore(database_url)
+
+    _upload(app, "current-release.xml", day=4)
+    created = _open_cases(app)
+    assert created
+
+    app.state.store.dispose()
+    app.state.store = PipelineStore(database_url)
+    assert _open_cases(app) == created
+
+
+def test_older_release_after_newer_one_is_recorded_but_not_compared(
+    isolated_app, medication_record
 ):
-    app.state.source_release_config = previous_config
-    app.state.open_review_cases = previous_cases
+    app = isolated_app
+    app.state.medication_records = (medication_record,)
 
-    if previous_records is None:
-        delattr(app.state, "medication_records")
-    else:
-        app.state.medication_records = previous_records
+    _upload(app, "current-release.xml", day=3)
+    older = _upload(app, "prior-release.xml", day=4)
 
-    if previous_history is None:
-        delattr(app.state, "source_release_history")
-    else:
-        app.state.source_release_history = previous_history
-
-    if previous_baseline is None:
-        if hasattr(app.state, "source_release_comparison_baseline"):
-            delattr(app.state, "source_release_comparison_baseline")
-    else:
-        app.state.source_release_comparison_baseline = previous_baseline
+    assert older["processingStatus"] == "VALIDATED"
+    assert len(app.state.store.captures()) == 2
+    assert app.state.store.comparison_baseline().source_order_value == "2099-01-02"
+    assert _open_cases(app) == []
 
 
-def test_sequential_api_releases_create_visible_cases_and_replay_is_idempotent(
-    tmp_path, medication_record
+def test_release_without_ajopvm_never_becomes_baseline(isolated_app, medication_record):
+    app = isolated_app
+    app.state.medication_records = (medication_record,)
+
+    unknown = _upload(
+        app,
+        "ordering-unknown-release.xml",
+        day=3,
+        declared_order={"value": "1", "evidenceClass": "VERIFIED"},
+    )
+    assert unknown["processingStatus"] == "VALIDATED"
+    assert unknown["chronologyStatus"] == "UNAVAILABLE"
+    assert app.state.store.comparison_baseline() is None
+
+    verified = _upload(app, "prior-release.xml", day=4)
+    baseline = app.state.store.comparison_baseline()
+    assert baseline.release_id == verified["capturedReleaseReference"]
+    assert len(app.state.store.captures()) == 2
+    assert _open_cases(app) == []
+
+
+def test_without_medication_records_releases_are_captured_but_no_cases_created(
+    isolated_app,
 ):
-    previous_config = app.state.source_release_config
-    previous_cases = app.state.open_review_cases
-    previous_records = getattr(app.state, "medication_records", None)
-    previous_history = getattr(app.state, "source_release_history", None)
-    previous_baseline = getattr(
-        app.state, "source_release_comparison_baseline", None
+    app = isolated_app
+
+    _upload(app, "prior-release.xml", day=3)
+    _upload(app, "current-release.xml", day=4)
+
+    assert len(app.state.store.captures()) == 2
+    assert _open_cases(app) == []
+
+
+def test_package_missing_from_next_release_opens_a_no_longer_present_case(isolated_app):
+    from src.domain.review_case import SimulatedMedicationRecord
+
+    app = isolated_app
+    app.state.medication_records = (
+        SimulatedMedicationRecord(
+            "SIM-MED-300", "SIM-PERSON-300", "Fictional Product Cedar", "SIM-PKG-300"
+        ),
+        # Only present in the current release: never opens a case.
+        SimulatedMedicationRecord(
+            "SIM-MED-400", "SIM-PERSON-400", "Fictional new pack", "SIM-PKG-400"
+        ),
     )
 
-    _prepare_app(tmp_path, medication_record)
+    _upload(app, "prior-release.xml", day=3)
+    _upload(app, "current-release.xml", day=4)
 
-    try:
-        prior_time = datetime(2099, 1, 3, tzinfo=UTC)
-        current_time = datetime(2099, 1, 4, tzinfo=UTC)
+    (case,) = _open_cases(app)
+    assert case["matchedRecord"]["recordId"] == "SIM-MED-300"
+    assert case["changeSet"]["kind"] == "NO_LONGER_PRESENT"
+    assert case["changeSet"]["changes"] == []
+    assert case["sources"]["prior"]["fileName"] == "prior-release.xml"
+    assert case["sources"]["current"]["fileName"] == "current-release.xml"
+    assert case["sources"]["current"]["recordLocator"] is None
+    last_known = {f["field"]: f["values"] for f in case["changeSet"]["lastKnownFields"]}
+    assert last_known["Pakkaus/Pakkauskokoteksti"][0]["value"] == "synthetic prior-only pack"
 
-        baseline = _upload_release(
-            "prior-release.xml",
-            {"value": "1", "evidenceClass": "VERIFIED"},
-            prior_time,
-        )
-
-        assert baseline["processingStatus"] == "VALIDATED"
-        assert app.state.open_review_cases == []
-
-        current = _upload_release(
-            "current-release.xml",
-            {"value": "2", "evidenceClass": "VERIFIED"},
-            current_time,
-        )
-
-        assert current["processingStatus"] == "VALIDATED"
-
-        cases_after_current = get_open_review_cases(_review_request())
-
-        assert cases_after_current
-        assert all(case["status"] == "NEW" for case in cases_after_current)
-        assert all(
-            case["matchedRecord"]["recordId"] == "SIM-MED-100"
-            for case in cases_after_current
-        )
-
-        replay = _upload_release(
-            "current-release.xml",
-            {"value": "2", "evidenceClass": "VERIFIED"},
-            current_time,
-        )
-
-        assert replay["processingStatus"] == "VALIDATED"
-        assert get_open_review_cases(_review_request()) == cases_after_current
-
-    finally:
-        _restore_app(
-            previous_config,
-            previous_cases,
-            previous_records,
-            previous_history,
-            previous_baseline,
-        )
-
-
-def test_conflicting_release_does_not_advance_comparison_history(
-    tmp_path, medication_record
-):
-    previous_config = app.state.source_release_config
-    previous_cases = app.state.open_review_cases
-    previous_records = getattr(app.state, "medication_records", None)
-    previous_history = getattr(app.state, "source_release_history", None)
-    previous_baseline = getattr(
-        app.state, "source_release_comparison_baseline", None
-    )
-
-    _prepare_app(tmp_path, medication_record)
-
-    try:
-        first = _upload_release(
-            "prior-release.xml",
-            {"value": "2", "evidenceClass": "VERIFIED"},
-            datetime(2099, 1, 3, tzinfo=UTC),
-        )
-
-        assert first["processingStatus"] == "VALIDATED"
-        assert len(app.state.source_release_history) == 1
-
-        original_baseline = app.state.source_release_comparison_baseline
-
-        conflicting = _upload_release(
-            "current-release.xml",
-            {"value": "1", "evidenceClass": "VERIFIED"},
-            datetime(2099, 1, 4, tzinfo=UTC),
-        )
-
-        assert conflicting["processingStatus"] == "VALIDATED"
-
-        # Both releases are retained for traceability.
-        assert len(app.state.source_release_history) == 2
-
-        # The conflicting release must not replace the baseline.
-        assert (
-            app.state.source_release_comparison_baseline
-            is original_baseline
-        )
-
-        assert app.state.open_review_cases == []
-
-    finally:
-        _restore_app(
-            previous_config,
-            previous_cases,
-            previous_records,
-            previous_history,
-            previous_baseline,
-        )
-
-
-def test_verified_release_after_unknown_release_becomes_baseline(
-    tmp_path, medication_record
-):
-    previous_config = app.state.source_release_config
-    previous_cases = app.state.open_review_cases
-    previous_records = getattr(app.state, "medication_records", None)
-    previous_history = getattr(app.state, "source_release_history", None)
-    previous_baseline = getattr(
-        app.state, "source_release_comparison_baseline", None
-    )
-
-    _prepare_app(tmp_path, medication_record)
-
-    try:
-        unknown = _upload_release(
-            "prior-release.xml",
-            {"value": None, "evidenceClass": "UNKNOWN"},
-            datetime(2099, 1, 3, tzinfo=UTC),
-        )
-
-        assert unknown["processingStatus"] == "VALIDATED"
-        assert app.state.source_release_comparison_baseline is None
-        assert app.state.open_review_cases == []
-
-        verified = _upload_release(
-            "current-release.xml",
-            {"value": "2", "evidenceClass": "VERIFIED"},
-            datetime(2099, 1, 4, tzinfo=UTC),
-        )
-
-        assert verified["processingStatus"] == "VALIDATED"
-        assert (
-            app.state.source_release_comparison_baseline.captured_release.release_id
-            == verified["capturedReleaseReference"]
-        )
-
-        # Both releases are retained, but no comparison was made
-        # between the UNKNOWN release and the verified release.
-        assert len(app.state.source_release_history) == 2
-        assert app.state.open_review_cases == []
-
-    finally:
-        _restore_app(
-            previous_config,
-            previous_cases,
-            previous_records,
-            previous_history,
-            previous_baseline,
-        )
+    _upload(app, "current-release.xml", day=4)
+    assert len(_open_cases(app)) == 1
