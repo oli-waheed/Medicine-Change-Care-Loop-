@@ -35,7 +35,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 ---
 
-## Phase 3: User Story 1 - Review a case from a medicine-information change (Priority: P1) 🎯 MVP
+## Phase 3: User Story 1 - Review a case from a medicine-information change (Priority: P1) ðŸŽ¯ MVP
 
 **Goal**: Turn a supported change and matching simulated medication record into a traceable NEW case visible to a pharmacist.
 
@@ -93,13 +93,13 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 ### Tests for User Story 3
 
 - [ ] T027 [P] [US3] Add no-match, ambiguous-match, and replay/idempotency tests for change-to-case processing in `tests/unit/review-case-idempotency`.
-- [ ] T028 [P] [US3] Add integration tests verifying repeat ingestion creates no duplicate cases and preserves the original evidence links in `tests/integration/idempotent-change-to-case`.
+- [x] T028 [P] [US3] Add integration tests verifying repeat ingestion creates no duplicate cases and preserves the original evidence links in `tests/integration/idempotent-change-to-case`.
 
 ### Implementation for User Story 3
 
-- [ ] T029 [US3] Implement explicit MATCHED, NO_MATCH, and AMBIGUOUS outcomes that preserve evidence classification in `backend/src/services/match-detected-changes`.
+- [X] T029 [US3] Implement explicit MATCHED, NO_MATCH, and AMBIGUOUS outcomes that preserve evidence classification in `backend/src/services/match-detected-changes`.
 - [ ] T030 [US3] Enforce one case per detected-change and simulated-record pair during repeated processing in `backend/src/services/create-review-cases`.
-- [ ] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change-processing-outcomes`.
+- [ ] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change-processing-outcomes`.- [ ] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change-processing-outcomes`.
 
 **Checkpoint**: User Story 3 is demonstrable by replaying the same source fixture and checking all match outcomes.
 
@@ -134,7 +134,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 ### Task Dependencies
 
-- T001 → T002-T003.
+- T001 â†’ T002-T003.
 - T004-T005 and T006-T009 complete before story implementation.
 - US1: T010-T012 before T014-T018; T013 before T015; T014 before T015; T015-T016 before T018; T016 before T017.
 - US2: T019-T021 before T022-T026; T022-T024 before T025; T018 and T025 before T026.
