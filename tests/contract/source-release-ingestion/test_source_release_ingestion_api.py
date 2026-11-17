@@ -5,6 +5,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 import pytest
+
 from src.api import source_release_ingestion
 from src.config import ApplicationConfig
 from src.main import app
@@ -13,11 +14,8 @@ FIXTURE_DIR = Path(__file__).parents[2] / "fixtures" / "fimea-basic-register"
 
 
 @pytest.fixture
-def api(tmp_path):
-    previous_config = app.state.source_release_config
-    app.state.source_release_config = ApplicationConfig(tmp_path / "captures", 250 * 1024 * 1024)
-    yield
-    app.state.source_release_config = previous_config
+def api(isolated_app):
+    yield isolated_app
 
 
 def _form_data(*, order=None, reference=None, retrieved_at=None):
@@ -137,7 +135,7 @@ def test_successful_upload_returns_capture_reference_and_preserves_capture(
     assert payload["chronologyStatus"] == "AVAILABLE"
     assert payload["failureDetail"] is None
     assert payload["capturedReleaseReference"].startswith("sha256-")
-    assert app.state.open_review_cases == []
+    assert app.state.store.open_case_payloads() == []
     capture_dir = app.state.source_release_config.source_release_storage_dir
     captured_file = next(capture_dir.glob("*/files/0001/prior-release.xml"))
     assert captured_file.read_bytes() == content
@@ -156,14 +154,42 @@ def test_validation_failure_is_reported_as_ingestion_outcome(api):
     assert response.json()["failureDetail"]
 
 
-def test_unknown_source_order_reports_unavailable_chronology(api):
+def test_release_without_ajopvm_reports_unavailable_chronology(api):
     response = _post_file(
-        data=_form_data(order={"value": None, "evidenceClass": "UNKNOWN"}),
+        "ordering-unknown-release.xml",
+        data=_form_data(order={"value": "7", "evidenceClass": "VERIFIED"}),
     )
 
     assert response.status_code == 200
     assert response.json()["processingStatus"] == "VALIDATED"
     assert response.json()["chronologyStatus"] == "UNAVAILABLE"
+
+
+def test_declared_unknown_order_does_not_hide_ajopvm_chronology(api):
+    response = _post_file(
+        data=_form_data(order={"value": None, "evidenceClass": "UNKNOWN"}),
+    )
+
+    assert response.status_code == 200
+    assert response.json()["chronologyStatus"] == "AVAILABLE"
+
+
+def test_source_order_form_field_is_optional(api):
+    data = _form_data()
+    del data["sourceOrder"]
+
+    response = _post_file(data=data)
+
+    assert response.status_code == 200
+    assert response.json()["processingStatus"] == "VALIDATED"
+
+
+def test_failed_validation_capture_is_recorded(api):
+    _post_file("malformed-release.xml")
+
+    captures = app.state.store.captures()
+    assert [row.processing_status for row in captures] == ["FAILED"]
+    assert captures[0].failure_detail
 
 
 @pytest.mark.parametrize(

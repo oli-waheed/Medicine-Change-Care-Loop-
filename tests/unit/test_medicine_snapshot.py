@@ -1,4 +1,5 @@
 import pytest
+
 from src.domain.medicine_snapshot import (
     ActiveSubstanceFields,
     AuthorizationBranch,

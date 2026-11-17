@@ -93,17 +93,13 @@ def test_unknown_source_order_captures_releases_without_creating_cases(
         1,
         datetime(2099, 1, 3, tzinfo=UTC),
     )
+    # The current release has no Ajopvm; a caller-declared VERIFIED order is ignored.
     current_payload = _release_payload(
-        "current-release.xml",
+        "ordering-unknown-release.xml",
         "SIM-RELEASE-UNKNOWN-002",
         2,
         datetime(2099, 1, 4, tzinfo=UTC),
     )
-    for payload in (prior_payload, current_payload):
-        payload["sourceOrder"] = {
-            "value": None,
-            "evidenceClass": "UNKNOWN",
-        }
 
     open_cases = []
     result = run_release_ingestion_to_review(
@@ -125,16 +121,17 @@ def test_unknown_source_order_captures_releases_without_creating_cases(
 def test_decreasing_verified_source_order_is_conflicting(
     tmp_path, medication_record
 ):
+    # Ajopvm of the "prior" file is later than that of the "current" file.
     prior_payload = _release_payload(
-        "prior-release.xml",
+        "current-release.xml",
         "SIM-RELEASE-LATER",
-        2,
+        1,
         datetime(2099, 1, 3, tzinfo=UTC),
     )
     current_payload = _release_payload(
-        "current-release.xml",
+        "prior-release.xml",
         "SIM-RELEASE-EARLIER",
-        1,
+        2,
         datetime(2099, 1, 4, tzinfo=UTC),
     )
 

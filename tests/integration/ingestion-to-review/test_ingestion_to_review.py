@@ -5,16 +5,16 @@ from starlette.requests import Request
 
 from src.api.open_review_cases import router
 from src.domain.evidence import EvidenceClassification
-from src.services.detect_relevant_changes import detect_relevant_changes
+from src.services.pipeline_store import PipelineStore
 from src.workflows.ingestion_to_review import run_ingestion_to_review
 
 
 def test_fixture_comparison_creates_case_visible_in_open_case_read_view(
-    snapshot_pair, medication_record
+    tmp_path, snapshot_pair, medication_record
 ):
     prior, current, order = snapshot_pair
     app = FastAPI()
-    app.state.open_review_cases = []
+    app.state.store = PipelineStore(f"sqlite:///{tmp_path / 'cases.sqlite3'}")
     app.include_router(router)
     read_request = Request(
         {
@@ -32,9 +32,10 @@ def test_fixture_comparison_creates_case_visible_in_open_case_read_view(
         (current,),
         (medication_record,),
         order=order,
-        open_cases=app.state.open_review_cases,
+        open_cases=[],
         created_at=datetime(2099, 1, 3, tzinfo=UTC),
     )
+    app.state.store.add_cases(result.created_cases)
     payload = router.routes[0].endpoint(read_request)
 
     assert len(result.comparison.changes) == 1

@@ -1,17 +1,20 @@
 """Validate captured source releases before exposing normalized snapshots."""
 
 import hashlib
+import json
 import re
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from enum import StrEnum
 from pathlib import Path
 from xml.etree.ElementTree import ParseError
 
 from ..domain.evidence import EvidenceClassification
 from ..domain.medicine_snapshot import MedicineSnapshot
+from ..domain.source_field import SourceFieldState
 from ..domain.source_release import SourceRelease
 from .capture_source_release import (
+    CapturedReleaseFile,
     CapturedSourceRelease,
     RawReleaseFile,
     SourceEvidence,
@@ -32,12 +35,20 @@ class ChronologyStatus(StrEnum):
 
 @dataclass(frozen=True, slots=True)
 class IngestionOutcome:
+    """Validated or failed ingestion.
+
+    ``source_order`` is derived by the backend from the source document's own
+    ``Ajopvm`` (dataset run date). ``declared_source_order`` is whatever the
+    caller sent; it is kept for traceability but never used for chronology.
+    """
+
     processing_status: ProcessingStatus
     source_order: SourceEvidence
     captured_release: CapturedSourceRelease | None = None
     source_releases: tuple[SourceRelease, ...] = ()
     snapshots: tuple[MedicineSnapshot, ...] = ()
     failure_detail: str | None = None
+    declared_source_order: SourceEvidence | None = None
 
     @property
     def source_release(self) -> SourceRelease | None:
@@ -53,28 +64,72 @@ class IngestionOutcome:
     @property
     def chronology_status(self) -> ChronologyStatus:
         """Report order-evidence availability separately from data validation."""
-        if (
-            self.source_order.value is not None
-            and bool(self.source_order.value.strip())
-            and self.source_order.evidence_class is EvidenceClassification.VERIFIED
-        ):
+        if source_order_key(self.source_order) is not None:
             return ChronologyStatus.AVAILABLE
         return ChronologyStatus.UNAVAILABLE
 
 
 _SHA256 = re.compile(r"^(?:sha256:)?([0-9a-fA-F]{64})$")
+_ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+
+UNKNOWN_SOURCE_ORDER = SourceEvidence(None, EvidenceClassification.UNKNOWN)
+
+SOURCE_ORDER_BASIS = (
+    "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. "
+    "Caller-declared order and retrieval timestamps were not used."
+)
+
+
+def _parse_ajopvm(value: str | None) -> date | None:
+    if value is None or not _ISO_DATE.fullmatch(value.strip()):
+        return None
+    try:
+        return date.fromisoformat(value.strip())
+    except ValueError:
+        return None
+
+
+def derive_source_order(releases: tuple[SourceRelease, ...]) -> SourceEvidence:
+    """Derive release chronology from the source documents themselves.
+
+    VERIFIED: every file carries the same valid Ajopvm date.
+    CONFLICTING: files in one release carry different Ajopvm dates.
+    UNKNOWN: Ajopvm is absent, empty or not an ISO date in any file.
+    """
+    if not releases:
+        return UNKNOWN_SOURCE_ORDER
+    dates = []
+    for release in releases:
+        if release.ajopvm.state is not SourceFieldState.VALUE:
+            return UNKNOWN_SOURCE_ORDER
+        parsed = _parse_ajopvm(release.ajopvm.value)
+        if parsed is None:
+            return UNKNOWN_SOURCE_ORDER
+        dates.append(parsed)
+    if len(set(dates)) != 1:
+        return SourceEvidence(None, EvidenceClassification.CONFLICTING)
+    return SourceEvidence(dates[0].isoformat(), EvidenceClassification.VERIFIED)
+
+
+def source_order_key(evidence: SourceEvidence) -> int | None:
+    """Return a comparable YYYYMMDD key only for VERIFIED, backend-derived order."""
+    if evidence.evidence_class is not EvidenceClassification.VERIFIED:
+        return None
+    parsed = _parse_ajopvm(evidence.value)
+    return int(parsed.strftime("%Y%m%d")) if parsed is not None else None
 
 
 def _failure(
     detail: str,
-    source_order: SourceEvidence,
+    declared_source_order: SourceEvidence | None,
     captured_release: CapturedSourceRelease | None = None,
 ) -> IngestionOutcome:
     return IngestionOutcome(
         processing_status=ProcessingStatus.FAILED,
-        source_order=source_order,
+        source_order=UNKNOWN_SOURCE_ORDER,
         captured_release=captured_release,
         failure_detail=detail,
+        declared_source_order=declared_source_order,
     )
 
 
@@ -150,12 +205,65 @@ def _read_files(payload: dict) -> tuple[RawReleaseFile, ...]:
     return tuple(raw_files)
 
 
+def _normalize_files(
+    raw_files: tuple[RawReleaseFile, ...],
+) -> tuple[tuple[SourceRelease, ...], tuple[MedicineSnapshot, ...]]:
+    """Normalize every file of one release atomically; raise on any problem."""
+    normalized_releases = []
+    all_snapshots = []
+    package_identifiers = set()
+    for raw_file in raw_files:
+        checksum = hashlib.sha256(raw_file.content).hexdigest()
+        source_release, snapshots = normalize_basic_register_release(
+            raw_file.content, file_name=raw_file.name, checksum=checksum
+        )
+        for snapshot in snapshots:
+            if snapshot.pakkaustunnus in package_identifiers:
+                raise ValueError(
+                    "Duplicate package identifier across source release files: "
+                    f"{snapshot.pakkaustunnus!r}"
+                )
+            package_identifiers.add(snapshot.pakkaustunnus)
+        normalized_releases.append(source_release)
+        all_snapshots.extend(snapshots)
+    if not all_snapshots:
+        raise ValueError("Source release contains no medicine records.")
+    return tuple(normalized_releases), tuple(all_snapshots)
+
+
+def _validated_outcome(
+    raw_files: tuple[RawReleaseFile, ...],
+    captured_release: CapturedSourceRelease,
+    declared_source_order: SourceEvidence | None,
+) -> IngestionOutcome:
+    try:
+        releases, snapshots = _normalize_files(raw_files)
+    except (ParseError, ValueError) as error:
+        return _failure(
+            f"Source release validation failed: {error}",
+            declared_source_order,
+            captured_release,
+        )
+    return IngestionOutcome(
+        processing_status=ProcessingStatus.VALIDATED,
+        source_order=derive_source_order(releases),
+        captured_release=captured_release,
+        source_releases=releases,
+        snapshots=snapshots,
+        declared_source_order=declared_source_order,
+    )
+
+
 def ingest_source_release(payload: dict, *, storage_dir: str | Path) -> IngestionOutcome:
     """Capture and validate a release atomically, returning no partial snapshots."""
     if not isinstance(payload, dict):
         raise ValueError("A source release request must be an object.")
 
-    source_order = _evidence(payload.get("sourceOrder"), "sourceOrder")
+    declared_order = (
+        _evidence(payload["sourceOrder"], "sourceOrder")
+        if payload.get("sourceOrder") is not None
+        else None
+    )
     source_name = payload.get("sourceName")
     reference = _evidence(payload.get("sourceReleaseReference"), "sourceReleaseReference")
     retrieved_at = _retrieved_at(payload.get("retrievedAt"))
@@ -167,60 +275,61 @@ def ingest_source_release(payload: dict, *, storage_dir: str | Path) -> Ingestio
     if not isinstance(capture_status, str) or capture_status not in {"COMPLETE", "FAILED"}:
         raise ValueError("captureStatus must be COMPLETE or FAILED.")
     if capture_status == "FAILED":
-        return _failure("Source acquisition failed.", source_order)
+        return _failure("Source acquisition failed.", declared_order)
 
     try:
         raw_files = _read_files(payload)
-    except OSError as error:
-        return _failure(str(error), source_order)
-    except ValueError as error:
-        return _failure(str(error), source_order)
+    except (OSError, ValueError) as error:
+        return _failure(str(error), declared_order)
 
     try:
         captured_release = capture_source_release(
             storage_dir=storage_dir,
             source_name=source_name,
             source_release_reference=reference,
-            source_order=source_order,
+            source_order=declared_order or UNKNOWN_SOURCE_ORDER,
             retrieved_at=retrieved_at,
             files=raw_files,
         )
     except OSError as error:
-        return _failure(f"Unable to persist source release: {error}", source_order)
+        return _failure(f"Unable to persist source release: {error}", declared_order)
     except ValueError as error:
-        return _failure(f"Unable to capture source release: {error}", source_order)
+        return _failure(f"Unable to capture source release: {error}", declared_order)
 
-    normalized_releases = []
-    all_snapshots = []
-    package_identifiers = set()
-    try:
-        for raw_file in raw_files:
-            checksum = hashlib.sha256(raw_file.content).hexdigest()
-            source_release, snapshots = normalize_basic_register_release(
-                raw_file.content, file_name=raw_file.name, checksum=checksum
+    return _validated_outcome(raw_files, captured_release, declared_order)
+
+
+def reload_captured_release(capture_directory: str | Path) -> IngestionOutcome:
+    """Rebuild an ingestion outcome from an immutable capture already on disk.
+
+    Used after a restart so the comparison baseline comes from the preserved raw
+    files, verified against the checksums recorded at capture time.
+    """
+    directory = Path(capture_directory)
+    manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+    declared_order = _evidence(manifest["sourceOrder"], "sourceOrder")
+    raw_files = []
+    captured_files = []
+    for entry in manifest["files"]:
+        content = (directory / entry["contentReference"]).read_bytes()
+        if hashlib.sha256(content).hexdigest() != entry["checksum"]:
+            raise ValueError(f"Stored raw file {entry['name']} no longer matches its checksum.")
+        locators = tuple(entry.get("recordLocators", ()))
+        raw_files.append(RawReleaseFile(entry["name"], content, locators))
+        captured_files.append(
+            CapturedReleaseFile(
+                entry["name"], entry["checksum"], entry["contentReference"], locators
             )
-            for snapshot in snapshots:
-                if snapshot.pakkaustunnus in package_identifiers:
-                    raise ValueError(
-                        "Duplicate package identifier across source release files: "
-                        f"{snapshot.pakkaustunnus!r}"
-                    )
-                package_identifiers.add(snapshot.pakkaustunnus)
-            normalized_releases.append(source_release)
-            all_snapshots.extend(snapshots)
-    except (ParseError, ValueError) as error:
-        return _failure(
-            f"Source release validation failed: {error}", source_order, captured_release
         )
-
-    if not all_snapshots:
-        return _failure(
-            "Source release contains no medicine records.", source_order, captured_release
-        )
-    return IngestionOutcome(
-        processing_status=ProcessingStatus.VALIDATED,
-        source_order=source_order,
-        captured_release=captured_release,
-        source_releases=tuple(normalized_releases),
-        snapshots=tuple(all_snapshots),
+    captured_release = CapturedSourceRelease(
+        release_id=directory.name,
+        source_name=manifest["sourceName"],
+        source_release_reference=_evidence(
+            manifest["sourceReleaseReference"], "sourceReleaseReference"
+        ),
+        source_order=declared_order,
+        retrieved_at=_retrieved_at(manifest["retrievedAt"]),
+        files=tuple(captured_files),
+        capture_directory=directory,
     )
+    return _validated_outcome(tuple(raw_files), captured_release, declared_order)

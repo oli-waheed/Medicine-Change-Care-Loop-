@@ -1,6 +1,7 @@
 from dataclasses import replace
 
 import pytest
+
 from src.domain.evidence import EvidenceClassification
 from src.domain.source_field import SourceField
 from src.services.detect_relevant_changes import detect_relevant_changes

@@ -14,9 +14,11 @@ from ..services.detect_relevant_changes import (
     detect_relevant_changes,
 )
 from ..services.ingest_source_release import (
+    SOURCE_ORDER_BASIS,
     IngestionOutcome,
     ProcessingStatus,
     ingest_source_release,
+    source_order_key,
 )
 
 
@@ -80,32 +82,20 @@ def run_ingested_release_to_review(
         )
 
     order = None
-    prior_order = prior.source_order
-    current_order = current.source_order
-
-    if (
-        prior_order.evidence_class is EvidenceClassification.VERIFIED
-        and current_order.evidence_class is EvidenceClassification.VERIFIED
-        and prior_order.value is not None
-        and current_order.value is not None
-    ):
-        try:
-            prior_number = int(prior_order.value.strip())
-            current_number = int(current_order.value.strip())
-        except ValueError:
-            pass
-        else:
-            order = SourceOrderEvidence(
-                prior_release=prior.source_release,
-                current_release=current.source_release,
-                prior_order=prior_number,
-                current_order=current_number,
-                classification=EvidenceClassification.VERIFIED,
-                basis=(
-                    "Explicit VERIFIED sourceOrder values supplied with the release "
-                    "payloads. Retrieval timestamps were not used."
-                ),
-            )
+    prior_key = source_order_key(prior.source_order)
+    current_key = source_order_key(current.source_order)
+    if prior_key is not None and current_key is not None:
+        order = SourceOrderEvidence(
+            prior_release=prior.source_release,
+            current_release=current.source_release,
+            prior_order=prior_key,
+            current_order=current_key,
+            classification=EvidenceClassification.VERIFIED,
+            basis=(
+                f"{SOURCE_ORDER_BASIS} Prior Ajopvm {prior.source_order.value}; "
+                f"current Ajopvm {current.source_order.value}."
+            ),
+        )
 
     return run_ingestion_to_review(
         prior.snapshots,

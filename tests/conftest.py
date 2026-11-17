@@ -107,3 +107,30 @@ def medication_record():
     return SimulatedMedicationRecord(
         "SIM-MED-100", "SIM-PERSON-100", "Fictional Alpha", "SIM-PKG-100", "000123"
     )
+
+
+@pytest.fixture
+def isolated_app(tmp_path):
+    """The real app wired to a throwaway SQLite database and capture directory."""
+    from src.config import ApplicationConfig
+    from src.main import app
+    from src.services.pipeline_store import PipelineStore
+
+    previous = (
+        app.state.source_release_config,
+        app.state.store,
+        app.state.medication_records,
+    )
+    database_url = f"sqlite:///{tmp_path / 'pipeline.sqlite3'}"
+    app.state.source_release_config = ApplicationConfig(
+        tmp_path / "captures", 250 * 1024 * 1024, database_url=database_url
+    )
+    app.state.store = PipelineStore(database_url)
+    app.state.medication_records = ()
+    yield app
+    app.state.store.dispose()
+    (
+        app.state.source_release_config,
+        app.state.store,
+        app.state.medication_records,
+    ) = previous

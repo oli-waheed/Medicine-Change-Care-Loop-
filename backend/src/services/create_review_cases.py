@@ -1,4 +1,4 @@
-﻿"""Exact package matching and initial NEW case creation for simulated records."""
+"""Exact package matching and initial NEW case creation for simulated records."""
 
 import hashlib
 from collections.abc import Iterable

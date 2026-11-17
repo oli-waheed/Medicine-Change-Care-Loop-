@@ -1,4 +1,3 @@
-
 """Upload and ingest a source release."""
 
 import hashlib
@@ -10,12 +9,14 @@ from typing import Annotated
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from ..config import ApplicationConfig
-from ..domain.evidence import EvidenceClassification
 from ..services.ingest_source_release import (
     IngestionOutcome,
     ProcessingStatus,
     ingest_source_release,
+    reload_captured_release,
+    source_order_key,
 )
+from ..services.pipeline_store import PipelineStore
 from ..workflows.ingestion_to_review import run_ingested_release_to_review
 
 router = APIRouter(prefix="/api/source-releases", tags=["source-releases"])
@@ -23,20 +24,31 @@ router = APIRouter(prefix="/api/source-releases", tags=["source-releases"])
 _UPLOAD_CHUNK_SIZE = 1024 * 1024
 
 
-def _verified_order(outcome: IngestionOutcome) -> int | None:
-    """Return source order only when it is explicitly VERIFIED and numeric."""
-    evidence = outcome.source_order
+def _compare_with_baseline(
+    request: Request, store: PipelineStore, outcome: IngestionOutcome
+) -> tuple:
+    """Return review cases from comparing ``outcome`` with the stored baseline.
 
-    if (
-        evidence.evidence_class is not EvidenceClassification.VERIFIED
-        or evidence.value is None
-    ):
-        return None
-
-    try:
-        return int(evidence.value.strip())
-    except ValueError:
-        return None
+    Only releases with backend-derived (Ajopvm) chronology are compared, and only
+    when strictly newer than the baseline. Older, equal-dated and UNKNOWN-order
+    releases are recorded for traceability but never compared.
+    """
+    current_key = source_order_key(outcome.source_order)
+    if current_key is None:
+        return ()
+    baseline_row = store.comparison_baseline()
+    if baseline_row is None or baseline_row.source_order_key >= current_key:
+        return ()
+    baseline = reload_captured_release(baseline_row.capture_directory)
+    if baseline.processing_status is not ProcessingStatus.VALIDATED:
+        raise RuntimeError(f"Stored baseline no longer validates: {baseline.failure_detail}")
+    result = run_ingested_release_to_review(
+        baseline,
+        outcome,
+        tuple(request.app.state.medication_records),
+        open_cases=[],
+    )
+    return result.created_cases
 
 
 @router.post("/ingest")
@@ -45,13 +57,15 @@ async def ingest_uploaded_source_release(
     file: Annotated[UploadFile, File()],
     source_name: Annotated[str, Form(alias="sourceName")],
     source_release_reference: Annotated[str, Form(alias="sourceReleaseReference")],
-    source_order: Annotated[str, Form(alias="sourceOrder")],
     retrieved_at: Annotated[str, Form(alias="retrievedAt")],
+    source_order: Annotated[str | None, Form(alias="sourceOrder")] = None,
 ) -> dict[str, str | None]:
-    """Capture a release and connect it to the comparison workflow."""
+    """Capture a release, persist it, and compare it with the stored baseline."""
     try:
         release_reference = json.loads(source_release_reference)
-        order_evidence = json.loads(source_order)
+        # Caller-declared order is recorded for traceability only; chronology
+        # is derived by the backend from the release's own Ajopvm.
+        order_evidence = json.loads(source_order) if source_order else None
     except json.JSONDecodeError as error:
         raise HTTPException(
             status_code=422,
@@ -125,75 +139,16 @@ async def ingest_uploaded_source_release(
             else None
         )
 
-        if (
-            outcome.processing_status is ProcessingStatus.VALIDATED
-            and outcome.captured_release is not None
-        ):
-            # Keep every unique validated capture for traceability and replay
-            # detection, including releases with UNKNOWN or conflicting order.
-            history: list[IngestionOutcome] = getattr(
-                request.app.state,
-                "source_release_history",
-                [],
-            )
-            request.app.state.source_release_history = history
-
-            known_release_ids = {
-                item.captured_release.release_id
-                for item in history
-                if item.captured_release is not None
-            }
-
-            if captured_reference not in known_release_ids:
-                history.append(outcome)
-
-                current_order = _verified_order(outcome)
-                baseline: IngestionOutcome | None = getattr(
-                    request.app.state,
-                    "source_release_comparison_baseline",
-                    None,
+        if outcome.captured_release is not None:
+            store: PipelineStore = request.app.state.store
+            if not store.is_known_release(captured_reference):
+                cases = (
+                    _compare_with_baseline(request, store, outcome)
+                    if outcome.processing_status is ProcessingStatus.VALIDATED
+                    else ()
                 )
-
-                # An UNKNOWN release is retained in capture history but
-                # cannot become a comparison baseline.
-                if current_order is not None:
-                    if baseline is None:
-                        # First release with usable verified chronology.
-                        # Do not compare it against an UNKNOWN release.
-                        request.app.state.source_release_comparison_baseline = (
-                            outcome
-                        )
-                    else:
-                        previous_order = _verified_order(baseline)
-
-                        if previous_order is None:
-                            # Recover safely if an older baseline has no
-                            # usable chronology.
-                            request.app.state.source_release_comparison_baseline = (
-                                outcome
-                            )
-                        elif current_order > previous_order:
-                            medication_records = tuple(
-                                getattr(
-                                    request.app.state,
-                                    "medication_records",
-                                    (),
-                                )
-                            )
-
-                            run_ingested_release_to_review(
-                                baseline,
-                                outcome,
-                                medication_records,
-                                open_cases=request.app.state.open_review_cases,
-                            )
-
-                            request.app.state.source_release_comparison_baseline = (
-                                outcome
-                            )
-
-                        # Equal or decreasing source order is retained in
-                        # capture history but does not replace the baseline.
+                # Capture and cases are written in one transaction.
+                store.record_ingestion(outcome, cases)
 
         return {
             "processingStatus": outcome.processing_status.value,

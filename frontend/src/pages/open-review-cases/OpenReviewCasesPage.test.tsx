@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import OpenReviewCasesPage from "./OpenReviewCasesPage";
+import { sourceValue } from "./sourceValue";
 import type { OpenReviewCase } from "./openReviewCases";
 
 const caseFixture: OpenReviewCase = {
@@ -18,14 +19,20 @@ const caseFixture: OpenReviewCase = {
     changeId: "CHANGE-SIM-100",
     field: "Laakevalmiste/Kauppanimi",
     before: [{ state: "value", value: "Fictional Alpha", attributes: {} }],
-    after: [{ state: "value", value: "Fictional Alpha Revised", attributes: {} }],
+    after: [
+      { state: "value", value: "Fictional Alpha Revised", attributes: {} },
+    ],
     detectedAt: "2099-01-03T00:00:00+00:00",
   },
   sources: {
     prior: {
       sourceName: "Fimea Basic Register",
       releaseDate: { state: "value", value: "2099-01-01", attributes: {} },
-      releaseReference: { state: "value", value: "SIM-2099-001", attributes: {} },
+      releaseReference: {
+        state: "value",
+        value: "SIM-2099-001",
+        attributes: {},
+      },
       fileName: "prior-release.xml",
       checksum: "synthetic-prior-checksum",
       recordIdentifier: "SIM-PKG-100",
@@ -38,7 +45,11 @@ const caseFixture: OpenReviewCase = {
     current: {
       sourceName: "Fimea Basic Register",
       releaseDate: { state: "value", value: "2099-01-02", attributes: {} },
-      releaseReference: { state: "value", value: "SIM-2099-002", attributes: {} },
+      releaseReference: {
+        state: "value",
+        value: "SIM-2099-002",
+        attributes: {},
+      },
       fileName: "current-release.xml",
       checksum: "synthetic-current-checksum",
       recordIdentifier: "SIM-PKG-100",
@@ -76,21 +87,30 @@ describe("OpenReviewCasesPage", () => {
     );
     render(<OpenReviewCasesPage />);
 
-    expect(await screen.findByRole("heading", { name: "Open review cases" })).toBeVisible();
-    expect(screen.getAllByText("Fictional Alpha Revised").length).toBeGreaterThan(0);
+    expect(
+      await screen.findByRole("heading", { name: "Open review cases" }),
+    ).toBeVisible();
+    expect(
+      screen.getAllByText("Fictional Alpha Revised").length,
+    ).toBeGreaterThan(0);
     expect(screen.getByText("SIM-PKG-100")).toBeVisible();
     expect(screen.getAllByText("Fictional Alpha").length).toBeGreaterThan(0);
     expect(screen.getByText("SIM-PERSON-100")).toBeVisible();
     expect(screen.getByText("prior-release.xml")).toBeVisible();
     expect(screen.getByText("current-release.xml")).toBeVisible();
-    expect(screen.getByText("Controlled synthetic source order, not retrieval time.")).toBeVisible();
-    expect(screen.queryByRole("button", { name: /close|resolve|recommend/i })).toBeNull();
+    expect(
+      screen.getByText(
+        "Controlled synthetic source order, not retrieval time.",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.queryByRole("button", { name: /close|resolve|recommend/i }),
+    ).toBeNull();
 
     fireEvent.click(screen.getByRole("button", { name: /Fictional Alpha/ }));
-    expect(screen.getByRole("button", { name: /Fictional Alpha/ })).toHaveAttribute(
-      "aria-pressed",
-      "true",
-    );
+    expect(
+      screen.getByRole("button", { name: /Fictional Alpha/ }),
+    ).toHaveAttribute("aria-pressed", "true");
   });
 
   it("shows an explicit load error and an empty state", async () => {
@@ -113,6 +133,79 @@ describe("OpenReviewCasesPage", () => {
       }),
     );
     render(<OpenReviewCasesPage />);
-    expect(await screen.findByText("There are no NEW review cases.")).toBeVisible();
+    expect(
+      await screen.findByText("There are no NEW review cases."),
+    ).toBeVisible();
+  });
+
+  it("shows code-table attribute values instead of 'Present but empty'", async () => {
+    const statusChange: OpenReviewCase = {
+      ...caseFixture,
+      change: {
+        ...caseFixture.change,
+        field: "Laakevalmiste/Myyntilupa[0]/Tila",
+        before: [
+          {
+            state: "empty",
+            value: "",
+            attributes: {
+              listname: "SIM-AUTH",
+              id: "SIM-ACTIVE",
+              value: "synthetic active",
+            },
+          },
+        ],
+        after: [
+          {
+            state: "empty",
+            value: "",
+            attributes: {
+              listname: "SIM-AUTH",
+              id: "SIM-REVOKED",
+              value: "synthetic revoked",
+            },
+          },
+        ],
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [statusChange] }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(
+      await screen.findByText(
+        "synthetic active (code SIM-ACTIVE, list SIM-AUTH)",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByText("synthetic revoked (code SIM-REVOKED, list SIM-AUTH)"),
+    ).toBeVisible();
+    expect(screen.queryByText("Present but empty")).toBeNull();
+  });
+});
+
+describe("sourceValue", () => {
+  it("keeps missing, empty and plain values distinct", () => {
+    expect(sourceValue({ state: "missing", value: null, attributes: {} })).toBe(
+      "Not present in source",
+    );
+    expect(sourceValue({ state: "empty", value: "", attributes: {} })).toBe(
+      "Present but empty",
+    );
+    expect(
+      sourceValue({ state: "value", value: "10 mg", attributes: {} }),
+    ).toBe("10 mg");
+  });
+
+  it("shows both text and attributes when an element has both", () => {
+    expect(
+      sourceValue({
+        state: "value",
+        value: "1",
+        attributes: { listname: "L", id: "X" },
+      }),
+    ).toBe("1 — X (list L)");
   });
 });

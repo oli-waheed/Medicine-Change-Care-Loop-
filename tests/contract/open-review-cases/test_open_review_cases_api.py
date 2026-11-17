@@ -3,11 +3,15 @@ from starlette.requests import Request
 
 from src.api.open_review_cases import get_open_review_cases, router
 from src.services.create_review_cases import create_review_cases
+from src.services.pipeline_store import PipelineStore
 
 
-def test_read_api_returns_only_new_cases_with_evidence(detected_change, medication_record):
+def test_read_api_returns_only_new_cases_with_evidence(
+    tmp_path, detected_change, medication_record
+):
     app = FastAPI()
-    app.state.open_review_cases = create_review_cases((detected_change,), (medication_record,))
+    app.state.store = PipelineStore(f"sqlite:///{tmp_path / 'cases.sqlite3'}")
+    app.state.store.add_cases(create_review_cases((detected_change,), (medication_record,)))
     request = Request(
         {
             "type": "http",

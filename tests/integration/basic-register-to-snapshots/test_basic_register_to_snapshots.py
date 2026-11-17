@@ -5,6 +5,7 @@ from pathlib import Path
 from xml.etree.ElementTree import ParseError
 
 import pytest
+
 from src.domain.evidence import EvidenceClassification
 from src.services.detect_relevant_changes import SourceOrderEvidence, detect_relevant_changes
 from src.services.normalize_basic_register_release import (

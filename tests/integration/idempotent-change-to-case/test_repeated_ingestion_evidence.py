@@ -6,9 +6,11 @@ from pathlib import Path
 
 from fastapi import FastAPI
 from fastapi.testclient import TestClient
+
 from src.api.open_review_cases import router as review_router
 from src.api.source_release_ingestion import router as ingestion_router
 from src.config import ApplicationConfig
+from src.services.pipeline_store import PipelineStore
 
 FIXTURES = Path(__file__).parents[2] / "fixtures" / "fimea-basic-register"
 
@@ -42,7 +44,7 @@ def test_repeated_ingestion_preserves_original_case_evidence(tmp_path, medicatio
     app.include_router(ingestion_router)
     app.include_router(review_router)
     app.state.source_release_config = ApplicationConfig(tmp_path / "captures", 1024 * 1024)
-    app.state.open_review_cases = []
+    app.state.store = PipelineStore(f"sqlite:///{tmp_path / 'pipeline.sqlite3'}")
     app.state.medication_records = (medication_record,)
 
     with TestClient(app) as client:
