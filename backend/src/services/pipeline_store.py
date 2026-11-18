@@ -1,5 +1,6 @@
 """SQLite persistence for captures, review cases and case status events."""
 
+import json
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -14,6 +15,7 @@ from ..models import (
     ChangeProcessingOutcomeRow,
     ReviewCaseRow,
     SourceReleaseCaptureRow,
+    SourceReleaseRetrievalRow,
 )
 from ..schemas.change_processing_outcomes import change_processing_outcome_payload
 from ..schemas.open_review_cases import open_review_case_payload
@@ -22,7 +24,10 @@ from .ingest_source_release import IngestionOutcome, ProcessingStatus, source_or
 
 
 def _as_utc(value: datetime) -> datetime:
-    # SQLite does not keep offsets; values are stored and returned as UTC.
+    # SQLite does not keep offsets: every time is written as UTC and read back naive.
+    # A naive value is therefore UTC, never the machine's local time zone.
+    if value.tzinfo is None or value.utcoffset() is None:
+        return value.replace(tzinfo=UTC)
     return value.astimezone(UTC)
 
 
@@ -33,6 +38,8 @@ class PipelineStore:
         self.database_url = database_url
         self._engine: Engine | None = None
         self._sessions: sessionmaker[Session] | None = None
+        # Capture manifests are immutable, so their file lists are cached by release id.
+        self._manifest_files: dict[str, tuple[tuple[str, Path], ...]] = {}
 
     def _session(self) -> Session:
         if self._sessions is None:
@@ -210,6 +217,80 @@ class PipelineStore:
             inserted += 1
         session.flush()
         return inserted
+
+    # --- raw capture files -------------------------------------------------------
+
+    def _capture_files(self, row: SourceReleaseCaptureRow) -> tuple[tuple[str, Path], ...]:
+        """``(checksum, raw file path)`` for every file listed in a capture's manifest."""
+        cached = self._manifest_files.get(row.release_id)
+        if cached is not None:
+            return cached
+        directory = Path(row.capture_directory)
+        try:
+            manifest = json.loads((directory / "manifest.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            return ()  # Not cached: the capture may be restored later.
+        files = tuple(
+            (entry["checksum"], directory / entry["contentReference"])
+            for entry in manifest.get("files", ())
+        )
+        self._manifest_files[row.release_id] = files
+        return files
+
+    def capture_with_identical_content(
+        self, source_name: str, checksums: set[str]
+    ) -> SourceReleaseCaptureRow | None:
+        """The earliest capture of the same source whose raw files have exactly these checksums."""
+        for row in self.captures():
+            if row.source_name != source_name:
+                continue
+            if {checksum for checksum, _ in self._capture_files(row)} == checksums:
+                return row
+        return None
+
+    def record_retrieval(
+        self, row: SourceReleaseCaptureRow, retrieved_at: datetime, reference: dict
+    ) -> bool:
+        """Record a later download of already-captured content; returns True if new."""
+        retrieved_at = _as_utc(retrieved_at)
+        if _as_utc(row.retrieved_at) == retrieved_at:
+            return False  # The capture itself already records this retrieval.
+        with self._session() as session, session.begin():
+            exists = session.scalar(
+                select(SourceReleaseRetrievalRow.id).where(
+                    SourceReleaseRetrievalRow.release_id == row.release_id,
+                    SourceReleaseRetrievalRow.retrieved_at == retrieved_at,
+                )
+            )
+            if exists is not None:
+                return False
+            session.add(
+                SourceReleaseRetrievalRow(
+                    release_id=row.release_id,
+                    retrieved_at=retrieved_at,
+                    source_release_reference=reference,
+                )
+            )
+            return True
+
+    def retrievals(self, release_id: str) -> list[SourceReleaseRetrievalRow]:
+        with self._session() as session:
+            return list(
+                session.scalars(
+                    select(SourceReleaseRetrievalRow)
+                    .where(SourceReleaseRetrievalRow.release_id == release_id)
+                    .order_by(SourceReleaseRetrievalRow.retrieved_at)
+                )
+            )
+
+    def available_file_checksums(self) -> set[str]:
+        """Checksums of raw files that are still present in the capture store."""
+        return {
+            checksum
+            for row in self.captures()
+            for checksum, path in self._capture_files(row)
+            if path.is_file()
+        }
 
     # --- read side ---------------------------------------------------------------
 

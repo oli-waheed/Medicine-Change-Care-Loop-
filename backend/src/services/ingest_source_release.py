@@ -133,6 +133,21 @@ def _failure(
     )
 
 
+SUPPORTED_SOURCE_NAME = "Fimea Basic Register"
+
+
+def validate_release_metadata(
+    source_name: object, reference: object, declared_order: object, retrieved_at: object
+) -> datetime:
+    """Apply the same metadata checks as ingestion; return the parsed retrieval time."""
+    if source_name != SUPPORTED_SOURCE_NAME:
+        raise ValueError("Only Fimea Basic Register releases are supported.")
+    _evidence(reference, "sourceReleaseReference")
+    if declared_order is not None:
+        _evidence(declared_order, "sourceOrder")
+    return _retrieved_at(retrieved_at)
+
+
 def _evidence(value: object, field_name: str) -> SourceEvidence:
     if not isinstance(value, dict):
         raise ValueError(f"{field_name} must include a value and evidenceClass.")
@@ -274,7 +289,7 @@ def ingest_source_release(payload: dict, *, storage_dir: str | Path) -> Ingestio
     capture_status = payload.get("captureStatus")
     if not isinstance(source_name, str) or not source_name.strip():
         raise ValueError("sourceName is required.")
-    if source_name != "Fimea Basic Register":
+    if source_name != SUPPORTED_SOURCE_NAME:
         raise ValueError("Only Fimea Basic Register releases are supported.")
     if not isinstance(capture_status, str) or capture_status not in {"COMPLETE", "FAILED"}:
         raise ValueError("captureStatus must be COMPLETE or FAILED.")

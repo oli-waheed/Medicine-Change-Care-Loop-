@@ -15,6 +15,7 @@ from ..services.ingest_source_release import (
     ingest_source_release,
     reload_captured_release,
     source_order_key,
+    validate_release_metadata,
 )
 from ..services.pipeline_store import PipelineStore
 from ..workflows.ingestion_to_review import run_ingested_release_to_review
@@ -59,7 +60,7 @@ async def ingest_uploaded_source_release(
     source_release_reference: Annotated[str, Form(alias="sourceReleaseReference")],
     retrieved_at: Annotated[str, Form(alias="retrievedAt")],
     source_order: Annotated[str | None, Form(alias="sourceOrder")] = None,
-) -> dict[str, str | None]:
+) -> dict[str, str | bool | None]:
     """Capture a release, persist it, and compare it with the stored baseline."""
     try:
         release_reference = json.loads(source_release_reference)
@@ -103,6 +104,29 @@ async def ingest_uploaded_source_release(
 
         filename = (file.filename or "source-release.xml").replace("\\", "/").rsplit("/", 1)[-1]
 
+        store: PipelineStore = request.app.state.store
+        try:
+            parsed_retrieved_at = validate_release_metadata(
+                source_name, release_reference, order_evidence, retrieved_at
+            )
+        except ValueError as error:
+            raise HTTPException(status_code=422, detail=str(error)) from error
+
+        # Identical content already captured (e.g. the unchanged daily Fimea file):
+        # keep the single stored copy and record only this retrieval.
+        existing = store.capture_with_identical_content(source_name, {digest.hexdigest()})
+        if existing is not None:
+            store.record_retrieval(existing, parsed_retrieved_at, release_reference)
+            return {
+                "processingStatus": existing.processing_status,
+                "chronologyStatus": (
+                    "AVAILABLE" if existing.source_order_key is not None else "UNAVAILABLE"
+                ),
+                "capturedReleaseReference": existing.release_id,
+                "failureDetail": existing.failure_detail,
+                "alreadyCaptured": True,
+            }
+
         payload = {
             "sourceName": source_name,
             "sourceReleaseReference": release_reference,
@@ -134,7 +158,6 @@ async def ingest_uploaded_source_release(
         )
 
         if outcome.captured_release is not None:
-            store: PipelineStore = request.app.state.store
             if not store.is_known_release(captured_reference):
                 cases, processing_outcomes = (
                     _compare_with_baseline(request, store, outcome)
@@ -149,6 +172,7 @@ async def ingest_uploaded_source_release(
             "chronologyStatus": outcome.chronology_status.value,
             "capturedReleaseReference": captured_reference,
             "failureDetail": outcome.failure_detail,
+            "alreadyCaptured": False,
         }
 
     finally:

@@ -108,7 +108,10 @@ describe("OpenReviewCasesPage clinical scope (T035)", () => {
       ok: true,
       json: async () => [
         reviewCase("100", "FIELDS_CHANGED"),
-        reviewCase("300", "NO_LONGER_PRESENT"),
+        {
+          ...reviewCase("300", "NO_LONGER_PRESENT"),
+          evidenceAvailability: "UNAVAILABLE",
+        },
       ],
     });
     vi.stubGlobal("fetch", fetchMock);

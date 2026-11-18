@@ -16,6 +16,8 @@ export type SourceEvidence = {
   evidenceClass: "VERIFIED" | "INFERRED" | "UNKNOWN" | "CONFLICTING";
   note: string | null;
   retrievedAt: string | null;
+  // Whether the raw capture file behind this source is still stored.
+  evidenceAvailable?: boolean;
 };
 
 export type ChangeKind = "FIELDS_CHANGED" | "NO_LONGER_PRESENT";
@@ -57,6 +59,8 @@ export type OpenReviewCase = {
     evidenceClass: "VERIFIED" | "INFERRED" | "UNKNOWN" | "CONFLICTING";
   };
   evidenceClass: "VERIFIED" | "INFERRED" | "UNKNOWN" | "CONFLICTING";
+  // UNAVAILABLE when a raw source file behind the case is no longer stored.
+  evidenceAvailability?: "AVAILABLE" | "UNAVAILABLE";
   initialStatusEvent: {
     eventId: string;
     caseId: string;

@@ -5,7 +5,7 @@ import {
   type OpenReviewCase,
   type SourceEvidence,
 } from "./openReviewCases";
-import { changeSummary } from "./changeSummary";
+import { changeSummary, evidenceUnavailable } from "./changeSummary";
 import { sourceValue } from "./sourceValue";
 import "./OpenReviewCasesPage.css";
 
@@ -36,7 +36,12 @@ function SourceCard({
         </div>
         <div>
           <dt>Raw file</dt>
-          <dd>{evidence.fileName ?? "Unknown"}</dd>
+          <dd>
+            {evidence.fileName ?? "Unknown"}
+            {evidence.evidenceAvailable === false && (
+              <span className="evidence-missing"> (no longer stored)</span>
+            )}
+          </dd>
         </div>
         <div>
           <dt>Checksum</dt>
@@ -55,7 +60,11 @@ function SourceCard({
         </div>
         <div>
           <dt>Evidence classification</dt>
-          <dd>{evidence.evidenceClass}</dd>
+          <dd>
+            {evidence.evidenceAvailable === false
+              ? `${evidence.evidenceClass} when recorded; source file now unavailable`
+              : evidence.evidenceClass}
+          </dd>
         </div>
       </dl>
       {evidence.note && <p className="evidence-note">{evidence.note}</p>}
@@ -148,6 +157,14 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
         <span className="status-badge">{reviewCase.status}</span>
       </header>
 
+      {evidenceUnavailable(reviewCase) && (
+        <p className="evidence-unavailable" role="status">
+          Source evidence unavailable. One or more raw source files behind this
+          case are no longer stored, so the values below, recorded when the case
+          was created, cannot be checked against the source again.
+        </p>
+      )}
+
       <section className="record-card" aria-label="Simulated medication record">
         <h3>Matched simulated record</h3>
         <p>{reviewCase.matchedRecord.medicineDisplay}</p>
@@ -166,7 +183,11 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
           </div>
           <div>
             <dt>Evidence classification</dt>
-            <dd>{reviewCase.evidenceClass}</dd>
+            <dd>
+              {evidenceUnavailable(reviewCase)
+                ? `${reviewCase.evidenceClass} when recorded; source evidence now unavailable`
+                : reviewCase.evidenceClass}
+            </dd>
           </div>
         </dl>
       </section>
@@ -267,6 +288,11 @@ export default function OpenReviewCasesPage() {
                 </span>
                 <span>{reviewCase.medicineIdentifier}</span>
                 <span>{changeSummary(reviewCase)}</span>
+                {evidenceUnavailable(reviewCase) && (
+                  <span className="case-list-warning">
+                    Evidence unavailable
+                  </span>
+                )}
                 <span className="case-list-status">{reviewCase.status}</span>
               </button>
             ))}

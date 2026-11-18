@@ -280,6 +280,56 @@ describe("OpenReviewCasesPage", () => {
       screen.queryByRole("button", { name: /close|resolve|recommend/i }),
     ).toBeNull();
   });
+
+  it("shows when a case's source evidence is no longer stored", async () => {
+    const unavailable: OpenReviewCase = {
+      ...caseFixture,
+      evidenceAvailability: "UNAVAILABLE",
+      sources: {
+        prior: { ...caseFixture.sources.prior, evidenceAvailable: false },
+        current: { ...caseFixture.sources.current, evidenceAvailable: true },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [unavailable] }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(
+      await screen.findByText(/Source evidence unavailable/),
+    ).toBeVisible();
+    expect(screen.getByText("Evidence unavailable")).toBeVisible();
+    expect(screen.getAllByText(/no longer stored/).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(
+        "VERIFIED when recorded; source evidence now unavailable",
+      ),
+    ).toBeVisible();
+    expect(
+      screen.getByText("VERIFIED when recorded; source file now unavailable"),
+    ).toBeVisible();
+  });
+
+  it("shows no warning while the evidence is available", async () => {
+    const available: OpenReviewCase = {
+      ...caseFixture,
+      evidenceAvailability: "AVAILABLE",
+      sources: {
+        prior: { ...caseFixture.sources.prior, evidenceAvailable: true },
+        current: { ...caseFixture.sources.current, evidenceAvailable: true },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({ ok: true, json: async () => [available] }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(await screen.findByText("Cases (1)")).toBeVisible();
+    expect(screen.queryByText(/Source evidence unavailable/)).toBeNull();
+    expect(screen.queryByText("Evidence unavailable")).toBeNull();
+  });
 });
 
 describe("sourceValue", () => {

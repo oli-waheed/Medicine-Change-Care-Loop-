@@ -88,3 +88,24 @@ def open_review_case_payload(case: ReviewCase):
             "occurredAt": case.initial_event.occurred_at.isoformat(),
         },
     }
+
+
+def with_evidence_availability(payload: dict, available_checksums: set[str]) -> dict:
+    """Return a copy of a stored case view with its current evidence availability.
+
+    A source is available while a raw capture file with its checksum is still
+    stored. If either source is gone, the case is reported as UNAVAILABLE so it is
+    not presented as fully verified evidence.
+    """
+    result = {**payload, "sources": {}}
+    for side, source in payload["sources"].items():
+        result["sources"][side] = {
+            **source,
+            "evidenceAvailable": source.get("checksum") in available_checksums,
+        }
+    result["evidenceAvailability"] = (
+        "AVAILABLE"
+        if all(source["evidenceAvailable"] for source in result["sources"].values())
+        else "UNAVAILABLE"
+    )
+    return result

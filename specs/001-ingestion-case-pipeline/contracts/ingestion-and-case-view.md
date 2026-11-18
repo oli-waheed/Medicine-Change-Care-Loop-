@@ -29,7 +29,8 @@ Response:
   "processingStatus": "VALIDATED",
   "chronologyStatus": "AVAILABLE",
   "capturedReleaseReference": "sha256-…",
-  "failureDetail": null
+  "failureDetail": null,
+  "alreadyCaptured": false
 }
 ```
 
@@ -38,8 +39,11 @@ Response:
   with the reason in `failureDetail`; no partial snapshot is used.
 - `chronologyStatus` is `AVAILABLE` only when every file has a valid ISO `Ajopvm`. Otherwise it is
   `UNAVAILABLE` and the release is stored but never compared.
-- `capturedReleaseReference` identifies the immutable capture. Uploading an identical file with the same
-  metadata returns the same reference and creates nothing new.
+- `capturedReleaseReference` identifies the immutable capture.
+- `alreadyCaptured` is `true` when the uploaded content (by SHA-256 checksum, regardless of file name or
+  metadata) is already captured for this source. The existing capture is reused and its reference and
+  results are returned; the raw file is not stored again, nothing is compared again, and the new
+  retrieval time is recorded as an additional retrieval of that capture. Metadata is still validated.
 
 Internally, the ingestion service accepts a release of one or more files with the same metadata plus
 `files[]` (`name`, `checksum`, `contentReference`, optional `recordLocators`) and
@@ -148,7 +152,11 @@ reports `FAILED` with the reason.
   (the package's prior-release values, only for `NO_LONGER_PRESENT`);
 - `sources.prior` and `sources.current`: source name, release date (`Ajopvm`) and reference
   (`Aineistoera`), raw file name, checksum, record locator (none when the package is no longer present),
-  retrieval time, evidence classification, and note;
+  retrieval time, evidence classification, note, and `evidenceAvailable` (whether a raw capture file with
+  that checksum is still stored, checked when the view is read);
+- `evidenceAvailability`: `AVAILABLE`, or `UNAVAILABLE` when either source's raw file is no longer
+  stored. The recorded values are still returned, but the view states that they can no longer be checked
+  against the source and does not present the case as fully verified;
 - `sourceOrder` (prior/current keys, basis, classification) and `evidenceClass`.
 
 Every source value keeps its `state` (`missing`, `empty`, or `value`), text, and code-table attributes.

@@ -6,3 +6,7 @@ export function changeSummary(reviewCase: OpenReviewCase): string {
   if (changes.length === 1) return changes[0].field;
   return `${changes.length} field changes`;
 }
+
+export function evidenceUnavailable(reviewCase: OpenReviewCase): boolean {
+  return reviewCase.evidenceAvailability === "UNAVAILABLE";
+}

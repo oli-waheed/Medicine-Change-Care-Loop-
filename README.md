@@ -165,7 +165,7 @@ The backend runs at `http://127.0.0.1:8000` while the server is running. It has 
 
 #### Backend configuration and data
 
-Cases, case status events and the source-release capture history are stored in SQLite, so they survive a restart. Raw source files are stored as immutable captures on disk; after a restart, the comparison baseline is rebuilt from its captured raw file, which is checked against its recorded checksum first.
+Cases, case status events and the source-release capture history are stored in SQLite, so they survive a restart. Raw source files are stored as immutable captures on disk; after a restart, the comparison baseline is rebuilt from its captured raw file, which is checked against its recorded checksum first. A download whose content is already captured, such as an unchanged daily file, is not stored again; only its retrieval time is recorded. If a raw file is later removed, the cases that rely on it are shown as having unavailable evidence.
 
 | Environment variable | Default | Purpose |
 |---|---|---|
@@ -279,7 +279,7 @@ The current implementation includes source-release ingestion, source-data normal
 
 Local backend and frontend startup, API proxying, frontend tests, and the frontend production build have been verified.
 
-The frontend tests currently include eight passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, the empty state, and the clinical-scope guard (no case actions or clinical wording). A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
+The frontend tests currently include ten passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, unavailable source evidence, loading errors, the empty state, and the clinical-scope guard (no case actions or clinical wording). A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
 
 Further development and validation are tracked in the project specifications and task lists.
 

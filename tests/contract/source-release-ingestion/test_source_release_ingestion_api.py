@@ -126,10 +126,12 @@ def test_successful_upload_returns_capture_reference_and_preserves_capture(api, 
         "chronologyStatus",
         "capturedReleaseReference",
         "failureDetail",
+        "alreadyCaptured",
     }
     assert payload["processingStatus"] == "VALIDATED"
     assert payload["chronologyStatus"] == "AVAILABLE"
     assert payload["failureDetail"] is None
+    assert payload["alreadyCaptured"] is False
     assert payload["capturedReleaseReference"].startswith("sha256-")
     assert app.state.store.open_case_payloads() == []
     capture_dir = app.state.source_release_config.source_release_storage_dir

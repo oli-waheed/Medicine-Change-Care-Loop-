@@ -296,3 +296,18 @@
 .case-evidence .last-known dd {
   margin: 0;
 }
+
+.evidence-unavailable {
+  margin: 0 0 1rem;
+  padding: 0.75rem 0.9rem;
+  border-left: 4px solid #8a5a00;
+  border-radius: 0.35rem;
+  background: #fdf5e6;
+  color: #4d3300;
+}
+
+.evidence-missing,
+.case-list-warning {
+  color: #8a5a00;
+  font-weight: 600;
+}

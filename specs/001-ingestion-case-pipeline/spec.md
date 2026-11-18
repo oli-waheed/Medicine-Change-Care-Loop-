@@ -63,7 +63,7 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 - A snapshot contains incomplete or conflicting medicine identifiers: do not create a medication match or review case from an ambiguous match; expose the uncertainty in the processing result.
 - A source is unavailable, returns malformed information, or ingestion stops partway through: do not treat the run as complete or create cases from a partial snapshot.
 - A relevant change has no matching simulated medication record: retain the traceable detected change but do not create a review case.
-- A pharmacist opens a case whose source evidence is no longer available: show that the evidence is unavailable rather than presenting the case as fully verified. **Not implemented** (see [Implementation status](#implementation-status)).
+- A pharmacist opens a case whose source evidence is no longer available: show that the evidence is unavailable rather than presenting the case as fully verified.
 - The same source snapshot is ingested more than once: repeated processing must not create duplicate changes or cases.
 - The prototype must not ingest, store, or display real patient-identifiable information.
 
@@ -133,10 +133,14 @@ and the T035 clinical-scope review ([contract](contracts/ingestion-and-case-view
   `AMBIGUOUS`, is kept and exposed through `GET /api/change-processing-outcomes`.
 - FR-017 and FR-018 are implemented as package change sets (`FIELDS_CHANGED`, `NO_LONGER_PRESENT`).
 
-Known gaps:
+- The edge case "a case whose source evidence is no longer available" is implemented at read time: each
+  case source reports whether its raw capture file is still stored, and a case with missing evidence is
+  marked `UNAVAILABLE` in the API and shown with a notice in the pharmacist view instead of as fully
+  verified.
+- A download whose content is already captured (for example the unchanged daily file) is not stored
+  again; the existing capture is reused and the later retrieval time is recorded.
 
-- The edge case "a case whose source evidence is no longer available" is not implemented. The case view
-  shows the evidence stored when the case was created and does not check whether the raw capture files
-  still exist in `backend/data/source-releases/`.
-- Each scheduled download is stored as a full new capture, even when the file is unchanged.
+No known gaps remain against this specification. Open items before relying on live data are listed in
+[research.md](research.md): confirming `Ajopvm` ordering on real successive releases, the current XSD,
+and an explicit automated-download frequency statement.
 

@@ -3,7 +3,7 @@
 from datetime import datetime
 from typing import Any
 
-from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -73,3 +73,19 @@ class ChangeProcessingOutcomeRow(Base):
     case_ids: Mapped[list[str]] = mapped_column(JSON)
     detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     evidence_payload: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+
+class SourceReleaseRetrievalRow(Base):
+    """A later download of content that is already captured.
+
+    The raw files are stored once; each further retrieval of identical content is
+    recorded here instead of storing another full copy.
+    """
+
+    __tablename__ = "source_release_retrievals"
+    __table_args__ = (UniqueConstraint("release_id", "retrieved_at"),)
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    release_id: Mapped[str] = mapped_column(String(80), index=True)
+    retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    source_release_reference: Mapped[dict[str, Any]] = mapped_column(JSON)

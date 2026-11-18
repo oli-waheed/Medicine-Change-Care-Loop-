@@ -62,7 +62,7 @@ In a second terminal with the virtual environment active:
 python -m pytest -q
 ```
 
-Expected: `187 passed`.
+Expected: `191 passed`.
 
 Run Ruff from the `backend` folder, where its settings (`backend/pyproject.toml`) live. Run from the
 repository root, Ruff falls back to default settings and reports false errors.
@@ -74,7 +74,7 @@ python -m ruff format --check src ..\tests
 Set-Location ..
 ```
 
-Expected: `All checks passed!` and `58 files already formatted`.
+Expected: `All checks passed!` and `59 files already formatted`.
 
 ## 3. Frontend setup, checks and start
 
@@ -90,7 +90,7 @@ npm run format:check
 Expected:
 
 - `npm run build` ends with `✓ built in …`.
-- `npm run test -- --run` shows `Test Files  2 passed (2)` and `Tests  8 passed (8)`.
+- `npm run test -- --run` shows `Test Files  2 passed (2)` and `Tests  10 passed (10)`.
 - `npm run lint` runs `oxlint` and prints no warnings or errors.
 - `npm run format:check` prints `All matched files use Prettier code style!`.
 
@@ -128,8 +128,9 @@ Notes:
 - The exported workflow is marked active, so its schedule runs once imported.
 - Release order comes from the XML's own `Ajopvm`; the polling time and retrieval time are never used as
   source chronology.
-- The real file is about 200 MB, below the 250 MiB upload limit. Each run currently stores a full copy
-  in `backend\data\source-releases\`, even when the file has not changed.
+- The real file is about 200 MB, below the 250 MiB upload limit. A copy is stored in
+  `backend\data\source-releases\` only when the content changes; an unchanged daily file is answered with
+  `"alreadyCaptured":true` and only its retrieval time is recorded.
 - Live data creates cases only for simulated records whose `Pakkaustunnus` is a real package identifier
   in the register; the seed records match the synthetic fixtures only.
 
@@ -183,7 +184,7 @@ Try it out**).
    (Invoke-RestMethod http://127.0.0.1:8000/api/open-review-cases).Count
    ```
 
-   Expected: `{"processingStatus":"VALIDATED","chronologyStatus":"AVAILABLE","capturedReleaseReference":"sha256-…","failureDetail":null}`
+   Expected: `{"processingStatus":"VALIDATED","chronologyStatus":"AVAILABLE","capturedReleaseReference":"sha256-…","failureDetail":null,"alreadyCaptured":false}`
    and `0`. The first release is a baseline only.
 
 2. **Newer release.**
@@ -239,7 +240,8 @@ Try it out**).
    (Invoke-RestMethod http://127.0.0.1:8000/api/change-processing-outcomes).Count
    ```
 
-   Expected: `VALIDATED` with the same `capturedReleaseReference` as in step 2, then `1` and `3`.
+   Expected: `VALIDATED`, `"alreadyCaptured":true`, and the same `capturedReleaseReference` as in step 2,
+   then `1` and `3`.
 
 7. **Malformed input fails visibly.**
 

@@ -170,10 +170,15 @@ As implemented on 2026-11-18:
 - Raw source files are stored unchanged in `backend/data/source-releases/<release_id>/` with a
   `manifest.json` that records the source name, release reference, caller-declared order, retrieval time,
   file names, checksums, and record locators when supplied.
-- SQLite (`backend/data/medicine-change-care-loop.sqlite3`, through SQLAlchemy) holds four tables:
+- SQLite (`backend/data/medicine-change-care-loop.sqlite3`, through SQLAlchemy) holds five tables:
   `source_release_captures` (`SourceRelease` with processing status, derived order, and failure detail),
+  `source_release_retrievals` (later retrievals of content that is already captured),
   `review_cases` (`ReviewCase` with the stored evidence view), `case_status_events` (`CaseStatusEvent`),
-  and `change_processing_outcomes` (`ChangeProcessingOutcome`).
+  and `change_processing_outcomes` (`ChangeProcessingOutcome`). Times are stored and read as UTC.
+- Identical content is captured once: an upload whose file checksums match an existing capture of the same
+  source reuses that capture and adds a row to `source_release_retrievals`.
+- Evidence availability is not stored. When cases are read, each source checksum is checked against the raw
+  files still present in the capture store.
 - `MedicineSnapshot`, `DetectedChange`, and `PackageChangeSet` are not stored as separate tables. Snapshots
   are re-derived from the immutable raw capture when needed; for example, after a restart the comparison
   baseline is rebuilt from its raw file once its checksum is verified. The changes and change set behind a
