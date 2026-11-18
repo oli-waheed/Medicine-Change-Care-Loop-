@@ -280,24 +280,48 @@ case and outcome. The pharmacist remains the decision-maker.
 
 ## Acceptance results (T034)
 
-Record the manual run here.
+### Run 1: 2026-11-18, commit `eceff47`
 
-- Date:
-- Tester:
-- Commit (`git log --oneline -1`):
+Environment:
+
+- Linux, on a fresh clone of `main`, following sections 1–5 in order.
+- Python 3.13.18 in a new virtual environment with the pinned packages (FastAPI 0.142.2, Uvicorn 0.54.0,
+  SQLAlchemy 2.1.3, pytest 9.1.1, Ruff 0.16.10); SQLite 3.53.1.
+- Node.js 22.23.4 for the frontend. n8n 2.42.3 refused to start on it ("requires >=24.0.0"), so step 9 used
+  Node.js 24.19.0. This confirms the Node.js 24 prerequisite.
+- The pharmacist view was checked in headless Chrome.
+- The uploads used `curl` with exactly the `-F` fields of the `Ingest` helper. The PowerShell-only
+  commands (the `Ingest` function itself, `Invoke-RestMethod` and `Select-Object`) were not executed in this
+  run; a Windows run should confirm them (see the follow-up below).
+
+Setup and checks (sections 1–3): `181 passed`; Ruff `All checks passed!` and `57 files already formatted`;
+frontend build succeeded, `Tests  7 passed (7)`, `oxlint` reported nothing and exited 0, Prettier
+`All matched files use Prettier code style!`; Uvicorn and Vite started on the documented addresses.
 
 | Step | Expected | Actual | Pass |
 |---|---|---|---|
-| 1 Baseline release | `VALIDATED`, `AVAILABLE`, 0 cases | | |
-| 2 Newer release | `VALIDATED`, `AVAILABLE` | | |
-| 3 Unique match | 1 NEW case: `SIM-MED-001` / `SIM-PKG-100` | | |
-| 4 Outcomes | `MATCHED`, `AMBIGUOUS`, `NO_MATCH` as in the table | | |
-| 5 Pharmacist view | 1 case with full evidence, no decision actions | | |
-| 6 Replay | same release reference; still 1 case and 3 outcomes | | |
-| 7 Malformed input | `FAILED` with reason; still 1 case | | |
-| 8 Unknown order | `VALIDATED`, `UNAVAILABLE`; still 1 case | | |
-| 9 Unavailable source | n8n download-failure branch runs | | |
-| 10 Simulated data and scope | only `SIM-` data; no clinical actions | | |
+| 1 Baseline release | `VALIDATED`, `AVAILABLE`, 0 cases | `VALIDATED`, `AVAILABLE`, `failureDetail: null`; 0 cases | Yes |
+| 2 Newer release | `VALIDATED`, `AVAILABLE` | `VALIDATED`, `AVAILABLE` | Yes |
+| 3 Unique match | 1 NEW case: `SIM-MED-001` / `SIM-PKG-100` | 1 case: `SIM-MED-001`, `SIM-PKG-100`, `FIELDS_CHANGED`, `Laakevalmiste/Kauppanimi, Pakkaus/JulkinenTarkenne`, status `NEW`, initial event `NEW` | Yes |
+| 4 Outcomes | `MATCHED`, `AMBIGUOUS`, `NO_MATCH` as in the table | `SIM-PKG-100` MATCHED (`SIM-MED-001`, 1 case); `SIM-PKG-300` AMBIGUOUS (`SIM-MED-003`, `SIM-MED-004`, 0 cases); `SIM-PKG-500` NO_MATCH (0 cases). Filter `NO_MATCH`+`AMBIGUOUS` returned `SIM-PKG-300`, `SIM-PKG-500` | Yes |
+| 5 Pharmacist view | 1 case with full evidence, no decision actions | `Cases (1)`, "Fictional Product Amber", "2 field changes"; both fields with before/after; `SIM-MED-001` / `SIM-PERSON-001`; file names, checksums, record locators, release dates `2099-01-01` / `2099-01-02`, retrieval times `2099-01-03T06:00:00+00:00` / `2099-01-04T06:00:00+00:00`, `VERIFIED`, `Ajopvm` basis, no-clinical-decision statement. Only button: the case-list entry | Yes |
+| 6 Replay | same release reference; still 1 case and 3 outcomes | same `capturedReleaseReference` as step 2; 1 case; 3 outcomes | Yes |
+| 7 Malformed input | `FAILED` with reason; still 1 case | `FAILED`, `UNAVAILABLE`, `Source release validation failed: mismatched tag: line 8, column 42`; captured as `FAILED`; 1 case | Yes |
+| 8 Unknown order | `VALIDATED`, `UNAVAILABLE`; still 1 case | `VALIDATED`, `UNAVAILABLE`; captured with order `UNKNOWN`; 1 case, 3 outcomes | Yes |
+| 9 Unavailable source | n8n download-failure branch runs | Imported workflow, download URL set to a non-existent file and executed once. The download failed (HTTP 403, because the test environment's network does not allow the Fimea host); "HTTP Request" sent 0 items to its success output and 1 to its error output; "Record Download Failure" ran; "Upload and Validate Fimea Release" did not run; backend captures unchanged (4) | Yes |
+| 10 Simulated data and scope | only `SIM-` data; no clinical actions | View and API showed only `SIM-` record, person and package identifiers; `tests/unit/test_simulated_data_guard.py` 15 passed; no diagnosis, recommendation, substitution, urgency, status change or close action | Yes |
+
+Result: all 10 steps passed. No defects were found in the application.
+
+Observations:
+
+- n8n 2.42.3 does not start on Node.js 22 ("requires >=24.0.0").
+- `n8n execute` on the command line needs a Manual Trigger or Execute Workflow Trigger node. The exported
+  workflow only has the Schedule Trigger, so for step 9 a test copy added a Manual Trigger connected to
+  "HTTP Request". In the n8n editor, use **Execute workflow** instead; no change is needed.
+
+Follow-up: repeat section 5 once on Windows PowerShell to confirm the `Ingest` helper and the
+`Invoke-RestMethod` commands, and add the result as Run 2.
 
 Refer to [data-model.md](data-model.md) for entity and state requirements and
 [contracts/ingestion-and-case-view.md](contracts/ingestion-and-case-view.md) for boundary data
