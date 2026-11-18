@@ -106,6 +106,15 @@ The workflow configuration is available in:
 
 `workflow/n8n/fimea-basic-register-ingestion.json`
 
+## Data Source and Licence
+
+Source data: **Basic register for medicinal products (Perusrekisteri), Finnish Medicines Agency Fimea**, published as open data under the [Creative Commons Attribution 4.0 (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) licence ([Fimea open data](https://fimea.fi/en/about_us/open-data)).
+
+- When presenting or sharing results, name Fimea as the licensor, the material ("Basic register for medicinal products"), and the release date of the data used. Each review case shows the release date (`Ajopvm`) and retrieval time of its source files.
+- This project changes the presentation of the data: it normalizes selected fields and compares successive releases. The comparisons are this project's, not Fimea's.
+- Fimea notes that individual errors may occur in the register and does not guarantee that the online data is complete or up to date.
+- The test fixtures in `tests/fixtures/` are synthetic and are not Fimea data.
+
 ## Safety and Project Scope
 
 Medicine Change Care Loop is a software development prototype, not an autonomous clinical decision-support system.
