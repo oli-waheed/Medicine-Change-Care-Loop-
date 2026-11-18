@@ -20,9 +20,12 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Compare medicine package information across eligible releases.
 - Use package identifiers (Pakkaustunnus) as the primary matching key.
 - Match source changes with simulated medication records.
-- Create new review cases for pharmacist assessment.
-- Present before-and-after information and supporting source evidence.
-- Provide an API for retrieving open review cases.
+- Create one review case per package update and matched record for pharmacist assessment.
+- Detect packages that are no longer present in the register.
+- Keep an outcome for every change (`MATCHED`, `NO_MATCH`, `AMBIGUOUS`), including those that create no case.
+- Present before-and-after information and supporting source evidence, and show when that evidence is no longer available.
+- Store an unchanged daily download only once, recording each retrieval time.
+- Provide APIs for retrieving open review cases and change processing outcomes.
 
 ## How It Works
 
@@ -68,6 +71,8 @@ It retrieves open review cases through the backend API and presents:
 - Source-release references and checksums.
 - Evidence classifications.
 - Source-order information.
+- Packages that are no longer present in the register, with their last known values.
+- A notice when a case's raw source files are no longer stored.
 
 The interface is designed to support pharmacist assessment. It does not make clinical decisions.
 
@@ -100,7 +105,7 @@ The workflow retrieves the XML source and submits it to the backend ingestion AP
 
 Release order is derived by the backend from the XML's own `Ajopvm` (dataset run date). The `sourceOrder` value sent by the workflow is recorded for traceability only and is not used for chronology. Each new release with a later `Ajopvm` is compared with the stored baseline, and matching changes create review cases.
 
-The workflow includes success and failure handling for download and upload operations.
+The workflow includes success and failure handling for download and upload operations. It runs daily at 06:00 and uploads to `http://host.docker.internal:8000`, which works when n8n runs in Docker; when n8n is started with `npx`, change the upload URL to `http://127.0.0.1:8000/api/source-releases/ingest`. n8n 2.42.3 requires Node.js 24. See [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#4-local-n8n-scheduled-ingestion).
 
 The workflow configuration is available in:
 
@@ -135,8 +140,11 @@ The following boundaries apply:
 ### Prerequisites
 
 - Python 3.13
-- Node.js 24.15.0 or later
+- Node.js 24.15.0 or later (also required by n8n 2.42.3)
 - npm
+
+The full setup and acceptance guide, with the expected output of every command, is in
+[specs/001-ingestion-case-pipeline/quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md).
 
 ### Backend
 
@@ -214,13 +222,23 @@ From the project root:
 python -m pytest
 ```
 
+Expected: `191 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+
+```powershell
+cd backend
+python -m ruff check src ..\tests
+python -m ruff format --check src ..\tests
+```
+
 ### Frontend Tests
 
 From the frontend directory:
 
 ```powershell
-npm test -- --run --pool=threads --maxWorkers=1 --minWorkers=1
+npm run test -- --run
 ```
+
+Expected: `Tests  10 passed (10)`.
 
 ### Frontend Production Build
 
@@ -273,15 +291,16 @@ Medicine-Change-Care-Loop/
 
 ## Project Status
 
-The project is under active development.
+All tasks of the feature specification (T001–T036 in [tasks.md](specs/001-ingestion-case-pipeline/tasks.md)) are implemented, and the specification lists no known gaps ([spec.md](specs/001-ingestion-case-pipeline/spec.md#implementation-status)).
 
-The current implementation includes source-release ingestion, source-data normalization, evidence preservation, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend page for viewing open review cases.
+The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend page for viewing open review cases.
 
-Local backend and frontend startup, API proxying, frontend tests, and the frontend production build have been verified.
+Verification:
 
-The frontend tests currently include ten passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, unavailable source evidence, loading errors, the empty state, and the clinical-scope guard (no case actions or clinical wording). A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
+- 191 backend tests and 10 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
-Further development and validation are tracked in the project specifications and task lists.
+Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
 
 ## Academic Context
 
