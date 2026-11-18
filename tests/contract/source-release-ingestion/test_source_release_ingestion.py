@@ -192,8 +192,10 @@ def test_source_order_is_optional_in_the_request(tmp_path):
 
 @pytest.mark.parametrize("ajopvm", [b"<Ajopvm/>", b"<Ajopvm>06.10.2026</Ajopvm>", b""])
 def test_absent_empty_or_non_iso_ajopvm_leaves_chronology_unknown(tmp_path, ajopvm):
-    content = (FIXTURE_DIR / "prior-release.xml").read_bytes().replace(
-        b"<Ajopvm>2099-01-01</Ajopvm>", ajopvm
+    content = (
+        (FIXTURE_DIR / "prior-release.xml")
+        .read_bytes()
+        .replace(b"<Ajopvm>2099-01-01</Ajopvm>", ajopvm)
     )
     source_path = tmp_path / "variant.xml"
     source_path.write_bytes(content)

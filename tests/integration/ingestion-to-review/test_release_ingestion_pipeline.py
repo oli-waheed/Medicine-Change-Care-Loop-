@@ -31,9 +31,7 @@ def _release_payload(filename, release_reference, source_order, retrieved_at):
     }
 
 
-def test_complete_release_ingestion_creates_traceable_review_case(
-    tmp_path, medication_record
-):
+def test_complete_release_ingestion_creates_traceable_review_case(tmp_path, medication_record):
     prior_payload = _release_payload(
         "prior-release.xml",
         "SIM-RELEASE-001",
@@ -66,8 +64,7 @@ def test_complete_release_ingestion_creates_traceable_review_case(
 
     changes = result.workflow_result.comparison.changes
     assert any(
-        change.medicine_key == "SIM-PKG-100"
-        and change.field_name == "Laakevalmiste/Kauppanimi"
+        change.medicine_key == "SIM-PKG-100" and change.field_name == "Laakevalmiste/Kauppanimi"
         for change in changes
     )
 
@@ -84,9 +81,7 @@ def test_complete_release_ingestion_creates_traceable_review_case(
     assert result.current_ingestion.captured_release.capture_directory.exists()
 
 
-def test_unknown_source_order_captures_releases_without_creating_cases(
-    tmp_path, medication_record
-):
+def test_unknown_source_order_captures_releases_without_creating_cases(tmp_path, medication_record):
     prior_payload = _release_payload(
         "prior-release.xml",
         "SIM-RELEASE-UNKNOWN-001",
@@ -118,9 +113,7 @@ def test_unknown_source_order_captures_releases_without_creating_cases(
     assert open_cases == []
 
 
-def test_decreasing_verified_source_order_is_conflicting(
-    tmp_path, medication_record
-):
+def test_decreasing_verified_source_order_is_conflicting(tmp_path, medication_record):
     # Ajopvm of the "prior" file is later than that of the "current" file.
     prior_payload = _release_payload(
         "current-release.xml",
@@ -152,9 +145,7 @@ def test_decreasing_verified_source_order_is_conflicting(
     assert open_cases == []
 
 
-def test_replaying_complete_release_pair_does_not_duplicate_open_case(
-    tmp_path, medication_record
-):
+def test_replaying_complete_release_pair_does_not_duplicate_open_case(tmp_path, medication_record):
     prior_payload = _release_payload(
         "prior-release.xml",
         "SIM-RELEASE-REPLAY-001",

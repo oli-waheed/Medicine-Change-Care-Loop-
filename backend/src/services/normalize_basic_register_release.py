@@ -4,6 +4,7 @@ This boundary parses a complete supplied document; raw capture, checksum verific
 source ordering and ingestion status belong to the subsequent ingestion tasks.
 """
 
+from datetime import datetime
 from pathlib import Path
 from xml.etree import ElementTree as ET
 
@@ -43,7 +44,11 @@ def _index(root: ET.Element, tag: str) -> dict[str, ET.Element]:
 
 
 def normalize_basic_register_release(
-    content: bytes, *, file_name: str, checksum: str
+    content: bytes,
+    *,
+    file_name: str,
+    checksum: str,
+    retrieved_at: datetime | None = None,
 ) -> tuple[SourceRelease, tuple[MedicineSnapshot, ...]]:
     """Return all snapshots atomically, or raise on malformed/ambiguous links.
 
@@ -67,7 +72,9 @@ def normalize_basic_register_release(
         aineistoera=_field(version, "Aineistoera"),
         kkera=_field(version, "Kkera"),
         kattavuus=_field(version, "Kattavuus"),
-        provenance=SourceProvenance("Fimea Basic Register", file_name, checksum),
+        provenance=SourceProvenance(
+            "Fimea Basic Register", file_name, checksum, retrieved_at=retrieved_at
+        ),
     )
     products = _index(root, "Laakevalmiste")
     substances = _index(root, "Laakeaine")

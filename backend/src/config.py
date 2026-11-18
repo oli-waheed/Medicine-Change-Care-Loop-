@@ -22,9 +22,7 @@ class ApplicationConfig:
     @classmethod
     def from_environment(cls) -> "ApplicationConfig":
         default_storage_dir = _BACKEND_DIR / "data" / "source-releases"
-        storage_dir = Path(
-            os.environ.get("SOURCE_RELEASE_STORAGE_DIR", str(default_storage_dir))
-        )
+        storage_dir = Path(os.environ.get("SOURCE_RELEASE_STORAGE_DIR", str(default_storage_dir)))
         max_upload_bytes = int(
             os.environ.get(
                 "MAX_SOURCE_RELEASE_UPLOAD_BYTES",

@@ -90,9 +90,7 @@ def _post_file(filename="prior-release.xml", *, content=None, data=None):
         message["status"] for message in messages if message["type"] == "http.response.start"
     )
     response_body = b"".join(
-        message.get("body", b"")
-        for message in messages
-        if message["type"] == "http.response.body"
+        message.get("body", b"") for message in messages if message["type"] == "http.response.body"
     )
 
     class ApiResponse:
@@ -105,9 +103,7 @@ def _post_file(filename="prior-release.xml", *, content=None, data=None):
     return ApiResponse()
 
 
-def test_successful_upload_returns_capture_reference_and_preserves_capture(
-    api, monkeypatch
-):
+def test_successful_upload_returns_capture_reference_and_preserves_capture(api, monkeypatch):
     content = (FIXTURE_DIR / "prior-release.xml").read_bytes()
     temporary_paths = []
     real_named_temporary_file = source_release_ingestion.tempfile.NamedTemporaryFile

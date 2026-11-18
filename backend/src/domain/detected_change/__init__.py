@@ -116,9 +116,7 @@ class PackageChangeSet:
                     or change.change_evidence_class is not self.change_evidence_class
                 ):
                     raise ValueError("Every field change must belong to this package pair.")
-            if len({change.field_name for change in self.field_changes}) != len(
-                self.field_changes
-            ):
+            if len({change.field_name for change in self.field_changes}) != len(self.field_changes):
                 raise ValueError("A field may appear only once in a change set.")
         else:
             if self.field_changes or self.current_snapshot is not None:

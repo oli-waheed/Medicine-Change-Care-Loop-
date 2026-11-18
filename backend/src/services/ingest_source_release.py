@@ -207,6 +207,7 @@ def _read_files(payload: dict) -> tuple[RawReleaseFile, ...]:
 
 def _normalize_files(
     raw_files: tuple[RawReleaseFile, ...],
+    retrieved_at: datetime | None = None,
 ) -> tuple[tuple[SourceRelease, ...], tuple[MedicineSnapshot, ...]]:
     """Normalize every file of one release atomically; raise on any problem."""
     normalized_releases = []
@@ -215,7 +216,10 @@ def _normalize_files(
     for raw_file in raw_files:
         checksum = hashlib.sha256(raw_file.content).hexdigest()
         source_release, snapshots = normalize_basic_register_release(
-            raw_file.content, file_name=raw_file.name, checksum=checksum
+            raw_file.content,
+            file_name=raw_file.name,
+            checksum=checksum,
+            retrieved_at=retrieved_at,
         )
         for snapshot in snapshots:
             if snapshot.pakkaustunnus in package_identifiers:
@@ -237,7 +241,7 @@ def _validated_outcome(
     declared_source_order: SourceEvidence | None,
 ) -> IngestionOutcome:
     try:
-        releases, snapshots = _normalize_files(raw_files)
+        releases, snapshots = _normalize_files(raw_files, captured_release.retrieved_at)
     except (ParseError, ValueError) as error:
         return _failure(
             f"Source release validation failed: {error}",

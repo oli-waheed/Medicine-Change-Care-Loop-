@@ -27,8 +27,7 @@ def create_review_cases(
     cases = []
 
     seen_pairs = {
-        (case.change_set.change_set_id, case.medication_record.record_id)
-        for case in existing_cases
+        (case.change_set.change_set_id, case.medication_record.record_id) for case in existing_cases
     }
 
     match_results = match_detected_changes(change_sets, records)
@@ -36,8 +35,7 @@ def create_review_cases(
     for match_result in match_results:
         if (
             match_result.result is not MatchStatus.MATCHED
-            or match_result.evidence_classification
-            is not EvidenceClassification.VERIFIED
+            or match_result.evidence_classification is not EvidenceClassification.VERIFIED
         ):
             continue
 
@@ -54,9 +52,7 @@ def create_review_cases(
 
         seen_pairs.add(pair)
 
-        key = hashlib.sha256(
-            f"{change_set.change_set_id}:{record.record_id}".encode()
-        ).hexdigest()
+        key = hashlib.sha256(f"{change_set.change_set_id}:{record.record_id}".encode()).hexdigest()
 
         case_id = f"CASE-{key}"
         event = CaseStatusEvent(

@@ -62,7 +62,7 @@ py -3.13 -m venv .venv
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 python -c "import sqlite3; print(sqlite3.sqlite_version)"
-python -m uvicorn main:app --app-dir src --reload
+python -m uvicorn src.main:app --reload
 python -m pytest ..\tests
 python -m ruff check src ..\tests
 python -m ruff format --check src ..\tests
