@@ -48,7 +48,7 @@ A source-data change does not automatically mean that there is a clinically sign
 | Frontend build tool | Vite |
 | Frontend testing | Vitest |
 | Backend | Python 3.13, FastAPI |
-| Backend dependency | SQLAlchemy |
+| Database | SQLite via SQLAlchemy |
 | Backend testing | pytest |
 | Workflow automation | n8n |
 | Source format | XML |
@@ -85,7 +85,7 @@ Current API endpoints include:
 
 ### API Documentation
 
-When the backend is running locally:
+These links work only on your own computer while the backend is running:
 
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
@@ -148,9 +148,10 @@ Start the FastAPI development server:
 uvicorn backend.src.main:app --reload
 ```
 
-The backend is available at:
+The backend runs at `http://127.0.0.1:8000` while the server is running. It has no page at `/` (opening it shows `{"detail":"Not Found"}`, which is expected). Use these instead:
 
-http://127.0.0.1:8000
+- API documentation: http://127.0.0.1:8000/docs
+- Health check: http://127.0.0.1:8000/health
 
 #### Backend configuration and data
 
@@ -187,9 +188,7 @@ Start the Vite development server:
 npm run dev
 ```
 
-The frontend is available at:
-
-http://localhost:5173/
+The frontend runs at http://localhost:5173/ while `npm run dev` is running. The backend must be running too; otherwise the page shows "Open cases could not be loaded".
 
 During local development, Vite proxies requests beginning with `/api` to the FastAPI backend at `http://127.0.0.1:8000`.
 
@@ -230,11 +229,11 @@ Medicine-Change-Care-Loop/
 |   +-- src/
 |   |   +-- api/
 |   |   +-- domain/
-|   |   +-- medicine/
 |   |   +-- models/
 |   |   +-- schemas/
 |   |   +-- services/
-|   |   +-- workflow/
+|   |   +-- workflows/
+|   +-- seed/
 |   +-- pyproject.toml
 |
 +-- frontend/
@@ -249,6 +248,7 @@ Medicine-Change-Care-Loop/
 |   +-- n8n/
 |
 +-- tests/
+|   +-- fixtures/
 |   +-- unit/
 |   +-- contract/
 |   +-- integration/
@@ -269,7 +269,7 @@ The current implementation includes source-release ingestion, source-data normal
 
 Local backend and frontend startup, API proxying, frontend tests, and the frontend production build have been verified.
 
-The frontend tests currently include seven passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, and the empty state. A populated review-case workflow has not yet been verified through the browser.
+The frontend tests currently include seven passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, and the empty state. A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
 
 Further development and validation are tracked in the project specifications and task lists.
 
