@@ -279,7 +279,7 @@ The current implementation includes source-release ingestion, source-data normal
 
 Local backend and frontend startup, API proxying, frontend tests, and the frontend production build have been verified.
 
-The frontend tests currently include seven passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, and the empty state. A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
+The frontend tests currently include eight passing tests covering the open-case interface, source evidence, code-table values, multi-field cases, packages no longer present, loading errors, the empty state, and the clinical-scope guard (no case actions or clinical wording). A populated review-case workflow has been verified in the browser using the synthetic fixture releases.
 
 Further development and validation are tracked in the project specifications and task lists.
 

@@ -160,3 +160,21 @@ clinical urgency, patient-facing communication, or automatic case closure operat
 - Repeated submission of identical release evidence is idempotent.
 - A unique change and simulated record pair creates at most one `NEW` case.
 - All displayed medication/person data is fictional; no real patient identifiers are valid contract data.
+
+## Clinical scope verification (T035)
+
+Verified on 2026-11-18 against `frontend/src/pages/open-review-cases`, `backend/src/workflows/ingestion_to_review.py`,
+the API and the n8n workflow:
+
+- The API has no operation that changes, closes, or deletes a case: only `GET /health`,
+  `GET /api/open-review-cases`, `GET /api/change-processing-outcomes`, and `POST /api/source-releases/ingest`.
+- `NEW` is the only case status. Cases and their creation event are only inserted; a later release that
+  changes the same package again opens a new case and leaves the earlier one unchanged.
+- No stored case or outcome field or text expresses diagnosis, treatment or dosing advice, substitution,
+  urgency, priority, severity, or risk. `Substituutioryhma` is never read or compared.
+- The view's only buttons select which case to show; it has no form controls, reads cases once with
+  `GET`, and states that it does not make a clinical decision.
+- The n8n workflow only downloads the Fimea file and uploads it to the ingestion endpoint.
+
+These rules are enforced by `tests/contract/clinical-scope/test_clinical_scope_guard.py` and
+`frontend/src/pages/open-review-cases/OpenReviewCasesPage.scope.test.tsx`.

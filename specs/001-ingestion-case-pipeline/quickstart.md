@@ -62,7 +62,7 @@ In a second terminal with the virtual environment active:
 python -m pytest -q
 ```
 
-Expected: `181 passed`.
+Expected: `187 passed`.
 
 Run Ruff from the `backend` folder, where its settings (`backend/pyproject.toml`) live. Run from the
 repository root, Ruff falls back to default settings and reports false errors.
@@ -74,7 +74,7 @@ python -m ruff format --check src ..\tests
 Set-Location ..
 ```
 
-Expected: `All checks passed!` and `57 files already formatted`.
+Expected: `All checks passed!` and `58 files already formatted`.
 
 ## 3. Frontend setup, checks and start
 
@@ -90,7 +90,7 @@ npm run format:check
 Expected:
 
 - `npm run build` ends with `✓ built in …`.
-- `npm run test -- --run` shows `Test Files  1 passed (1)` and `Tests  7 passed (7)`.
+- `npm run test -- --run` shows `Test Files  2 passed (2)` and `Tests  8 passed (8)`.
 - `npm run lint` runs `oxlint` and prints no warnings or errors.
 - `npm run format:check` prints `All matched files use Prettier code style!`.
 
