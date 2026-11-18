@@ -109,7 +109,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 **Purpose**: Verify end-to-end quality, scope, and project documentation.
 
-- [ ] T032 [P] Update `specs/001-ingestion-case-pipeline/quickstart.md` with the selected stack's prerequisites, runnable commands, and actual expected output.
+- [x] T032 [P] Update `specs/001-ingestion-case-pipeline/quickstart.md` with the selected stack's prerequisites, runnable commands, and actual expected output.
 - [ ] T033 [P] Verify all seeded/test/demo patient and medication data is simulated and contains no real patient-identifiable information in `tests/fixtures/`.
 - [ ] T034 Run the complete manual end-to-end acceptance flow in `specs/001-ingestion-case-pipeline/quickstart.md` and record results in `specs/001-ingestion-case-pipeline/quickstart.md`.
 - [ ] T035 Verify the pharmacist view and workflow do not diagnose, recommend treatment, select substitutions, determine urgency, autonomously change case status, or automatically close a case in `frontend/src/pages/open-review-cases` and `backend/src/workflows/ingestion-to-review`.
