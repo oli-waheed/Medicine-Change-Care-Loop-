@@ -25,9 +25,7 @@ def test_missing_or_different_primary_key_never_falls_back_to_vnr(
     change_set, medication_record, key
 ):
     assert (
-        create_review_cases(
-            (change_set,), (replace(medication_record, package_identifier=key),)
-        )
+        create_review_cases((change_set,), (replace(medication_record, package_identifier=key),))
         == ()
     )
 
@@ -92,9 +90,7 @@ def test_invalid_case_event_or_classification_is_rejected(change_set, medication
         replace(case, evidence_class=EvidenceClassification.UNKNOWN)
 
 
-def test_one_package_update_with_several_fields_creates_one_case(
-    snapshot_pair, medication_record
-):
+def test_one_package_update_with_several_fields_creates_one_case(snapshot_pair, medication_record):
     from src.domain.source_field import SourceField
     from src.services.detect_relevant_changes import detect_relevant_changes
 

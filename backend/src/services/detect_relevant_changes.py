@@ -191,10 +191,7 @@ def detect_relevant_changes(
         _release_identity(order.prior_release),
         _release_identity(order.current_release),
     ]
-    note = (
-        "Source-data difference only; cross-release key stability "
-        "is not established generally."
-    )
+    note = "Source-data difference only; cross-release key stability is not established generally."
 
     def change_set_id(key, kind):
         identity = [*release_identities, key, kind.value]

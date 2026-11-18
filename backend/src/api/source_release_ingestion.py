@@ -101,11 +101,7 @@ async def ingest_uploaded_source_release(
                 digest.update(chunk)
                 temporary_file.write(chunk)
 
-        filename = (
-            (file.filename or "source-release.xml")
-            .replace("\\", "/")
-            .rsplit("/", 1)[-1]
-        )
+        filename = (file.filename or "source-release.xml").replace("\\", "/").rsplit("/", 1)[-1]
 
         payload = {
             "sourceName": source_name,
@@ -134,9 +130,7 @@ async def ingest_uploaded_source_release(
             ) from error
 
         captured_reference = (
-            outcome.captured_release.release_id
-            if outcome.captured_release is not None
-            else None
+            outcome.captured_release.release_id if outcome.captured_release is not None else None
         )
 
         if outcome.captured_release is not None:

@@ -30,7 +30,7 @@ Set-Location backend
 .\.venv\Scripts\Activate.ps1
 python -m pip install -e ".[dev]"
 python -c "import sqlite3; print(sqlite3.sqlite_version)"
-python -m uvicorn main:app --app-dir src --reload
+python -m uvicorn src.main:app --reload
 ```
 
 In another terminal, run the backend tests:
@@ -46,7 +46,7 @@ python -m ruff format --check src ..\tests
 The SQLite version printed is the library included with the installed Python runtime. Use SQLAlchemy
 declarative ORM mappings and SQLite-compatible types; do not use PostgreSQL-specific SQL, JSONB, or
 database-specific UUID generation. The local database file is planned at
-`backend/data/medicine-change-loop.sqlite3`.
+`backend/data/medicine-change-care-loop.sqlite3`.
 
 ### Frontend
 

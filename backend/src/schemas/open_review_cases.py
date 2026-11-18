@@ -22,7 +22,11 @@ def _source(evidence):
         "fieldReference": evidence.field_reference,
         "evidenceClass": evidence.classification.value,
         "note": evidence.note,
-        "retrievedAt": None,
+        "retrievedAt": (
+            release.provenance.retrieved_at.isoformat()
+            if release.provenance.retrieved_at is not None
+            else None
+        ),
     }
 
 
@@ -63,9 +67,7 @@ def open_review_case_payload(case: ReviewCase):
                 }
                 for change in change_set.field_changes
             ],
-            "lastKnownFields": (
-                _last_known_fields(change_set.prior_snapshot) if removed else None
-            ),
+            "lastKnownFields": (_last_known_fields(change_set.prior_snapshot) if removed else None),
         },
         "sources": {
             "prior": _source(change_set.prior_evidence),

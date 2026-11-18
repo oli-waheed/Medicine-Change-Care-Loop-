@@ -46,7 +46,7 @@ def test_file_to_snapshots_retains_release_and_raw_record_provenance(filename):
     path = FIXTURES / filename
     checksum = hashlib.sha256(path.read_bytes()).hexdigest()
     release, snapshots = read_basic_register_release(path, checksum=checksum)
-    assert len(snapshots) == 3
+    assert len(snapshots) == 4
     assert release.provenance.raw_file_name == filename
     assert release.provenance.raw_file_checksum == checksum
     assert release.aineistoera.value.startswith("SIM-")

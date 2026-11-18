@@ -73,6 +73,13 @@ def test_n8n_style_uploads_create_persisted_cases_and_replay_is_idempotent(
     assert {case["sourceOrder"]["prior"] for case in cases} == {20990101}
     assert {case["sourceOrder"]["current"] for case in cases} == {20990102}
     assert "Ajopvm" in cases[0]["sourceOrder"]["basis"]
+    # Retrieval time is evidence of when the prototype fetched each file.
+    assert {case["sources"]["prior"]["retrievedAt"] for case in cases} == {
+        "2099-01-03T00:00:00+00:00"
+    }
+    assert {case["sources"]["current"]["retrievedAt"] for case in cases} == {
+        "2099-01-04T00:00:00+00:00"
+    }
 
     for case in cases:
         events = app.state.store.status_events(case["caseId"])
@@ -98,6 +105,8 @@ def test_cases_and_baseline_survive_a_restart(isolated_app, medication_record, t
     _upload(app, "current-release.xml", day=4)
     created = _open_cases(app)
     assert created
+    # The baseline was reloaded from disk; its retrieval time survives the restart.
+    assert created[0]["sources"]["prior"]["retrievedAt"] == "2099-01-03T00:00:00+00:00"
 
     app.state.store.dispose()
     app.state.store = PipelineStore(database_url)

@@ -58,12 +58,17 @@ def test_pakkaustunnus_is_the_match_key_and_vnr_is_supporting(tmp_path):
     "content",
     [
         {"dataset": "patients", "records": []},
-        {"dataset": "SIMULATED", "records": [{"record_id": "123", "person_reference": "SIM-P",
-                                             "medicine_display": "x"}]},
-        {"dataset": "SIMULATED", "records": [
-            {"record_id": "SIM-1", "person_reference": "SIM-P", "medicine_display": "x"},
-            {"record_id": "SIM-1", "person_reference": "SIM-P", "medicine_display": "y"},
-        ]},
+        {
+            "dataset": "SIMULATED",
+            "records": [{"record_id": "123", "person_reference": "SIM-P", "medicine_display": "x"}],
+        },
+        {
+            "dataset": "SIMULATED",
+            "records": [
+                {"record_id": "SIM-1", "person_reference": "SIM-P", "medicine_display": "x"},
+                {"record_id": "SIM-1", "person_reference": "SIM-P", "medicine_display": "y"},
+            ],
+        },
     ],
 )
 def test_non_simulated_or_duplicate_records_are_rejected(tmp_path, content):

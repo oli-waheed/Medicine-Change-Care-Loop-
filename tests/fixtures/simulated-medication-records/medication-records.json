@@ -6,53 +6,70 @@
     {
       "record_id": "SIM-MED-001",
       "person_reference": "SIM-PERSON-001",
-      "medicine_display": "Fictional medicine Alpha",
-      "Pakkaustunnus": "SIM-PKG-0001",
-      "VNR-numero": "SIM-VNR-0001"
+      "medicine_display": "Fictional Product Amber",
+      "Pakkaustunnus": "SIM-PKG-100",
+      "VNR-numero": "SIM-VNR-100"
     },
     {
       "record_id": "SIM-MED-002",
       "person_reference": "SIM-PERSON-002",
-      "medicine_display": "Fictional medicine Beta",
-      "Pakkaustunnus": "SIM-PKG-0002"
+      "medicine_display": "Fictional medicine Beta (package not in any release)",
+      "Pakkaustunnus": "SIM-PKG-9999"
     },
     {
       "record_id": "SIM-MED-003",
       "person_reference": "SIM-PERSON-003",
-      "medicine_display": "Fictional medicine Gamma",
-      "Pakkaustunnus": "SIM-PKG-0003",
-      "VNR-numero": "SIM-VNR-0003"
+      "medicine_display": "Fictional Product Cedar",
+      "Pakkaustunnus": "SIM-PKG-300",
+      "VNR-numero": "SIM-VNR-300"
     },
     {
       "record_id": "SIM-MED-004",
       "person_reference": "SIM-PERSON-004",
-      "medicine_display": "Fictional medicine Delta",
-      "Pakkaustunnus": "SIM-PKG-0003",
-      "VNR-numero": "SIM-VNR-0004"
+      "medicine_display": "Fictional Product Cedar (second record)",
+      "Pakkaustunnus": "SIM-PKG-300",
+      "VNR-numero": "SIM-VNR-300"
     },
     {
       "record_id": "SIM-MED-005",
       "person_reference": "SIM-PERSON-005",
-      "medicine_display": "Fictional medicine Epsilon",
-      "VNR-numero": "SIM-VNR-0001"
+      "medicine_display": "Fictional medicine Epsilon (no package key)",
+      "VNR-numero": "SIM-VNR-100"
     }
   ],
   "matching_scenarios": {
+    "_note": "Against tests/fixtures/fimea-basic-register prior-release.xml -> current-release.xml.",
     "unique_exact_match": {
-      "Pakkaustunnus": "SIM-PKG-0001",
-      "expected_record_ids": ["SIM-MED-001"]
-    },
-    "no_match": {
-      "Pakkaustunnus": "SIM-PKG-9999",
-      "expected_record_ids": []
+      "Pakkaustunnus": "SIM-PKG-100",
+      "change": "FIELDS_CHANGED",
+      "expected_record_ids": [
+        "SIM-MED-001"
+      ],
+      "expected_cases": 1
     },
     "ambiguous_exact_match": {
-      "Pakkaustunnus": "SIM-PKG-0003",
-      "expected_record_ids": ["SIM-MED-003", "SIM-MED-004"]
+      "Pakkaustunnus": "SIM-PKG-300",
+      "change": "NO_LONGER_PRESENT",
+      "expected_record_ids": [
+        "SIM-MED-003",
+        "SIM-MED-004"
+      ],
+      "expected_cases": 0
+    },
+    "no_match": {
+      "Pakkaustunnus": "SIM-PKG-500",
+      "change": "FIELDS_CHANGED",
+      "expected_record_ids": [],
+      "expected_cases": 0
+    },
+    "record_without_change": {
+      "record_id": "SIM-MED-002",
+      "Pakkaustunnus": "SIM-PKG-9999"
     },
     "primary_key_absent": {
       "record_id": "SIM-MED-005",
-      "supporting_vnr_is_not_a_match_key": true
+      "supporting_vnr_is_not_a_match_key": true,
+      "note": "Its VNR-numero equals SIM-PKG-100's, yet it must not match."
     }
   }
 }

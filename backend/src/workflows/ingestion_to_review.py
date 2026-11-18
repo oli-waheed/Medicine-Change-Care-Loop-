@@ -72,14 +72,10 @@ def run_ingested_release_to_review(
     """Compare two already captured and normalized releases."""
     for label, outcome in (("Prior", prior), ("Current", current)):
         if outcome.processing_status is not ProcessingStatus.VALIDATED:
-            raise ValueError(
-                f"{label} source release ingestion failed: {outcome.failure_detail}"
-            )
+            raise ValueError(f"{label} source release ingestion failed: {outcome.failure_detail}")
 
     if prior.source_release is None or current.source_release is None:
-        raise ValueError(
-            "Comparison requires exactly one normalized source file per release."
-        )
+        raise ValueError("Comparison requires exactly one normalized source file per release.")
 
     order = None
     prior_key = source_order_key(prior.source_order)

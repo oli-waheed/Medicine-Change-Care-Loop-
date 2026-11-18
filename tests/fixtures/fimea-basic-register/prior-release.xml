@@ -48,6 +48,22 @@
     </Kaupanolo>
     <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-300"/>
   </Pakkaus>
+  <!-- SIM-PKG-500: changes, but no simulated record matches it (no-match scenario). -->
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-200">
+    <Pakkaustunnus>SIM-PKG-500</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-500</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack size E</Pakkauskokoteksti>
+    <Pakkauskokokerroin>1</Pakkauskokokerroin>
+    <Pakkauskoko>50</Pakkauskoko>
+    <Pakkauskokoyksikko listname="SIM-UNIT" id="SIM-COUNT" value="fictional units"/>
+    <JulkinenTarkenne/>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2098-12-03</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-200"/>
+  </Pakkaus>
   <Laakevalmiste id="SYN-PROD-100">
     <Kauppanimi>Fictional Product Amber</Kauppanimi>
     <ATC-koodi listname="SIM-ATC" id="SIM-A01" value="synthetic category"/>

@@ -35,9 +35,7 @@ class PipelineStore:
             engine = create_engine(
                 self.database_url,
                 connect_args=(
-                    {"check_same_thread": False}
-                    if self.database_url.startswith("sqlite")
-                    else {}
+                    {"check_same_thread": False} if self.database_url.startswith("sqlite") else {}
                 ),
             )
             if self.database_url.startswith("sqlite"):
