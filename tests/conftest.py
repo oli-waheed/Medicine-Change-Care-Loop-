@@ -45,7 +45,7 @@ def snapshot_pair():
     )
     old = MedicineSnapshot(
         "SIM-PKG-100",
-        F.of("000123"),
+        F.of("SIM-VNR-000123"),
         F.of("PRODUCT-OLD"),
         ProductFields(
             F.of("Fictional Alpha"),
@@ -113,7 +113,7 @@ def change_set(snapshot_pair):
 @pytest.fixture
 def medication_record():
     return SimulatedMedicationRecord(
-        "SIM-MED-100", "SIM-PERSON-100", "Fictional Alpha", "SIM-PKG-100", "000123"
+        "SIM-MED-100", "SIM-PERSON-100", "Fictional Alpha", "SIM-PKG-100", "SIM-VNR-000123"
     )
 
 

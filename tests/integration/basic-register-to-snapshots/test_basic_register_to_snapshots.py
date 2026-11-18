@@ -94,6 +94,8 @@ def test_invalid_release_is_rejected_atomically_even_after_valid_records(mutatio
 
 def test_repeated_elements_raw_whitespace_and_leading_zero_identifiers_are_preserved():
     content = (FIXTURES / "prior-release.xml").read_bytes()
+    # Deliberately numeric: real Pakkaustunnus values are numeric strings, and a SIM- prefix
+    # would hide the leading-zero case. The rest of this record stays fictional (T033).
     content = content.replace(b"SIM-PKG-100", b"000100")
     content = content.replace(b"Fictional Product Amber", b" Fictional Product Amber ")
     content = content.replace(b"<Antoreitti/>", b"<Antoreitti/><Antoreitti>second</Antoreitti>")

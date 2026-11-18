@@ -40,7 +40,7 @@ def test_unique_exact_match_creates_one_case_and_preserves_evidence(change_set, 
 def test_no_exact_package_match_creates_no_case(change_set, medication_record):
     record_with_only_supporting_vnr = replace(
         medication_record,
-        package_identifier="000123",
+        package_identifier="SIM-PKG-000123",
         supporting_package_reference=change_set.medicine_key,
     )
 
