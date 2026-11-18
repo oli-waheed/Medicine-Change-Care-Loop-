@@ -99,7 +99,7 @@ those documented conventions; workflow, fixture, and Spec Kit paths are concrete
 
 - [x] T029 [US3] Implement explicit MATCHED, NO_MATCH, and AMBIGUOUS outcomes that preserve evidence classification in `backend/src/services/match-detected-changes`.
 - [x] T030 [US3] Enforce one case per package-change-set and simulated-record pair during repeated processing in `backend/src/services/create_review_cases.py` (team decision 2026-11-18: one case per package update; packages no longer present create cases, see FR-017/FR-018).
-- [ ] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change-processing-outcomes`.
+- [x] T031 [US3] Expose unmatched and ambiguous processing outcomes without creating review cases in `backend/src/api/change_processing_outcomes.py` (`GET /api/change-processing-outcomes`).
 
 **Checkpoint**: User Story 3 is demonstrable by replaying the same source fixture and checking all match outcomes.
 

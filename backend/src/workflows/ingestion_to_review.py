@@ -7,6 +7,10 @@ from pathlib import Path
 from ..domain.evidence import EvidenceClassification
 from ..domain.medicine_snapshot import MedicineSnapshot
 from ..domain.review_case import ReviewCase, SimulatedMedicationRecord
+from ..services.change_processing_outcomes import (
+    ChangeProcessingOutcome,
+    build_change_processing_outcomes,
+)
 from ..services.create_review_cases import create_review_cases
 from ..services.detect_relevant_changes import (
     ComparisonResult,
@@ -26,6 +30,8 @@ from ..services.ingest_source_release import (
 class IngestionToReviewResult:
     comparison: ComparisonResult
     created_cases: tuple[ReviewCase, ...]
+    # One matching outcome per detected change set (MATCHED, NO_MATCH, AMBIGUOUS).
+    outcomes: tuple[ChangeProcessingOutcome, ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -57,8 +63,11 @@ def run_ingestion_to_review(
         existing_cases=open_cases,
     )
     open_cases.extend(created)
+    outcomes = build_change_processing_outcomes(
+        comparison.change_sets, medication_records, open_cases
+    )
 
-    return IngestionToReviewResult(comparison, created)
+    return IngestionToReviewResult(comparison, created, outcomes)
 
 
 def run_ingested_release_to_review(

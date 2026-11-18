@@ -57,3 +57,19 @@ class CaseStatusEventRow(Base):
     from_status: Mapped[str | None] = mapped_column(String(20))
     to_status: Mapped[str] = mapped_column(String(20))
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class ChangeProcessingOutcomeRow(Base):
+    """The matching outcome of one package change set (MATCHED, NO_MATCH, AMBIGUOUS)."""
+
+    __tablename__ = "change_processing_outcomes"
+
+    outcome_id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    result: Mapped[str] = mapped_column(String(20), index=True)
+    reason: Mapped[str] = mapped_column(String(40))
+    medicine_key: Mapped[str] = mapped_column(String(200), index=True)
+    change_kind: Mapped[str] = mapped_column(String(30))
+    record_ids: Mapped[list[str]] = mapped_column(JSON)
+    case_ids: Mapped[list[str]] = mapped_column(JSON)
+    detected_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    evidence_payload: Mapped[dict[str, Any]] = mapped_column(JSON)

@@ -110,6 +110,28 @@ Matching runs on package change sets (all field changes for one package between 
 - evidence classification and source references.
 
 Only a unique `MATCHED` result may create a case. `NO_MATCH` and `AMBIGUOUS` never create a case.
+
+### Change processing outcomes view (T031)
+
+Every match result is stored once per package change set and is readable through
+`GET /api/change-processing-outcomes`. The optional, repeatable `result` query parameter filters by
+`MATCHED`, `NO_MATCH`, or `AMBIGUOUS` (for example `?result=NO_MATCH&result=AMBIGUOUS`); any other
+value is rejected with HTTP 422. Each outcome contains:
+
+- `outcomeId` (equal to `changeSetId`), `result`, `reason` (`UNIQUE_EXACT_PACKAGE_MATCH`,
+  `NO_SIMULATED_RECORD`, or `MULTIPLE_SIMULATED_RECORDS`), and a non-clinical `note`;
+- `medicineIdentifier`, `comparedIdentifier`, and `identifierGranularity` (`package`);
+- `changeSetId`, `changeKind`, and `changedFields`;
+- `simulatedRecords`: every simulated record with the compared identifier (none for `NO_MATCH`, two or
+  more for `AMBIGUOUS`);
+- `caseIds`: the review case created for a `MATCHED` outcome, and always empty for `NO_MATCH` and
+  `AMBIGUOUS`;
+- `evidenceClass`, prior/current `sources` (same shape as in the case view), `sourceOrder`, and
+  `detectedAt`.
+
+The view is read-only. It does not create, change, or close cases. A duplicated `Pakkaustunnus`
+inside a release is not a match outcome: the release fails validation and the ingestion response
+reports `FAILED` with the reason.
 For package-level matching, the compared identifier is the exact simulated `Pakkaustunnus`; `VNR-numero`
 is supporting metadata only, not a match key. This key decision does not assert that
 `Pakkaustunnus` is stable across Fimea releases. A source-field change or match never makes a clinical

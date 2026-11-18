@@ -98,7 +98,8 @@ retrieval time.
 4. Run the scheduled/manual workflow once.
 5. Verify the unique match creates exactly one review case in `NEW`, and the pharmacist open-case view
    exposes its before/after evidence, source references, simulated record, and evidence classifications.
-6. Verify the no-match and ambiguous scenarios create no cases and retain an honest outcome.
+6. Verify the no-match and ambiguous scenarios create no cases and retain an honest outcome in
+   `GET /api/change-processing-outcomes?result=NO_MATCH&result=AMBIGUOUS`.
 7. Run the same release through the workflow again. Verify that the existing case remains traceable and
    no duplicate review case is created for the same change and simulated medication record.
 8. Simulate unavailable or malformed source input and verify the run is visibly failed/incomplete and

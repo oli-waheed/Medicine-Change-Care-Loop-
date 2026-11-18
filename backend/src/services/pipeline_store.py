@@ -8,8 +8,16 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from ..domain.review_case import ReviewCase
-from ..models import Base, CaseStatusEventRow, ReviewCaseRow, SourceReleaseCaptureRow
+from ..models import (
+    Base,
+    CaseStatusEventRow,
+    ChangeProcessingOutcomeRow,
+    ReviewCaseRow,
+    SourceReleaseCaptureRow,
+)
+from ..schemas.change_processing_outcomes import change_processing_outcome_payload
 from ..schemas.open_review_cases import open_review_case_payload
+from .change_processing_outcomes import ChangeProcessingOutcome
 from .ingest_source_release import IngestionOutcome, ProcessingStatus, source_order_key
 
 
@@ -87,12 +95,16 @@ class PipelineStore:
             ).first()
 
     def record_ingestion(
-        self, outcome: IngestionOutcome, cases: tuple[ReviewCase, ...] = ()
+        self,
+        outcome: IngestionOutcome,
+        cases: tuple[ReviewCase, ...] = (),
+        processing_outcomes: tuple[ChangeProcessingOutcome, ...] = (),
     ) -> tuple[ReviewCase, ...]:
-        """Record a capture and any new cases in one transaction.
+        """Record a capture, its new cases and its matching outcomes in one transaction.
 
         Returns the cases that were actually inserted; a case whose idempotency key
-        already exists is skipped, so replays never duplicate cases.
+        already exists is skipped, so replays never duplicate cases. Outcomes are
+        likewise inserted once per change set.
         """
         captured = outcome.captured_release
         if captured is None:
@@ -117,7 +129,9 @@ class PipelineStore:
                         failure_detail=outcome.failure_detail,
                     )
                 )
-            return self._insert_cases(session, cases)
+            inserted = self._insert_cases(session, cases)
+            self._insert_outcomes(session, processing_outcomes)
+            return inserted
 
     def add_cases(self, cases: tuple[ReviewCase, ...]) -> tuple[ReviewCase, ...]:
         with self._session() as session, session.begin():
@@ -168,6 +182,35 @@ class PipelineStore:
             inserted.append(case)
         return tuple(inserted)
 
+    def add_processing_outcomes(self, outcomes: tuple[ChangeProcessingOutcome, ...]) -> int:
+        with self._session() as session, session.begin():
+            return self._insert_outcomes(session, outcomes)
+
+    @staticmethod
+    def _insert_outcomes(session: Session, outcomes: tuple[ChangeProcessingOutcome, ...]) -> int:
+        inserted = 0
+        for outcome in outcomes:
+            if session.get(ChangeProcessingOutcomeRow, outcome.outcome_id) is not None:
+                continue
+            session.add(
+                ChangeProcessingOutcomeRow(
+                    outcome_id=outcome.outcome_id,
+                    result=outcome.result.value,
+                    reason=outcome.reason.value,
+                    medicine_key=outcome.change_set.medicine_key,
+                    change_kind=outcome.change_set.kind.value,
+                    record_ids=[
+                        record.record_id for record in outcome.match.simulated_record_references
+                    ],
+                    case_ids=list(outcome.case_ids),
+                    detected_at=_as_utc(outcome.change_set.detected_at),
+                    evidence_payload=change_processing_outcome_payload(outcome),
+                )
+            )
+            inserted += 1
+        session.flush()
+        return inserted
+
     # --- read side ---------------------------------------------------------------
 
     def open_case_payloads(self) -> list[dict]:
@@ -196,3 +239,15 @@ class PipelineStore:
                     select(SourceReleaseCaptureRow).order_by(SourceReleaseCaptureRow.sequence)
                 )
             )
+
+    def processing_outcome_payloads(self, results: set[str] | None = None) -> list[dict]:
+        """Stored matching outcomes, optionally only those with the given results."""
+        with self._session() as session:
+            query = select(ChangeProcessingOutcomeRow).order_by(
+                ChangeProcessingOutcomeRow.detected_at,
+                ChangeProcessingOutcomeRow.medicine_key,
+                ChangeProcessingOutcomeRow.outcome_id,
+            )
+            if results:
+                query = query.where(ChangeProcessingOutcomeRow.result.in_(sorted(results)))
+            return [row.evidence_payload for row in session.scalars(query)]

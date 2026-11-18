@@ -26,8 +26,8 @@ _UPLOAD_CHUNK_SIZE = 1024 * 1024
 
 def _compare_with_baseline(
     request: Request, store: PipelineStore, outcome: IngestionOutcome
-) -> tuple:
-    """Return review cases from comparing ``outcome`` with the stored baseline.
+) -> tuple[tuple, tuple]:
+    """Return ``(review cases, matching outcomes)`` from comparing with the baseline.
 
     Only releases with backend-derived (Ajopvm) chronology are compared, and only
     when strictly newer than the baseline. Older, equal-dated and UNKNOWN-order
@@ -35,10 +35,10 @@ def _compare_with_baseline(
     """
     current_key = source_order_key(outcome.source_order)
     if current_key is None:
-        return ()
+        return (), ()
     baseline_row = store.comparison_baseline()
     if baseline_row is None or baseline_row.source_order_key >= current_key:
-        return ()
+        return (), ()
     baseline = reload_captured_release(baseline_row.capture_directory)
     if baseline.processing_status is not ProcessingStatus.VALIDATED:
         raise RuntimeError(f"Stored baseline no longer validates: {baseline.failure_detail}")
@@ -48,7 +48,7 @@ def _compare_with_baseline(
         tuple(request.app.state.medication_records),
         open_cases=[],
     )
-    return result.created_cases
+    return result.created_cases, result.outcomes
 
 
 @router.post("/ingest")
@@ -136,13 +136,13 @@ async def ingest_uploaded_source_release(
         if outcome.captured_release is not None:
             store: PipelineStore = request.app.state.store
             if not store.is_known_release(captured_reference):
-                cases = (
+                cases, processing_outcomes = (
                     _compare_with_baseline(request, store, outcome)
                     if outcome.processing_status is ProcessingStatus.VALIDATED
-                    else ()
+                    else ((), ())
                 )
-                # Capture and cases are written in one transaction.
-                store.record_ingestion(outcome, cases)
+                # Capture, cases and matching outcomes are written in one transaction.
+                store.record_ingestion(outcome, cases, processing_outcomes)
 
         return {
             "processingStatus": outcome.processing_status.value,

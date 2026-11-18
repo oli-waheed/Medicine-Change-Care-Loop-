@@ -98,3 +98,58 @@ def test_fixture_release_replay_creates_exactly_one_case(isolated_app):
     assert case["medicineIdentifier"] == "SIM-PKG-100"
     assert case["changeSet"]["kind"] == "FIELDS_CHANGED"
     assert replay == first
+
+
+def test_fixture_outcomes_are_exposed_and_survive_replay_and_restart(isolated_app):
+    from src.services.pipeline_store import PipelineStore
+
+    app = isolated_app
+    app.state.medication_records = load_simulated_medication_records(RECORDS_FILE)
+    scenarios = _scenarios()
+
+    with TestClient(app) as client:
+        _upload(client, "prior-release.xml", 3)
+        _upload(client, "current-release.xml", 4)
+        outcomes = client.get("/api/change-processing-outcomes").json()
+        (case,) = client.get("/api/open-review-cases").json()
+
+        by_key = {o["medicineIdentifier"]: o for o in outcomes}
+        assert set(by_key) == {"SIM-PKG-100", "SIM-PKG-300", "SIM-PKG-500"}
+
+        unique = by_key[scenarios["unique_exact_match"]["Pakkaustunnus"]]
+        assert unique["result"] == "MATCHED"
+        assert unique["caseIds"] == [case["caseId"]]
+        assert unique["changeSetId"] == case["changeSet"]["changeSetId"]
+
+        ambiguous = by_key[scenarios["ambiguous_exact_match"]["Pakkaustunnus"]]
+        assert ambiguous["result"] == "AMBIGUOUS"
+        assert ambiguous["changeKind"] == "NO_LONGER_PRESENT"
+        assert [r["recordId"] for r in ambiguous["simulatedRecords"]] == scenarios[
+            "ambiguous_exact_match"
+        ]["expected_record_ids"]
+        assert ambiguous["caseIds"] == []
+
+        no_match = by_key[scenarios["no_match"]["Pakkaustunnus"]]
+        assert no_match["result"] == "NO_MATCH"
+        assert no_match["changedFields"] == ["Pakkaus/Pakkauskokoteksti"]
+        assert no_match["caseIds"] == []
+        assert no_match["sources"]["current"]["retrievedAt"] == "2099-01-04T06:00:00+00:00"
+
+        unmatched = client.get(
+            "/api/change-processing-outcomes",
+            params=[("result", "NO_MATCH"), ("result", "AMBIGUOUS")],
+        ).json()
+        assert sorted(o["medicineIdentifier"] for o in unmatched) == [
+            "SIM-PKG-300",
+            "SIM-PKG-500",
+        ]
+
+        _upload(client, "current-release.xml", 4)  # replay
+        assert client.get("/api/change-processing-outcomes").json() == outcomes
+
+    # Restart: a new store on the same database still has the outcomes.
+    database_url = app.state.store.database_url
+    app.state.store.dispose()
+    app.state.store = PipelineStore(database_url)
+    with TestClient(app) as client:
+        assert client.get("/api/change-processing-outcomes").json() == outcomes

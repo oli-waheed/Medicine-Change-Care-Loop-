@@ -126,6 +126,19 @@ Represents a human-review item created from one package change set and one deter
 | `evidence_class` | Evidence status shown with the case | Must preserve unknown/conflicting information |
 | `idempotency_key` | Identity derived from change set and simulated record | Unique; prevents duplicate cases on reprocessing |
 
+### ChangeProcessingOutcome
+
+Records the deterministic match result for one `PackageChangeSet`, including results that create no case.
+
+| Field | Meaning | Validation |
+|---|---|---|
+| `outcome_id` | Outcome identity | Equal to `change_set_id`; at most one outcome per change set, so replays add nothing |
+| `result` | `MATCHED`, `NO_MATCH`, or `AMBIGUOUS` | Required |
+| `reason` | `UNIQUE_EXACT_PACKAGE_MATCH`, `NO_SIMULATED_RECORD`, or `MULTIPLE_SIMULATED_RECORDS` | Must agree with `result` |
+| `simulated_record_ids` | Records sharing the compared `Pakkaustunnus` | None for `NO_MATCH`; two or more for `AMBIGUOUS` |
+| `case_ids` | Case created from a `MATCHED` result | Empty for `NO_MATCH` and `AMBIGUOUS`; never invented when no case exists |
+| `evidence_class`, sources, source order | Copied from the change set | Preserve unknown/conflicting information |
+
 ### CaseStatusEvent
 
 Records an important case status transition, including initial creation in NEW status.

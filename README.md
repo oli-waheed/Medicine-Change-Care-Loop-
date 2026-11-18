@@ -81,6 +81,7 @@ Current API endpoints include:
 |---|---|---|
 | GET | `/health` | Check backend health |
 | GET | `/api/open-review-cases` | Retrieve open review cases |
+| GET | `/api/change-processing-outcomes` | Retrieve every matching outcome (`MATCHED`, `NO_MATCH`, `AMBIGUOUS`); filter with `?result=NO_MATCH&result=AMBIGUOUS` |
 | POST | `/api/source-releases/ingest` | Submit and process a source release |
 
 ### API Documentation
