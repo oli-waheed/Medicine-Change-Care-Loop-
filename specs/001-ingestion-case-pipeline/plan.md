@@ -8,17 +8,17 @@
 
 Deliver a small end-to-end prototype slice that imports the official Fimea Basic Register XML through a scheduled n8n workflow, retains source snapshots, compares successive snapshots for relevant catalog-field changes, deterministically matches those changes against simulated medication records, and presents traceable NEW review cases to a pharmacist. Preserve the raw source and provenance throughout the flow. Fimea describes transferring information to the XML file once daily and says an XSD schema exists; this cadence is not evidence of per-record change timestamps or release ordering. The prototype does not claim to detect leaflet/SPC clinical-content changes or determine clinical significance.
 
-The team has selected Python/FastAPI with SQLite and SQLAlchemy for the backend, React/TypeScript/Vite for the frontend, and local n8n for scheduled workflow automation. Use SQLAlchemy ORM mappings and SQLite-portable features; do not use PostgreSQL-specific SQL/types or database-specific UUID generation. The repository now has initial backend/frontend skeletons and pinned dependency manifests; the business pipeline is not yet implemented.
+The team has selected Python/FastAPI with SQLite and SQLAlchemy for the backend, React/TypeScript/Vite for the frontend, and local n8n for scheduled workflow automation. Use SQLAlchemy ORM mappings and SQLite-portable features; do not use PostgreSQL-specific SQL/types or database-specific UUID generation. The pipeline is implemented as a prototype (T001–T036): scheduled n8n download, immutable raw-release capture, normalization, comparison, matching, SQLite persistence, read APIs, and the pharmacist open-case page. [quickstart.md](quickstart.md) is the canonical setup and acceptance guide.
 
 ## Technical Context
 
-**Language/Version**: Python 3.13.x; Node.js 24.x LTS (24.15.0 or later for the selected jsdom release; also satisfies the selected local n8n release's Node.js requirement); TypeScript 7.0.2.
+**Language/Version**: Python 3.13.x; Node.js 24.x LTS (24.15.0 or later for the selected jsdom release; n8n 2.42.3 refuses to start on Node.js below 24.0.0, as observed in the T034 run); TypeScript 7.0.2.
 
 **Primary Dependencies**: FastAPI 0.142.2; Uvicorn 0.54.0; SQLAlchemy 2.1.3; React/React DOM 19.3.0; Vite 8.3.3 with `@vitejs/plugin-react` 6.1.2; n8n 2.42.3, run locally.
 
 **Storage**: SQLite 3.x through Python's built-in `sqlite3` module, with SQLAlchemy 2.1.3 declarative ORM models. Record the actual SQLite runtime version during setup. Use portable SQLAlchemy types and application-generated identifiers; avoid JSONB, PostgreSQL-specific SQL, and server/database-specific UUID generation.
 
-**Testing and quality**: pytest 9.1.1 and Ruff 0.16.10 for backend tests/linting; Vitest 5.0.3 with React Testing Library 16.3.3, `@testing-library/jest-dom` 7.0.1, jsdom 30.1.2, and React type declarations `@types/react` and `@types/react-dom` 19.3.0 for frontend tests; Oxlint 1.87.0 for frontend linting; Prettier 3.9.9 for formatting; manual end-to-end validation of ingestion through pharmacist case review.
+**Testing and quality**: pytest 9.1.1 and Ruff 0.16.10 for backend tests/linting, with httpx2 2.16.2 for the FastAPI/Starlette test client; Vitest 5.0.3 with React Testing Library 16.3.3, `@testing-library/jest-dom` 7.0.1, jsdom 30.1.2, and React type declarations `@types/react` and `@types/react-dom` 19.3.0 for frontend tests; Oxlint 1.87.0 for frontend linting; Prettier 3.9.9 for formatting; manual end-to-end validation of ingestion through pharmacist case review.
 
 **Target Platform**: Prototype environment; production deployment is out of scope.
 
@@ -54,18 +54,25 @@ Version source: package release metadata from PyPI and the npm registry, checked
 
 ### Commands
 
-Windows PowerShell commands for the backend:
+Windows PowerShell commands, run from the repository root (the full guide with expected output is in
+[quickstart.md](quickstart.md)):
+
+```powershell
+py -3.13 -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -e "./backend[dev]"
+python -c "import sqlite3; print(sqlite3.sqlite_version)"
+python -m uvicorn backend.src.main:app --reload
+python -m pytest -q
+```
+
+Ruff reads its settings from `backend/pyproject.toml`, so run it from the `backend` folder:
 
 ```powershell
 Set-Location backend
-py -3.13 -m venv .venv
-.\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
-python -c "import sqlite3; print(sqlite3.sqlite_version)"
-python -m uvicorn src.main:app --reload
-python -m pytest ..\tests
 python -m ruff check src ..\tests
 python -m ruff format --check src ..\tests
+Set-Location ..
 ```
 
 The frontend scaffold was created with `create-vite@9.2.1`; that scaffolding
@@ -83,8 +90,7 @@ npm run format:check
 npm run dev
 ```
 
-`npm run format` applies Prettier formatting. Vitest exits unsuccessfully when
-no matching test files exist, which is expected before feature tests are added.
+`npm run format` applies Prettier formatting.
 
 Run the local workflow editor in a separate terminal:
 
@@ -94,10 +100,10 @@ npx --yes n8n@2.42.3 start
 
 ### File Naming Conventions
 
-- Backend source root: `backend/src/`; use lowercase `snake_case.py` modules and `__init__.py` package markers. The ASGI entry point is `backend/src/main.py`; keep API routes under `api/routes/`, domain types under `domain/`, SQLAlchemy ORM mappings under `models/`, request/response schemas under `schemas/`, and business logic under `services/`.
+- Backend source root: `backend/src/`; use lowercase `snake_case.py` modules and `__init__.py` package markers. The ASGI entry point is `backend/src/main.py`; API route modules are under `api/` (one module per endpoint group; the empty `api/routes/` package from the T002 skeleton is unused), domain types under `domain/`, SQLAlchemy ORM mappings under `models/`, response serialization under `schemas/`, business logic under `services/`, and the ingestion-to-review orchestration under `workflows/`. Demo simulated medication records are in `backend/seed/`.
 - SQLAlchemy models use declarative typed mappings (`Mapped` and `mapped_column`) and portable SQLite-compatible column types. Do not add PostgreSQL-only types or raw PostgreSQL-specific SQL.
 - Backend unit and contract tests live in repository-root `tests/unit/` and `tests/contract/` as `test_<subject>.py`; integration tests live in `tests/integration/` and use `test_<journey>.py`. Shared pytest fixtures are in `tests/conftest.py`; synthetic source and simulated medication fixtures are under `tests/fixtures/`.
-- Frontend source: `frontend/src/main.tsx`; React components and page files use `PascalCase.tsx` (for example, `OpenReviewCasesPage.tsx`); hooks use `use<Name>.ts`; non-component TypeScript modules use `camelCase.ts`.
+- Frontend source: `frontend/src/main.tsx`; React components and page files use `PascalCase.tsx` (for example, `OpenReviewCasesPage.tsx`); hooks use `use<Name>.ts`; non-component TypeScript modules use `camelCase.ts`. The open-case page and its helpers live together in `frontend/src/pages/open-review-cases/`.
 - Frontend tests: colocated `<Name>.test.tsx` or `<name>.test.ts`; test setup uses `frontend/src/test/setup.ts`.
 - n8n exported workflows use descriptive kebab-case JSON filenames, including `workflow/n8n/fimea-basic-register-ingestion.json`.
 - Simulated medication records use descriptive JSON fixture filenames; synthetic Fimea release fixtures retain the source-like text extension/format. Never place real patient-identifiable information in source, fixtures, logs, or demonstrations.
@@ -119,52 +125,58 @@ npx --yes n8n@2.42.3 start
 
 ## Research Plan and Decisions
 
-Phase 0 findings and decision rationale are recorded in [research.md](research.md). The selected source is the Fimea Basic Register. Before relying on live data, validate file access, current file layout, release ordering metadata, permitted reuse/automated access, and the exact fields included in the chosen release. If reliable release ordering cannot be established from source evidence, the pipeline must expose the order as unknown and refrain from claiming a verified change.
+Phase 0 findings and decision rationale are recorded in [research.md](research.md). The selected source is the Fimea Basic Register. The file layout, relevant fields (T005), and reuse terms (Fimea open data, CC BY 4.0) are documented there. Still open before relying on live data: confirming that `Ajopvm` orders successive real releases, the 2021/2022 XSD mismatch, and an explicit automated-download frequency statement. If reliable release ordering cannot be established from source evidence, the pipeline exposes the order as unknown and does not claim a verified change.
 
-The Basic Register is a catalog source with package-level release changes; it is not a documented feed of leaflet/SPC clinical text. The team must agree which available catalog fields count as relevant changes before implementation. The feature must not describe catalog differences as clinical risk or medicine advice.
+The Basic Register is a catalog source with package-level release changes; it is not a documented feed of leaflet/SPC clinical text. The team agreed the relevant catalog fields in T005. The feature must not describe catalog differences as clinical risk or medicine advice.
 
 ## Design
 
 ### Processing Flow
 
-1. n8n checks for a new official Basic Register release on the agreed schedule and captures the raw release bundle without modifying its contents.
-2. The ingestion boundary records source identity, any source-supplied release/order information, retrieval time, filenames, and content checksums. Retrieval time is not substituted for missing source update information.
-3. The normalizer produces records for fields selected as relevant, retaining each value's source-record reference and evidence classification.
-4. The comparison process pairs package records by the exact `Pakkaustunnus` value selected by the team, resolves product and active-substance references within each source document, compares the T005 field set across successive ordered snapshots, and retains that cross-release key stability is unverified. `VNR-numero` is supporting metadata only.
-5. A deterministic matcher checks each relevant change against simulated medication records at the same identifier granularity. Missing or ambiguous identifiers result in no match and an explicit uncertainty outcome.
-6. A matched change creates one NEW review case per unique change and simulated medication record. Reprocessing the same release is idempotent.
-7. The pharmacist-facing open-case view reads cases and presents their change, simulated match, source evidence, evidence quality, and current status. No case-closing or clinical-decision action is added in this feature.
+1. n8n downloads the official Basic Register XML once a day (06:00) and uploads it unchanged to `POST /api/source-releases/ingest`. A failed download or upload is recorded in its own n8n branch and never reaches comparison.
+2. The ingestion boundary stores the raw file immutably with its checksum, source identity, caller-supplied release reference, and retrieval time, and records the capture in SQLite. Release order is derived by the backend from the XML's own `Ajopvm`; retrieval time and caller-declared order are never used as source chronology.
+3. The normalizer validates the whole release atomically (malformed XML, duplicate `Pakkaustunnus`, or `Kattavuus` other than 1 fail the release) and produces package snapshots of the T005 fields, preserving missing/empty/value states and code-table attributes.
+4. A release with verified order that is newer than the stored baseline is compared with it. Packages are paired by the exact `Pakkaustunnus`, product and active-substance references are resolved within each source document, and linked substances are paired by `Aine` code. All field differences for one package form one change set; a package present once in the baseline and absent from the newer full-coverage release forms a `NO_LONGER_PRESENT` change set. `VNR-numero` is supporting metadata only, and cross-release key stability remains unverified.
+5. A deterministic matcher checks each change set against simulated medication records by exact `Pakkaustunnus` and records one outcome per change set: `MATCHED`, `NO_MATCH`, or `AMBIGUOUS`.
+6. A `MATCHED` outcome creates one NEW review case per change set and simulated record, with a NEW status event. Captures, cases, and outcomes are written in one transaction, and reprocessing the same release creates nothing new.
+7. The pharmacist-facing open-case view reads cases and presents their changes, simulated match, source evidence, evidence classifications, and status. `GET /api/change-processing-outcomes` exposes every outcome, including those that created no case. No case-closing or clinical-decision action exists in this feature.
 
 ### Project Structure
 
-The repository has no application code yet. This selected structure is the baseline T002 will establish:
+Implemented structure (main folders):
 
 ```text
 workflow/
 └── n8n/
     └── fimea-basic-register-ingestion.json
 backend/
-├── src/
-│   ├── main.py
-│   ├── api/routes/
-│   ├── domain/
-│   ├── models/
-│   ├── schemas/
-│   └── services/
+├── pyproject.toml
+├── seed/                      # simulated demo medication records
+└── src/
+    ├── main.py
+    ├── config.py
+    ├── api/                   # open_review_cases, change_processing_outcomes, source_release_ingestion
+    ├── domain/                # source release, snapshot, change/change set, case, status event, evidence
+    ├── models/                # SQLAlchemy ORM mappings (SQLite)
+    ├── schemas/               # API payload serialization
+    ├── services/              # capture, normalize, detect, match, outcomes, cases, store, records loader
+    └── workflows/             # ingestion_to_review orchestration
 frontend/
 └── src/
-    ├── components/
-    ├── pages/
-    ├── services/
+    ├── pages/open-review-cases/
+    ├── assets/
     └── test/
 tests/
 ├── fixtures/
+│   ├── acceptance/
 │   ├── fimea-basic-register/
 │   └── simulated-medication-records/
 ├── unit/
 ├── contract/
 └── integration/
 ```
+
+Runtime data (SQLite database and raw captures) is created in `backend/data/`, which is git-ignored.
 
 **Structure Decision**: Use the selected Python/FastAPI backend, React/TypeScript frontend, SQLite persistence, and local n8n orchestration to make the ingestion-to-review journey testable as small vertical slices. Backend and frontend tests remain in their documented roots. Keep SQLAlchemy models portable across SQLite. Do not add services or layers without a demonstrated need.
 

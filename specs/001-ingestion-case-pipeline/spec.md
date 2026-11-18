@@ -4,7 +4,7 @@
 
 **Created**: 2026-10-06
 
-**Status**: Draft
+**Status**: Implemented as a prototype (T001–T036, 2026-11-18). See [Implementation status](#implementation-status).
 
 **Input**: User description: "Build the ingestion-to-case pipeline for the Medicine Change Care Loop prototype, from scheduled ingestion of selected official Finnish medicine information through change detection and simulated medication matching to a pharmacist-facing, evidence-based review case list."
 
@@ -63,7 +63,7 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 - A snapshot contains incomplete or conflicting medicine identifiers: do not create a medication match or review case from an ambiguous match; expose the uncertainty in the processing result.
 - A source is unavailable, returns malformed information, or ingestion stops partway through: do not treat the run as complete or create cases from a partial snapshot.
 - A relevant change has no matching simulated medication record: retain the traceable detected change but do not create a review case.
-- A pharmacist opens a case whose source evidence is no longer available: show that the evidence is unavailable rather than presenting the case as fully verified.
+- A pharmacist opens a case whose source evidence is no longer available: show that the evidence is unavailable rather than presenting the case as fully verified. **Not implemented** (see [Implementation status](#implementation-status)).
 - The same source snapshot is ingested more than once: repeated processing must not create duplicate changes or cases.
 - The prototype must not ingest, store, or display real patient-identifiable information.
 
@@ -116,5 +116,27 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 - Source update information is the primary evidence for ordering snapshots; where it is unavailable or contradictory, the system reports uncertainty instead of guessing.
 - Matching criteria are deterministic and will use medicine identifiers present in both the source information and simulated medication records.
 - An open case for this feature is a case in NEW status; case handling and additional workflow states are outside this feature.
-- The scheduled source fetch and ingestion are orchestrated by the requested n8n workflow; the exact Basic Register files and relevant catalog fields will be confirmed before implementation.
+- The scheduled source fetch and ingestion are orchestrated by the requested n8n workflow. The Basic Register XML file and the relevant catalog fields were confirmed in T004 and T005 ([research.md](research.md)).
 - Acceptance data consists exclusively of simulated medication records and controlled source snapshots.
+
+## Implementation status
+
+Verified on 2026-11-18 by the automated tests, the T034 acceptance run ([quickstart.md](quickstart.md#acceptance-results-t034)),
+and the T035 clinical-scope review ([contract](contracts/ingestion-and-case-view.md#clinical-scope-verification-t035)).
+
+- User stories 1–3 and FR-001 to FR-018 are implemented, except as noted below.
+- FR-004: each new release is compared with the stored baseline release (the release with the latest
+  verified `Ajopvm`), pairing packages by `Pakkaustunnus`. Source order is taken from `Ajopvm` in the XML;
+  releases without a valid `Ajopvm` are stored but never compared. This ordering rule awaits team
+  confirmation against real successive releases ([research.md](research.md)).
+- FR-008, FR-015 and the "no matching record" edge case: every match result, including `NO_MATCH` and
+  `AMBIGUOUS`, is kept and exposed through `GET /api/change-processing-outcomes`.
+- FR-017 and FR-018 are implemented as package change sets (`FIELDS_CHANGED`, `NO_LONGER_PRESENT`).
+
+Known gaps:
+
+- The edge case "a case whose source evidence is no longer available" is not implemented. The case view
+  shows the evidence stored when the case was created and does not check whether the raw capture files
+  still exist in `backend/data/source-releases/`.
+- Each scheduled download is stored as a full new capture, even when the file is unchanged.
+

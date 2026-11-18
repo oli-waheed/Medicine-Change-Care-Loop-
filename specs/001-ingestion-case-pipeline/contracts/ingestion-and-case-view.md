@@ -1,54 +1,52 @@
 # Ingestion and Case View Contracts
 
-These are logical data contracts for the prototype's boundaries, not a prescribed transport or framework.
-The team must choose the actual transport, serialization schema, and authentication approach before
-implementation. Any patient and medication records in payloads must be simulated.
+These are the data contracts for the prototype's boundaries. As implemented, the backend is a FastAPI
+HTTP service with JSON responses, run locally without authentication (production deployment is out of
+scope). Any patient and medication records in payloads must be simulated.
 
 ## Source release ingestion
 
-The scheduled n8n workflow provides one complete captured release to the ingestion boundary.
-Raw files remain immutable and are linked by file name and checksum.
+The scheduled n8n workflow uploads one complete downloaded release file to
+`POST /api/source-releases/ingest` as `multipart/form-data`. Raw files remain immutable and are linked
+by file name and checksum.
 
-Required logical fields:
-
-| Field | Requirement |
+| Form field | Requirement |
 |---|---|
-| `sourceName` | Identifies Fimea Basic Register |
-| `sourceReleaseReference` | Source-provided release identifier/date when available; otherwise explicitly unknown |
-| `sourceOrder` | Source-evidenced ordering value when available; never substitute local retrieval time |
-| `retrievedAt` | Local retrieval timestamp |
-| `files[]` | One or more immutable raw files with name, checksum, retrievable content/reference, and source record locators when available |
-| `captureStatus` | Complete or failed; partial acquisition cannot be submitted as complete |
+| `file` | The raw XML file. Larger than `MAX_SOURCE_RELEASE_UPLOAD_BYTES` (default 250 MiB) is rejected with HTTP 413 |
+| `sourceName` | Must be `Fimea Basic Register` |
+| `sourceReleaseReference` | JSON `{"value": …, "evidenceClass": …}`: source-provided release identifier/date when available; otherwise `null` with `UNKNOWN` |
+| `retrievedAt` | Local retrieval timestamp, ISO 8601 with a time zone |
+| `sourceOrder` | Optional JSON `{"value": …, "evidenceClass": …}`. Recorded in the capture manifest for traceability only; chronology is derived by the backend from the XML's `Ajopvm` and never from this field or from retrieval time |
 
-Illustrative payload:
+Invalid JSON metadata, an unsupported source name, an invalid evidence class, or a timestamp without a
+time zone is rejected with HTTP 422. A failed download never reaches the backend; n8n records it in its
+"Record Download Failure" branch.
+
+Response:
 
 ```json
 {
-  "sourceName": "Fimea Basic Register",
-  "sourceReleaseReference": {
-    "value": "source-provided release reference",
-    "evidenceClass": "VERIFIED"
-  },
-  "sourceOrder": {
-    "value": "source-evidenced order",
-    "evidenceClass": "VERIFIED"
-  },
-  "retrievedAt": "2026-10-06T00:00:00Z",
-  "files": [
-    {
-      "name": "source-file-name",
-      "checksum": "content-checksum",
-      "contentReference": "immutable-captured-content",
-      "recordLocators": ["/Perusrekisteri/Pakkaus[1]"]
-    }
-  ],
-  "captureStatus": "COMPLETE"
+  "processingStatus": "VALIDATED",
+  "chronologyStatus": "AVAILABLE",
+  "capturedReleaseReference": "sha256-…",
+  "failureDetail": null
 }
 ```
 
-Values above illustrate the shape only; they are not Fimea field names or asserted live-release values.
-If the source does not provide an order value that can be verified, the release must not be labeled
-verified chronological evidence.
+- `processingStatus` is `VALIDATED` or `FAILED`. Malformed XML, more than one or no `Versiotiedot`,
+  `Kattavuus` other than `1`, unresolved references, or a duplicate `Pakkaustunnus` fail the whole release,
+  with the reason in `failureDetail`; no partial snapshot is used.
+- `chronologyStatus` is `AVAILABLE` only when every file has a valid ISO `Ajopvm`. Otherwise it is
+  `UNAVAILABLE` and the release is stored but never compared.
+- `capturedReleaseReference` identifies the immutable capture. Uploading an identical file with the same
+  metadata returns the same reference and creates nothing new.
+
+Internally, the ingestion service accepts a release of one or more files with the same metadata plus
+`files[]` (`name`, `checksum`, `contentReference`, optional `recordLocators`) and
+`captureStatus` (`COMPLETE` or `FAILED`). The HTTP endpoint always submits one file as `COMPLETE`.
+Values above illustrate the shape only; they are not asserted live-release values. If the source does
+not provide an order value that can be verified, the release is not labeled verified chronological
+evidence.
 
 ## Evidence and provenance
 
@@ -111,6 +109,11 @@ Matching runs on package change sets (all field changes for one package between 
 
 Only a unique `MATCHED` result may create a case. `NO_MATCH` and `AMBIGUOUS` never create a case.
 
+For package-level matching, the compared identifier is the exact simulated `Pakkaustunnus`; `VNR-numero`
+is supporting metadata only, not a match key. This key decision does not assert that
+`Pakkaustunnus` is stable across Fimea releases. A source-field change or match never makes a clinical
+or substitution decision; human review remains required.
+
 ### Change processing outcomes view (T031)
 
 Every match result is stored once per package change set and is readable through
@@ -132,22 +135,23 @@ value is rejected with HTTP 422. Each outcome contains:
 The view is read-only. It does not create, change, or close cases. A duplicated `Pakkaustunnus`
 inside a release is not a match outcome: the release fails validation and the ingestion response
 reports `FAILED` with the reason.
-For package-level matching, the compared identifier is the exact simulated `Pakkaustunnus`; `VNR-numero`
-is supporting metadata only, not a match key. This key decision does not assert that
-`Pakkaustunnus` is stable across Fimea releases. A source-field change or match never makes a clinical
-or substitution decision; human review remains required.
 
 ## Pharmacist open-case view
 
-The read view returns open cases (initially `NEW`) with:
+`GET /api/open-review-cases` returns open cases (`NEW`), each with:
 
-- case identity, creation time, and status;
-- medicine identifier and identifier granularity;
-- matched simulated-record reference and fictional display information;
-- detected field and before/after values;
-- source release references, raw file/record locators, and retrieval/source-order information;
-- evidence classifications, including unknown or conflicting values when relevant.
+- `caseId`, `createdAt`, `status`, and `initialStatusEvent`;
+- `medicineIdentifier` (`Pakkaustunnus`) and `identifierGranularity` (`package`);
+- `matchedRecord`: the simulated `recordId`, `personReference`, and fictional `medicineDisplay`;
+- `changeSet`: `changeSetId`, `kind` (`FIELDS_CHANGED` or `NO_LONGER_PRESENT`), `detectedAt`,
+  `changes[]` (each with `changeId`, `field`, and `before`/`after` source values), and `lastKnownFields`
+  (the package's prior-release values, only for `NO_LONGER_PRESENT`);
+- `sources.prior` and `sources.current`: source name, release date (`Ajopvm`) and reference
+  (`Aineistoera`), raw file name, checksum, record locator (none when the package is no longer present),
+  retrieval time, evidence classification, and note;
+- `sourceOrder` (prior/current keys, basis, classification) and `evidenceClass`.
 
+Every source value keeps its `state` (`missing`, `empty`, or `value`), text, and code-table attributes.
 The view is read-only for this feature. It exposes no diagnosis, treatment recommendation, substitution,
 clinical urgency, patient-facing communication, or automatic case closure operation.
 
@@ -158,7 +162,7 @@ clinical urgency, patient-facing communication, or automatic case closure operat
   eligibility is reported separately as unavailable; no verified release-to-release change is asserted.
 - Malformed or conflicting identifiers cannot be silently normalized into a match.
 - Repeated submission of identical release evidence is idempotent.
-- A unique change and simulated record pair creates at most one `NEW` case.
+- A unique package change set and simulated record pair creates at most one `NEW` case.
 - All displayed medication/person data is fictional; no real patient identifiers are valid contract data.
 
 ## Clinical scope verification (T035)
