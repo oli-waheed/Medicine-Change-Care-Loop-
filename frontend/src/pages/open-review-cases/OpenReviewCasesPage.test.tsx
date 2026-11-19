@@ -330,6 +330,128 @@ describe("OpenReviewCasesPage", () => {
     expect(screen.queryByText(/Source evidence unavailable/)).toBeNull();
     expect(screen.queryByText("Evidence unavailable")).toBeNull();
   });
+
+  it("renders all four evidence classifications as distinct labels", async () => {
+    const classifiedCase: OpenReviewCase = {
+      ...caseFixture,
+      evidenceClass: "VERIFIED",
+      sourceOrder: {
+        ...caseFixture.sourceOrder,
+        evidenceClass: "CONFLICTING",
+      },
+      sources: {
+        prior: {
+          ...caseFixture.sources.prior,
+          evidenceClass: "INFERRED",
+        },
+        current: {
+          ...caseFixture.sources.current,
+          evidenceClass: "UNKNOWN",
+        },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [classifiedCase],
+      }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(await screen.findByText("Cases (1)")).toBeVisible();
+    for (const classification of [
+      "VERIFIED",
+      "INFERRED",
+      "UNKNOWN",
+      "CONFLICTING",
+    ] as const) {
+      expect(screen.getByText(classification, { exact: true })).toHaveClass(
+        "evidence-classification",
+        `evidence-classification--${classification.toLowerCase()}`,
+      );
+    }
+  });
+
+  it("marks unavailable evidence classifications as warnings", async () => {
+    const unavailable: OpenReviewCase = {
+      ...caseFixture,
+      evidenceAvailability: "UNAVAILABLE",
+      sources: {
+        prior: { ...caseFixture.sources.prior, evidenceAvailable: false },
+        current: { ...caseFixture.sources.current, evidenceAvailable: true },
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [unavailable],
+      }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(
+      await screen.findByText(
+        "VERIFIED when recorded; source evidence now unavailable",
+      ),
+    ).toHaveClass("evidence-classification--warning");
+    expect(
+      screen.getByText("VERIFIED when recorded; source file now unavailable"),
+    ).toHaveClass("evidence-classification--warning");
+  });
+
+  it("visually distinguishes missing, empty, and no-occurrence values", async () => {
+    const missingAndEmpty: OpenReviewCase = {
+      ...caseFixture,
+      changeSet: {
+        ...caseFixture.changeSet,
+        changes: [
+          {
+            ...caseFixture.changeSet.changes[0],
+            before: [{ state: "missing", value: null, attributes: {} }],
+            after: [{ state: "empty", value: "", attributes: {} }],
+          },
+        ],
+      },
+    };
+    const noOccurrences: OpenReviewCase = {
+      ...caseFixture,
+      caseId: "CASE-SIM-101",
+      medicineIdentifier: "SIM-PKG-101",
+      matchedRecord: {
+        ...caseFixture.matchedRecord,
+        medicineDisplay: "Fictional Beta",
+      },
+      changeSet: {
+        ...caseFixture.changeSet,
+        changeSetId: "CHANGESET-SIM-101",
+        kind: "NO_LONGER_PRESENT",
+        changes: [],
+        lastKnownFields: [{ field: "Laakevalmiste/Antoreitti", values: [] }],
+      },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => [missingAndEmpty, noOccurrences],
+      }),
+    );
+    render(<OpenReviewCasesPage />);
+
+    expect(
+      await screen.findByText("Not present in source", { exact: true }),
+    ).toHaveClass("source-value--missing");
+    expect(screen.getByText("Present but empty", { exact: true })).toHaveClass(
+      "source-value--empty",
+    );
+
+    fireEvent.click(screen.getByRole("button", { name: /Fictional Beta/ }));
+    expect(await screen.findByText("No occurrences")).toHaveClass(
+      "source-value--no-occurrences",
+    );
+  });
 });
 
 describe("sourceValue", () => {

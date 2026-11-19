@@ -3,11 +3,67 @@ import {
   fetchOpenReviewCases,
   type FieldChange,
   type OpenReviewCase,
+  type SourceField,
   type SourceEvidence,
 } from "./openReviewCases";
 import { changeSummary, evidenceUnavailable } from "./changeSummary";
 import { sourceValue } from "./sourceValue";
+import { formatTimestamp } from "./timestamp";
 import "./OpenReviewCasesPage.css";
+
+function TimestampDisplay({
+  value,
+  fallback,
+}: {
+  value: string | null;
+  fallback: string;
+}) {
+  if (value === null)
+    return <span className="timestamp-fallback">{fallback}</span>;
+
+  const formatted = formatTimestamp(value);
+  if (formatted === null) {
+    return <span className="timestamp-fallback">{value}</span>;
+  }
+
+  return (
+    <span className="timestamp-display">
+      <time dateTime={value}>{formatted}</time>
+      <small className="timestamp-exact">{value}</small>
+    </span>
+  );
+}
+
+function EvidenceClassificationLabel({
+  classification,
+  warningSuffix,
+}: {
+  classification: SourceEvidence["evidenceClass"];
+  warningSuffix?: string;
+}) {
+  const className = warningSuffix
+    ? "evidence-classification evidence-classification--warning"
+    : `evidence-classification evidence-classification--${classification.toLowerCase()}`;
+
+  return (
+    <span className={className}>
+      {classification}
+      {warningSuffix}
+    </span>
+  );
+}
+
+function SourceValueDisplay({ field }: { field: SourceField }) {
+  const value = sourceValue(field);
+  const state =
+    field.state === "missing"
+      ? "missing"
+      : field.state === "empty" && value === "Present but empty"
+        ? "empty"
+        : "value";
+
+  return <span className={`source-value source-value--${state}`}>{value}</span>;
+}
 
 function SourceCard({
   label,
@@ -28,15 +84,19 @@ function SourceCard({
         </div>
         <div>
           <dt>Release reference</dt>
-          <dd>{sourceValue(evidence.releaseReference)}</dd>
+          <dd>
+            <SourceValueDisplay field={evidence.releaseReference} />
+          </dd>
         </div>
         <div>
           <dt>Release date</dt>
-          <dd>{sourceValue(evidence.releaseDate)}</dd>
+          <dd>
+            <SourceValueDisplay field={evidence.releaseDate} />
+          </dd>
         </div>
         <div>
           <dt>Raw file</dt>
-          <dd>
+          <dd className="monospace-value">
             {evidence.fileName ?? "Unknown"}
             {evidence.evidenceAvailable === false && (
               <span className="evidence-missing"> (no longer stored)</span>
@@ -45,25 +105,35 @@ function SourceCard({
         </div>
         <div>
           <dt>Checksum</dt>
-          <dd>{evidence.checksum ?? "Unknown"}</dd>
+          <dd className="monospace-value">{evidence.checksum ?? "Unknown"}</dd>
         </div>
         <div>
           <dt>Record locator</dt>
-          <dd>
+          <dd className="monospace-value">
             {evidence.recordLocator ??
               (recordAbsent ? "Not in this release" : "Unknown")}
           </dd>
         </div>
         <div>
           <dt>Retrieved at</dt>
-          <dd>{evidence.retrievedAt ?? "Not captured"}</dd>
+          <dd>
+            <TimestampDisplay
+              value={evidence.retrievedAt}
+              fallback="Not captured"
+            />
+          </dd>
         </div>
         <div>
           <dt>Evidence classification</dt>
           <dd>
-            {evidence.evidenceAvailable === false
-              ? `${evidence.evidenceClass} when recorded; source file now unavailable`
-              : evidence.evidenceClass}
+            <EvidenceClassificationLabel
+              classification={evidence.evidenceClass}
+              warningSuffix={
+                evidence.evidenceAvailable === false
+                  ? " when recorded; source file now unavailable"
+                  : undefined
+              }
+            />
           </dd>
         </div>
       </dl>
@@ -80,13 +150,17 @@ function FieldChangeRow({ change }: { change: FieldChange }) {
         <div>
           <h4>Before</h4>
           {change.before.map((field, index) => (
-            <p key={`before-${index}`}>{sourceValue(field)}</p>
+            <p key={`before-${index}`}>
+              <SourceValueDisplay field={field} />
+            </p>
           ))}
         </div>
         <div>
           <h4>After</h4>
           {change.after.map((field, index) => (
-            <p key={`after-${index}`}>{sourceValue(field)}</p>
+            <p key={`after-${index}`}>
+              <SourceValueDisplay field={field} />
+            </p>
           ))}
         </div>
       </div>
@@ -112,9 +186,18 @@ function ChangeSetEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
             <div key={item.field}>
               <dt>{item.field}</dt>
               <dd>
-                {item.values.length === 0
-                  ? "No occurrences"
-                  : item.values.map(sourceValue).join("; ")}
+                {item.values.length === 0 ? (
+                  <span className="source-value source-value--no-occurrences">
+                    No occurrences
+                  </span>
+                ) : (
+                  item.values.map((field, index) => (
+                    <span key={`${item.field}-${index}`}>
+                      {index > 0 && "; "}
+                      <SourceValueDisplay field={field} />
+                    </span>
+                  ))
+                )}
               </dd>
             </div>
           ))}
@@ -179,14 +262,24 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
           </div>
           <div>
             <dt>Case created</dt>
-            <dd>{reviewCase.createdAt}</dd>
+            <dd>
+              <TimestampDisplay
+                value={reviewCase.createdAt}
+                fallback={reviewCase.createdAt}
+              />
+            </dd>
           </div>
           <div>
             <dt>Evidence classification</dt>
             <dd>
-              {evidenceUnavailable(reviewCase)
-                ? `${reviewCase.evidenceClass} when recorded; source evidence now unavailable`
-                : reviewCase.evidenceClass}
+              <EvidenceClassificationLabel
+                classification={reviewCase.evidenceClass}
+                warningSuffix={
+                  evidenceUnavailable(reviewCase)
+                    ? " when recorded; source evidence now unavailable"
+                    : undefined
+                }
+              />
             </dd>
           </div>
         </dl>
@@ -197,7 +290,9 @@ function CaseEvidence({ reviewCase }: { reviewCase: OpenReviewCase }) {
         <p className="classification-line">
           Source order: {reviewCase.sourceOrder.prior} →{" "}
           {reviewCase.sourceOrder.current} ·{" "}
-          {reviewCase.sourceOrder.evidenceClass}
+          <EvidenceClassificationLabel
+            classification={reviewCase.sourceOrder.evidenceClass}
+          />
         </p>
         <p className="evidence-note">{reviewCase.sourceOrder.basis}</p>
       </section>
@@ -256,13 +351,20 @@ export default function OpenReviewCasesPage() {
       <header className="page-header">
         <p className="eyebrow">Medicine Change Care Loop</p>
         <h1>Open review cases</h1>
-        <p>
+        <p className="page-description">
           Review source-data changes with their simulated record match and
           evidence.
         </p>
+        <p className="simulated-notice" role="note">
+          All records shown are simulated.
+        </p>
       </header>
 
-      {loading && <p role="status">Loading open cases…</p>}
+      {loading && (
+        <p className="loading-state" role="status">
+          Loading open cases…
+        </p>
+      )}
       {error && (
         <p className="load-error" role="alert">
           {error}

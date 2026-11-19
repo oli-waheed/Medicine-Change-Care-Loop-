@@ -22,7 +22,7 @@ description: "Task list for Open Review Case Readability"
 
 **Purpose**: Establish a passing baseline before changing the frontend.
 
-- [ ] T001 Run the existing frontend test suite with `npm test -- --run` and the build as defined in `frontend/package.json` before making changes.
+- [X] T001 Run the existing frontend test suite with `npm test -- --run` and the build as defined in `frontend/package.json` before making changes.
 
 ---
 
@@ -30,8 +30,8 @@ description: "Task list for Open Review Case Readability"
 
 **Purpose**: Replace starter-wide styling and remove unused starter files before page-specific work.
 
-- [ ] T002 [P] Replace Vite starter rules in `frontend/src/index.css` with the page's global light baseline, set `color-scheme: light`, and ensure the page remains readable when the OS requests dark colors.
-- [ ] T003 [P] Remove the unreferenced starter files `frontend/src/App.css`, `frontend/src/assets/vite.svg`, `frontend/src/assets/react.svg`, and `frontend/src/assets/hero.png`; preserve the referenced `frontend/public/favicon.svg`.
+- [X] T002 [P] Replace Vite starter rules in `frontend/src/index.css` with the page's global light baseline, set `color-scheme: light`, and ensure the page remains readable when the OS requests dark colors.
+- [X] T003 [P] Remove the unreferenced starter files `frontend/src/App.css`, `frontend/src/assets/vite.svg`, `frontend/src/assets/react.svg`, and `frontend/src/assets/hero.png`; preserve the referenced `frontend/public/favicon.svg`.
 
 **Checkpoint**: The app has a light global baseline, no unused starter styles/assets, and its existing favicon remains available.
 
@@ -45,12 +45,12 @@ description: "Task list for Open Review Case Readability"
 
 ### Tests for User Story 1
 
-- [ ] T004 [US1] Add automated assertions for all four evidence classifications, unavailable-evidence warning presentation, and missing/empty/no-occurrence distinctions in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.test.tsx`, leaving existing assertions unchanged.
+- [X] T004 [US1] Add automated assertions for all four evidence classifications, unavailable-evidence warning presentation, and missing/empty/no-occurrence distinctions in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.test.tsx`, leaving existing assertions unchanged.
 
 ### Implementation for User Story 1
 
-- [ ] T005 [US1] Update `frontend/src/pages/open-review-cases/OpenReviewCasesPage.tsx` to retain existing case selection and wording, add the simulated-record notice, and distinguish classifications, unavailable evidence, and missing/empty/no-occurrence values without adding case actions or clinical wording; ensure the header and notice contain no words matched by `CLINICAL_WORDS` in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.scope.test.tsx`.
-- [ ] T006 [US1] Style the page header, cards, selected case, before/after groups, classification labels, unavailable warnings, value-state indicators, and loading/error/empty states in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`.
+- [X] T005 [US1] Update `frontend/src/pages/open-review-cases/OpenReviewCasesPage.tsx` to retain existing case selection and wording, add the simulated-record notice, and distinguish classifications, unavailable evidence, and missing/empty/no-occurrence values without adding case actions or clinical wording; ensure the header and notice contain no words matched by `CLINICAL_WORDS` in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.scope.test.tsx`.
+- [X] T006 [US1] Style the page header, cards, selected case, before/after groups, classification labels, unavailable warnings, value-state indicators, and loading/error/empty states in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`.
 
 **Checkpoint**: A pharmacist can scan a selected simulated case and identify its changed values, evidence classifications, and unavailable or absent-value states.
 
@@ -64,7 +64,7 @@ description: "Task list for Open Review Case Readability"
 
 ### Implementation for User Story 2
 
-- [ ] T007 [US2] Implement the responsive case layout in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`: stack the list and details at 320–767 pixels, keep them side by side without stickiness at 768–1023 pixels, and keep the case list visible during detail scrolling at 1024 pixels and wider.
+- [X] T007 [US2] Implement the responsive case layout in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`: stack the list and details at 320–767 pixels, keep them side by side without stickiness at 768–1023 pixels, and keep the case list visible during detail scrolling at 1024 pixels and wider.
 
 **Checkpoint**: The page uses the specified layout at all three viewport ranges without overlap or horizontal page overflow.
 
@@ -78,13 +78,13 @@ description: "Task list for Open Review Case Readability"
 
 ### Tests for User Story 3
 
-- [ ] T008 [US3] Create `frontend/src/pages/open-review-cases/timestamp.test.ts` with unit tests for valid UTC, valid `+02:00` offset, invalid, and missing timestamp inputs.
+- [X] T008 [US3] Create `frontend/src/pages/open-review-cases/timestamp.test.ts` with unit tests for valid UTC, valid `+02:00` offset, invalid, and missing timestamp inputs.
 
 ### Implementation for User Story 3
 
-- [ ] T009 [P] [US3] Set a meaningful Open Review Cases and project title in `frontend/index.html`.
-- [ ] T010 [US3] Implement the timestamp formatter in `frontend/src/pages/open-review-cases/timestamp.ts` and use it in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.tsx` to render valid values as `YYYY-MM-DD HH:MM UTC` in `<time>` elements, keep the exact original in `dateTime`, show it as small muted text beside the time, and preserve existing fallbacks without adding a control.
-- [ ] T011 [US3] Style the always-visible exact timestamp text as small and muted, with no focus/tap reveal interaction, and apply monospace styling to checksums, file names, and record locators in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`.
+- [X] T009 [P] [US3] Set a meaningful Open Review Cases and project title in `frontend/index.html`.
+- [X] T010 [US3] Implement the timestamp formatter in `frontend/src/pages/open-review-cases/timestamp.ts` and use it in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.tsx` to render valid values as `YYYY-MM-DD HH:MM UTC` in `<time>` elements, keep the exact original in `dateTime`, show it as small muted text beside the time, and preserve existing fallbacks without adding a control.
+- [X] T011 [US3] Style the always-visible exact timestamp text as small and muted, with no focus/tap reveal interaction, and apply monospace styling to checksums, file names, and record locators in `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`.
 
 **Checkpoint**: Timestamp values are deterministic and accessible without hover; source references and the page title meet the UI contract.
 
@@ -94,8 +94,10 @@ description: "Task list for Open Review Case Readability"
 
 **Purpose**: Validate that the integrated page meets the spec and preserves existing behavior.
 
-- [ ] T012 [P] Manually verify the specified viewport ranges, dark OS text contrast, that the exact timestamp is always visible without a focus/tap control, and that a team member acting as the pharmacist can identify the selected case, every changed field's before/after values, and all evidence classifications within 30 seconds without assistance; also verify existing text, warnings, and the retained favicon using `specs/002-case-review-readability/quickstart.md`.
-- [ ] T013 [P] Run `npm test -- --run`, build, lint, and format checks from `frontend/package.json`; confirm existing test assertions and dependency manifests remain unchanged.
+- [X] T012 [P] Manually verify the specified viewport ranges, dark OS text contrast, that the exact timestamp is always visible without a focus/tap control, and that a team member acting as the pharmacist can identify the selected case, every changed field's before/after values, and all evidence classifications within 30 seconds without assistance; also verify existing text, warnings, and the retained favicon using `specs/002-case-review-readability/quickstart.md`.
+- [X] T013 [P] Run `npm test -- --run`, build, lint, and format checks from `frontend/package.json`; confirm existing test assertions and dependency manifests remain unchanged.
+
+**Validation notes**: All tests, build, lint, and formatting checks for changed frontend files pass. The repository-wide `npm run format:check` still reports 14 untouched frontend files; they were not reformatted as part of this feature. A team member acting as pharmacist reported passing the timed 30-second scan.
 
 ---
 
@@ -166,7 +168,12 @@ Complete T008 before T010. T009 may run in parallel with T010 because the page t
 
 ## Format Validation
 
-- Task IDs are sequential from T001 through T013.
-- Each task is an unchecked checklist item with an ID, an optional `[P]` marker, a required story label only in user-story phases, and an explicit file path.
+- Task IDs are sequential from T001 through T014.
+- Each task uses a checklist item with an ID, an optional `[P]` marker, a required story label only in user-story phases, and an explicit file path.
 - Setup, foundational, and polish tasks have no story label.
+
 - Every user story has a goal and an independent test criterion.
+
+## Phase 7: Convergence
+
+- [X] T014 Reject impossible calendar or clock components in `frontend/src/pages/open-review-cases/timestamp.ts` and add regression cases to `frontend/src/pages/open-review-cases/timestamp.test.ts` so invalid values use the existing exact-value fallback per FR-006 / FR-017 (partial).
