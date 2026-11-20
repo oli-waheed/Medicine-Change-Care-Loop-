@@ -1,9 +1,11 @@
-﻿"""Read access to the latest validated medicine catalogue release."""
+﻿
+"""Read access to the latest validated medicine catalogue release."""
 
 from dataclasses import dataclass
 from threading import RLock
 
 from ..domain.medicine_snapshot import MedicineSnapshot
+from ..domain.source_field import SourceFieldState
 from ..models import SourceReleaseCaptureRow
 from ..services.ingest_source_release import (
     IngestionOutcome,
@@ -74,4 +76,51 @@ class MedicineCatalogueService:
         return MedicineCatalogueBaseline(
             capture=capture,
             ingestion=ingestion,
+        )
+
+    @staticmethod
+    def _field_matches(field, query: str) -> bool:
+        """Match a query against a populated source field only."""
+
+        return (
+            field.state is SourceFieldState.VALUE
+            and field.value is not None
+            and query in field.value.casefold()
+        )
+
+    @classmethod
+    def _snapshot_matches(
+        cls,
+        snapshot: MedicineSnapshot,
+        query: str,
+    ) -> bool:
+        """Search product name, package identity and VNR."""
+
+        return (
+            query in snapshot.pakkaustunnus.casefold()
+            or cls._field_matches(snapshot.product.kauppanimi, query)
+            or cls._field_matches(snapshot.vnr_numero, query)
+        )
+
+    def search(self, query: str = "") -> tuple[MedicineSnapshot, ...]:
+        """Search the active catalogue by product name, package ID or VNR.
+
+        An empty query returns every snapshot in the selected baseline.
+        Results preserve the original source ordering and package identities.
+        """
+
+        baseline = self.get_baseline()
+
+        if baseline is None:
+            return ()
+
+        normalized_query = query.strip().casefold()
+
+        if not normalized_query:
+            return baseline.snapshots
+
+        return tuple(
+            snapshot
+            for snapshot in baseline.snapshots
+            if self._snapshot_matches(snapshot, normalized_query)
         )
