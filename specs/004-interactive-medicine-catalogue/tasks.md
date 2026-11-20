@@ -90,4 +90,4 @@
 
 - [x] T058 Verify all Feature 004 acceptance criteria. *(Acceptance criteria 1–12 of `spec.md` §11 checked against the tests above and against the real release of T005.)*
 - [x] T059 Summarize implementation and test results. *(Summary in the status block above.)*
-- [ ] T060 Obtain explicit approval before committing or pushing.
+- [x] T060 Obtain explicit approval before committing or pushing. *(Approved by Oli on 2026-11-20; committed in 3da9f04 and f3a06a2.)*
