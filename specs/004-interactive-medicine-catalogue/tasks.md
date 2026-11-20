@@ -1,4 +1,13 @@
-﻿# Feature 004: Implementation Tasks
+# Feature 004: Implementation Tasks
+
+**Status (2026-11-20)**:
+
+- T009 is done (commit `c9ad6e9`): `MedicineCatalogueService.search()` matches product name (`Kauppanimi`), package identifier (`Pakkaustunnus`) and VNR, case-insensitively and by partial match; an empty query returns the whole baseline in source order; missing and empty fields are never matched; snapshots are not modified. Evidence: 8 unit tests in `tests/unit/test_medicine_catalogue_service.py`; full backend suite 199 passed; Ruff check and format clean.
+- T007 and T008 are implemented in commit `75ea1a2` but not yet verified by automated tests against a real stored release (T027), so they stay open. A manual check against the two fixture releases returned the validated baseline with 4 package snapshots, reused the cached reconstruction on the second call, and returned `None` with no validated release.
+- No other task has started.
+
+**Process note**: The service was committed before T060 ("obtain explicit approval before committing or pushing"). From here on, commit only after the related tests pass, and record evidence next to each task.
+
 
 ## Phase 1 — Technical inspection
 
@@ -11,9 +20,9 @@
 
 ## Phase 2 — Backend catalogue service
 
-- [ ] T007 Create the medicine catalogue service using the existing baseline selector.
-- [ ] T008 Reconstruct snapshots using the existing captured-release loader.
-- [ ] T009 Implement catalogue search.
+- [ ] T007 Create the medicine catalogue service using the existing baseline selector. *(Implemented in `75ea1a2`; verification pending T027.)*
+- [ ] T008 Reconstruct snapshots using the existing captured-release loader. *(Implemented in `75ea1a2`, with an in-memory cache of one release; verification pending T027.)*
+- [x] T009 Implement catalogue search. *(`c9ad6e9`; 8 unit tests. FR-002.)*
 - [ ] T010 Implement catalogue filters.
 - [ ] T011 Implement product detail lookup.
 - [ ] T012 Implement package detail lookup by pakkaustunnus.
@@ -22,7 +31,7 @@
 - [ ] T015 Implement source-release and provenance information.
 - [ ] T016 Expose VNR explicitly and preserve missing values.
 - [ ] T017 Implement VNR-based grouping only where source evidence supports it.
-- [ ] T018 Handle missing or unavailable validated baseline.
+- [ ] T018 Handle missing or unavailable validated baseline. *(Service returns `None`; the API must still map this to the explicit unavailable state of FR-009.)*
 
 ## Phase 3 — Backend API
 
@@ -37,7 +46,7 @@
 
 ## Phase 4 — Backend tests
 
-- [ ] T027 Test validated baseline selection and unavailable baseline.
+- [ ] T027 Test validated baseline selection and unavailable baseline, including cache reuse, cache reset when the baseline disappears, and the error when a capture cannot be reconstructed as validated. *(Next task: verifies T007, T008.)*
 - [ ] T028 Test catalogue search and filters.
 - [ ] T029 Test product and package detail lookup.
 - [ ] T030 Test active-substance exploration.
