@@ -1,6 +1,12 @@
 // T035: the pharmacist view presents source evidence only. It must not diagnose,
 // recommend treatment, select substitutions, set urgency, or change/close cases.
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  within,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import OpenReviewCasesPage from "./OpenReviewCasesPage";
 import type { OpenReviewCase, SourceEvidence } from "./openReviewCases";
@@ -118,18 +124,32 @@ describe("OpenReviewCasesPage clinical scope (T035)", () => {
     render(<OpenReviewCasesPage />);
     await screen.findByText("Cases (2)");
 
-    const buttons = screen.getAllByRole("button");
+    // The page's only controls are the case-selection buttons in the case
+    // list: one per case, each naming the package it selects.
+    const caseList = screen.getByRole("navigation", {
+      name: "Open review cases",
+    });
+    const buttons = within(caseList).getAllByRole("button");
     expect(buttons).toHaveLength(2);
+    expect(screen.getAllByRole("button")).toEqual(buttons);
     for (const button of buttons) {
       expect(button.textContent).toMatch(/SIM-PKG-/);
       fireEvent.click(button);
       expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
     }
 
-    // No form controls that could set status, priority or a decision.
-    expect(
-      document.querySelectorAll("input, select, textarea, form"),
-    ).toHaveLength(0);
+    // No form controls that could set status, priority or a decision. The
+    // only input is the read-only case search (feature 003), which filters
+    // the cases already loaded and sends nothing.
+    const search = screen.getByRole("searchbox", { name: "Search cases" });
+    expect(document.querySelectorAll("input")).toEqual(
+      document.querySelectorAll('input[type="search"]'),
+    );
+    expect(document.querySelectorAll("input")).toHaveLength(1);
+    expect(document.querySelectorAll("select, textarea, form")).toHaveLength(0);
+    fireEvent.change(search, { target: { value: "SIM-PKG-300" } });
+    expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
+    fireEvent.change(search, { target: { value: "" } });
     // The view never changes data: one read on load, nothing on selection.
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, options] = fetchMock.mock.calls[0];

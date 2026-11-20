@@ -4,6 +4,8 @@
 
 **Input**: Feature specification from `specs/002-case-review-readability/spec.md`
 
+> **Superseded in part by [003](../003-app-shell-and-themes/plan.md)** (2026-11-20): the page is now part of an application shell with a sidebar, a read-only case search and separate review layouts. The light-only theme and all other decisions remain in force.
+
 ## Summary
 
 Restyle the existing Open Review Cases page so pharmacists can scan the selected case, changed values, evidence classifications, timestamps, and source references more easily. Preserve existing displayed text and case behavior except for the required readable timestamp presentation and simulated-record notice; keep the current API contract and simulated data, and update the browser tab title. Use plain CSS in `frontend/src/index.css` and `frontend/src/pages/open-review-cases/OpenReviewCasesPage.css`, set `color-scheme: light`, add no npm packages, and remove verified-unused Vite starter styles and assets.

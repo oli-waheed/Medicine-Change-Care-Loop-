@@ -1,0 +1,384 @@
+/* Application shell: persistent sidebar from 1024 px, drawer below. */
+
+.app-shell {
+  --sidebar-width: 264px;
+
+  min-height: 100vh;
+}
+
+/* ---------- Top bar (narrow viewports only) ---------- */
+
+.app-topbar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.5rem 1rem;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.app-topbar-brand {
+  overflow: hidden;
+  font-weight: 650;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-menu-toggle {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.4rem 0.75rem;
+  border: 1px solid var(--sidebar-border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--sidebar-text);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.app-menu-toggle:hover {
+  background: var(--sidebar-current-bg);
+}
+
+.app-menu-toggle[aria-expanded="true"] {
+  background: var(--sidebar-current-bg);
+  color: var(--sidebar-current-text);
+}
+
+.app-topbar :focus-visible,
+.app-sidebar :focus-visible {
+  outline-color: var(--sidebar-focus);
+}
+
+/* ---------- Sidebar ---------- */
+
+/* The rail toggle exists only on tablet widths (768–1023 px). */
+.sidebar-rail-toggle {
+  display: none;
+}
+
+.app-sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 50;
+  width: min(var(--sidebar-width), 86vw);
+  overflow-y: auto;
+  background: var(--sidebar-bg);
+  color: var(--sidebar-text);
+  box-shadow: var(--shadow-drawer);
+  transform: translateX(-105%);
+  visibility: hidden;
+}
+
+.app-sidebar--open {
+  transform: none;
+  visibility: visible;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-sidebar {
+    transition:
+      transform 0.2s ease,
+      visibility 0.2s;
+  }
+
+  /* Become visible at once when opening, so focus can move into the drawer. */
+  .app-sidebar--open {
+    transition:
+      transform 0.2s ease,
+      visibility 0s;
+  }
+}
+
+.app-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  background: var(--scrim);
+}
+
+.app-shell--drawer-open {
+  overflow: hidden;
+  height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 1.25rem 0.9rem 1rem;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.25rem 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--sidebar-border);
+}
+
+.sidebar-brand-mark {
+  flex: 0 0 auto;
+}
+
+.sidebar-brand-name {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.sidebar-nav {
+  padding: 1rem 0;
+}
+
+.sidebar-nav ul {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  min-height: 44px;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  color: var(--sidebar-text);
+  font-weight: 550;
+  text-decoration: none;
+}
+
+.sidebar-link:hover {
+  background: var(--sidebar-current-bg);
+  color: var(--sidebar-text);
+}
+
+.sidebar-link--current {
+  background: var(--sidebar-current-bg);
+  color: var(--sidebar-current-text);
+  font-weight: 700;
+  box-shadow: inset 3px 0 0 var(--sidebar-current-text);
+}
+
+.sidebar-link--current:hover {
+  color: var(--sidebar-current-text);
+}
+
+.sidebar-link-icon {
+  flex: 0 0 auto;
+}
+
+.sidebar-footer {
+  display: grid;
+  gap: 0.9rem;
+  margin-top: auto;
+  padding: 1rem 0.5rem 0;
+  border-top: 1px solid var(--sidebar-border);
+}
+
+.sidebar-attribution,
+.sidebar-version {
+  margin: 0;
+  color: var(--sidebar-muted);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.sidebar-attribution a {
+  color: var(--sidebar-current-text);
+  font-weight: 650;
+}
+
+/* ---------- Main region and shared page header ---------- */
+
+.app-main {
+  min-width: 0;
+  padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 3vw, 2.25rem) 3rem;
+}
+
+.app-main:focus {
+  outline: none;
+}
+
+.app-main .page-header {
+  margin-bottom: 1.5rem;
+}
+
+.app-main .eyebrow {
+  margin: 0;
+  color: var(--color-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.app-main .page-header h1 {
+  margin: 0.2rem 0 0.35rem;
+  color: var(--color-heading);
+  font-size: clamp(1.6rem, 3vw, 2.1rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.app-main .page-description {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.not-found-page p {
+  margin: 0;
+}
+
+.not-found-page a {
+  font-weight: 650;
+}
+
+/* ---------- Tablet: collapsible icon rail (768–1023 px) ---------- */
+
+@media (min-width: 768px) and (max-width: 1023.98px) {
+  .app-shell {
+    --rail-width: 72px;
+
+    display: grid;
+    grid-template-columns: var(--rail-width) minmax(0, 1fr);
+    background: linear-gradient(
+      to right,
+      var(--sidebar-bg) var(--rail-width),
+      transparent var(--rail-width)
+    );
+  }
+
+  .app-topbar {
+    display: none;
+  }
+
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    width: var(--rail-width);
+    height: 100vh;
+    box-shadow: none;
+    border-right: 1px solid var(--sidebar-border);
+    transform: none;
+    visibility: visible;
+  }
+
+  .app-sidebar--open {
+    position: fixed;
+    width: min(var(--sidebar-width), 86vw);
+    box-shadow: var(--shadow-drawer);
+  }
+
+  /* Keep the content in its column while the expanded sidebar overlays it. */
+  .app-main {
+    grid-column: 2;
+  }
+
+  .sidebar-rail-toggle {
+    display: inline-grid;
+    flex: 0 0 auto;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    margin-left: auto;
+    border: 1px solid var(--sidebar-border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--sidebar-text);
+    cursor: pointer;
+  }
+
+  .sidebar-rail-toggle:hover {
+    background: var(--sidebar-current-bg);
+  }
+
+  .sidebar-rail-toggle[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+  }
+
+  /* Collapsed rail: icons only; labels stay available to assistive technology. */
+  .app-sidebar:not(.app-sidebar--open) .sidebar {
+    align-items: center;
+    padding: 1rem 0.5rem;
+  }
+
+  .app-sidebar:not(.app-sidebar--open) .sidebar-brand {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0 0 1rem;
+  }
+
+  .app-sidebar:not(.app-sidebar--open) .sidebar-rail-toggle {
+    margin-left: 0;
+  }
+
+  .app-sidebar:not(.app-sidebar--open) .sidebar-brand-name,
+  .app-sidebar:not(.app-sidebar--open) .sidebar-link-label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .app-sidebar:not(.app-sidebar--open) .sidebar-link {
+    justify-content: center;
+    width: 48px;
+    padding: 0;
+  }
+
+  .app-sidebar:not(.app-sidebar--open) .sidebar-footer {
+    display: none;
+  }
+}
+
+/* ---------- Desktop: persistent sidebar ---------- */
+
+@media (min-width: 1024px) {
+  .app-shell {
+    display: grid;
+    grid-template-columns: var(--sidebar-width) minmax(0, 1fr);
+    background: linear-gradient(
+      to right,
+      var(--sidebar-bg) var(--sidebar-width),
+      transparent var(--sidebar-width)
+    );
+  }
+
+  .app-topbar,
+  .app-scrim {
+    display: none;
+  }
+
+  .app-sidebar {
+    position: sticky;
+    top: 0;
+    width: auto;
+    height: 100vh;
+    box-shadow: none;
+    border-right: 1px solid var(--sidebar-border);
+    transform: none;
+    visibility: visible;
+  }
+
+  .app-shell--drawer-open {
+    overflow: visible;
+    height: auto;
+  }
+}
