@@ -1,4 +1,4 @@
-﻿# Feature 004: Implementation Plan
+# Feature 004: Implementation Plan
 
 ## 1. Overview
 

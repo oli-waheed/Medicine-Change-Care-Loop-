@@ -1,4 +1,3 @@
-﻿
 """Read access to the latest validated medicine catalogue release."""
 
 from dataclasses import dataclass
@@ -56,10 +55,7 @@ class MedicineCatalogueService:
             return None
 
         with self._lock:
-            if (
-                self._cached_release_id == capture.release_id
-                and self._cached_ingestion is not None
-            ):
+            if self._cached_release_id == capture.release_id and self._cached_ingestion is not None:
                 ingestion = self._cached_ingestion
             else:
                 ingestion = reload_captured_release(capture.capture_directory)

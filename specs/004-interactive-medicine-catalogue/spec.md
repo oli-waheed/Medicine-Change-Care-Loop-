@@ -1,4 +1,4 @@
-﻿# Feature 004: Interactive Medicine Catalogue
+# Feature 004: Interactive Medicine Catalogue
 
 **Status:** Approved specification
 **Branch:** feature/interactive-medicine-catalogue

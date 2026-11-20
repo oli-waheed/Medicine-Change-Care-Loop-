@@ -1,4 +1,3 @@
-
 from dataclasses import replace
 from types import SimpleNamespace
 
@@ -61,9 +60,7 @@ def test_empty_search_returns_all_snapshots_in_source_order(catalogue_service):
     assert service.search("   ") == (old, new)
 
 
-def test_missing_and_empty_source_fields_are_not_searchable(
-    snapshot_pair, monkeypatch
-):
+def test_missing_and_empty_source_fields_are_not_searchable(snapshot_pair, monkeypatch):
     old, _new, _order = snapshot_pair
 
     snapshot = replace(
