@@ -25,6 +25,7 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Keep an outcome for every change (`MATCHED`, `NO_MATCH`, `AMBIGUOUS`), including those that create no case.
 - Present before-and-after information and supporting source evidence, and show when that evidence is no longer available.
 - Review cases in a responsive workspace with a sidebar, case search and separate layouts for changed and removed packages (feature 003).
+- Browse a read-only Medicine Catalogue of the active validated release: search by name, package ID or VNR, filter by source fields, open product and package records with provenance, explore active substances and compare two products field by field (feature 004).
 - Store an unchanged daily download only once, recording each retrieval time.
 - Provide APIs for retrieving open review cases and change processing outcomes.
 
@@ -95,6 +96,12 @@ Current API endpoints include:
 | GET | `/api/open-review-cases` | Retrieve open review cases |
 | GET | `/api/change-processing-outcomes` | Retrieve every matching outcome (`MATCHED`, `NO_MATCH`, `AMBIGUOUS`); filter with `?result=NO_MATCH&result=AMBIGUOUS` |
 | POST | `/api/source-releases/ingest` | Submit and process a source release |
+| GET | `/api/medicine-catalogue` | Search and filter packages of the active validated release (`q`, `activeSubstance`, `atc`, `form`, `route`, `available`, `vnr`, `missing`, `page`, `pageSize`) |
+| GET | `/api/medicine-catalogue/products/{productReference}` | One product and its packages |
+| GET | `/api/medicine-catalogue/packages/{pakkaustunnus}` | One package, its provenance and packages sharing its VNR |
+| GET | `/api/medicine-catalogue/active-substances` | Active substances with every occurrence in source order |
+| GET | `/api/medicine-catalogue/compare?productA=…&productB=…` | Source fields of two products side by side |
+| GET | `/api/medicine-catalogue/source` | Active catalogue release and record counts |
 
 ### API Documentation
 
@@ -229,7 +236,7 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `191 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `227 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
@@ -245,7 +252,7 @@ From the frontend directory:
 npx vitest run
 ```
 
-Expected: `Tests  54 passed (54)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
+Expected: `Tests  69 passed (69)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
 
 Lint and format checks:
 
@@ -307,11 +314,11 @@ Medicine-Change-Care-Loop/
 
 All tasks of the feature specification (T001–T036 in [tasks.md](specs/001-ingestion-case-pipeline/tasks.md)) are implemented, and the specification lists no known gaps ([spec.md](specs/001-ingestion-case-pipeline/spec.md#implementation-status)).
 
-The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts.
+The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`.
 
 Verification:
 
-- 191 backend tests and 54 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 227 backend tests and 69 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).

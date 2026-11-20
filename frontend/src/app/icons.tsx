@@ -78,3 +78,12 @@ export function ChevronIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function CatalogueIcon({ className }: IconProps) {
+  return (
+    <svg {...common} className={className}>
+      <rect x="3.5" y="4" width="17" height="16" rx="2.5" />
+      <path d="M3.5 9h17M9 9v11" />
+    </svg>
+  );
+}

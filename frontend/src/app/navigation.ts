@@ -1,6 +1,7 @@
 import { useSyncExternalStore, type MouseEvent } from "react";
 
-export type PageId = "open-review-cases" | "about-data" | "not-found";
+export type PageId =
+  "open-review-cases" | "medicine-catalogue" | "about-data" | "not-found";
 
 export type NavigationItem = {
   page: Exclude<PageId, "not-found">;
@@ -11,11 +12,18 @@ export type NavigationItem = {
 // The only pages in the sidebar. Do not add items without a working page.
 export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { page: "open-review-cases", path: "/", label: "Open Review Cases" },
+  // Feature 004 (supersedes 003 FR-001/FR-002 in part).
+  {
+    page: "medicine-catalogue",
+    path: "/medicine-catalogue",
+    label: "Medicine Catalogue",
+  },
   { page: "about-data", path: "/about-data", label: "About the Data" },
 ];
 
 export const PAGE_TITLES: Record<PageId, string> = {
   "open-review-cases": "Open Review Cases",
+  "medicine-catalogue": "Medicine Catalogue",
   "about-data": "About the Data",
   "not-found": "Page not found",
 };

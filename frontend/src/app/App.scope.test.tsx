@@ -1,11 +1,14 @@
 // Feature 003 (FR-023): the whole application, including the sidebar, top bar
 // and About the Data, offers only reading and navigation controls and uses no
 // clinical wording. Extends the page-level T035 guard to every page.
+// Feature 004 adds the read-only Medicine Catalogue: its search fields, filter
+// selects and view, record and comparison buttons are listed here deliberately.
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import App from "../App";
 import type { OpenReviewCase } from "../pages/open-review-cases/openReviewCases";
 import { CLINICAL_WORDS } from "../test/clinicalWords";
+import { catalogueFetch } from "../test/catalogueFixtures";
 
 function fixture(id: string, removed: boolean): OpenReviewCase {
   const source = {
@@ -87,20 +90,48 @@ function fixture(id: string, removed: boolean): OpenReviewCase {
 }
 
 const ALLOWED_BUTTONS = [/^Fictional Product \d+/, /^Menu$/, /^Sidebar$/];
+// Feature 004: catalogue reading controls (open records, switch views, page).
+const CATALOGUE_BUTTONS = [
+  /^Fictional Product /,
+  /^Packages$/,
+  /^Active substances$/,
+  /^Compare( \(\d\))?$/,
+  /^SYN-/,
+  /^SIM-/,
+  /^Open product /,
+  /^Add to comparison$/,
+  /^Remove Product [AB]$/,
+  /^Clear search and filters$/,
+  /^(Previous|Next) page$/,
+];
+const CATALOGUE_INPUTS = [
+  "Search medicines",
+  "Active substance",
+  "ATC code starts with",
+  "Pharmaceutical form",
+  "Administration route",
+  "VNR",
+  "Search active substances",
+];
+const CATALOGUE_SELECTS = ["On the market (Kaupan)", "Not present in source"];
 const ALLOWED_LINKS: [string, string][] = [
   ["Skip to main content", "#main-content"],
   ["Open Review Cases", "/"],
+  ["Medicine Catalogue", "/medicine-catalogue"],
   ["About the Data", "/about-data"],
   ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
   ["CC BY 4.0 licence", "https://creativecommons.org/licenses/by/4.0/"],
   ["Fimea open data", "https://fimea.fi/en/about_us/open-data"],
 ];
 
-function expectOnlyAllowedControls() {
+function expectOnlyAllowedControls(catalogue = false) {
+  const buttons = catalogue
+    ? [...ALLOWED_BUTTONS, ...CATALOGUE_BUTTONS]
+    : ALLOWED_BUTTONS;
   for (const button of screen.queryAllByRole("button", { hidden: true })) {
     const name = button.textContent?.trim() ?? "";
     expect(
-      ALLOWED_BUTTONS.some((pattern) => pattern.test(name)),
+      buttons.some((pattern) => pattern.test(name)),
       `unexpected button "${name}"`,
     ).toBe(true);
   }
@@ -111,12 +142,24 @@ function expectOnlyAllowedControls() {
       pair,
     );
   }
-  // The only form control allowed is the read-only case search.
-  for (const input of document.querySelectorAll("input")) {
-    expect(input).toHaveAttribute("type", "search");
-    expect(input).toHaveAccessibleName("Search cases");
+  if (catalogue) {
+    // Catalogue fields only narrow what is read; nothing is ever submitted.
+    for (const input of document.querySelectorAll("input")) {
+      expect(["search", "text"]).toContain(input.getAttribute("type"));
+      expect(CATALOGUE_INPUTS).toContain(input.labels?.[0]?.textContent);
+    }
+    for (const select of document.querySelectorAll("select")) {
+      expect(CATALOGUE_SELECTS).toContain(select.labels?.[0]?.textContent);
+    }
+    expect(document.querySelectorAll("textarea, form")).toHaveLength(0);
+  } else {
+    // The only form control allowed is the read-only case search.
+    for (const input of document.querySelectorAll("input")) {
+      expect(input).toHaveAttribute("type", "search");
+      expect(input).toHaveAccessibleName("Search cases");
+    }
+    expect(document.querySelectorAll("select, textarea, form")).toHaveLength(0);
   }
-  expect(document.querySelectorAll("select, textarea, form")).toHaveLength(0);
   expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
 }
 
@@ -124,10 +167,14 @@ describe("Application clinical scope (feature 003)", () => {
   let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    fetchMock = vi.fn().mockResolvedValue({
-      ok: true,
-      json: async () => [fixture("100", false), fixture("300", true)],
-    });
+    fetchMock = vi.fn(async (url: string) =>
+      url.startsWith("/api/medicine-catalogue")
+        ? catalogueFetch(url)
+        : {
+            ok: true,
+            json: async () => [fixture("100", false), fixture("300", true)],
+          },
+    );
     vi.stubGlobal("fetch", fetchMock);
   });
 
@@ -171,5 +218,41 @@ describe("Application clinical scope (feature 003)", () => {
       expect(options?.method ?? "GET").toBe("GET");
     }
     expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("keeps the Medicine Catalogue to reading controls and GET requests", async () => {
+    window.history.replaceState(null, "", "/medicine-catalogue");
+    render(<App />);
+    await screen.findByRole("heading", {
+      level: 1,
+      name: "Medicine Catalogue",
+    });
+    await screen.findByText(/Showing 1–4 of 4 packages/);
+    expectOnlyAllowedControls(true);
+
+    fireEvent.click(screen.getByText("Filters"));
+    expectOnlyAllowedControls(true);
+
+    fireEvent.click(screen.getByRole("button", { name: /SIM-PKG-100/ }));
+    await screen.findByRole("button", { name: "Open product SYN-PROD-100" });
+    expectOnlyAllowedControls(true);
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Open product SYN-PROD-100" }),
+    );
+    fireEvent.click(
+      await screen.findByRole("button", { name: "Add to comparison" }),
+    );
+    await screen.findByText("Product A");
+    expectOnlyAllowedControls(true);
+
+    fireEvent.click(screen.getByRole("button", { name: "Active substances" }));
+    await screen.findByText("Aine=SIM-SA01");
+    expectOnlyAllowedControls(true);
+
+    for (const [url, options] of fetchMock.mock.calls) {
+      expect(String(url)).toMatch(/^\/api\/medicine-catalogue(\/|\?|$)/);
+      expect(options?.method ?? "GET").toBe("GET");
+    }
   });
 });

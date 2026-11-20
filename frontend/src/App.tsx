@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import AppShell from "./app/AppShell";
 import { documentTitle, pageForPath, useCurrentPath } from "./app/navigation";
 import AboutDataPage from "./pages/about-data/AboutDataPage";
+import MedicineCataloguePage from "./pages/medicine-catalogue/MedicineCataloguePage";
 import NotFoundPage from "./pages/not-found/NotFoundPage";
 import OpenReviewCasesPage from "./pages/open-review-cases/OpenReviewCasesPage";
 
@@ -15,6 +16,7 @@ function App() {
   return (
     <AppShell currentPage={page}>
       {page === "open-review-cases" && <OpenReviewCasesPage />}
+      {page === "medicine-catalogue" && <MedicineCataloguePage />}
       {page === "about-data" && <AboutDataPage />}
       {page === "not-found" && <NotFoundPage />}
     </AppShell>

@@ -1,5 +1,11 @@
 import { appVersion } from "./appVersion";
-import { BrandMark, CasesIcon, ChevronIcon, DataIcon } from "./icons";
+import {
+  BrandMark,
+  CasesIcon,
+  CatalogueIcon,
+  ChevronIcon,
+  DataIcon,
+} from "./icons";
 import {
   NAVIGATION_ITEMS,
   PRODUCT_NAME,
@@ -9,6 +15,7 @@ import {
 
 const ICONS = {
   "open-review-cases": CasesIcon,
+  "medicine-catalogue": CatalogueIcon,
   "about-data": DataIcon,
 } as const;
 

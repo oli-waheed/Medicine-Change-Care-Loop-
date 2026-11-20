@@ -77,6 +77,13 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         ("GET", "/api/open-review-cases"),
         ("GET", "/api/change-processing-outcomes"),
         ("POST", "/api/source-releases/ingest"),
+        # Feature 004: read-only medicine catalogue (contracts/catalogue-api.md).
+        ("GET", "/api/medicine-catalogue"),
+        ("GET", "/api/medicine-catalogue/products/{product_reference}"),
+        ("GET", "/api/medicine-catalogue/packages/{pakkaustunnus}"),
+        ("GET", "/api/medicine-catalogue/active-substances"),
+        ("GET", "/api/medicine-catalogue/compare"),
+        ("GET", "/api/medicine-catalogue/source"),
     }
 
 

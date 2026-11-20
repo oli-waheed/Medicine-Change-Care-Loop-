@@ -1,0 +1,2245 @@
+{
+  "/api/medicine-catalogue/source": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "packageCount": 4,
+    "productCount": 3,
+    "activeSubstanceCount": 3
+  },
+  "/api/medicine-catalogue": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "total": 4,
+    "page": 1,
+    "pageSize": 50,
+    "items": [
+      {
+        "pakkaustunnus": "SIM-PKG-100",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-100",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-100",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Amber Revised",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength A",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F01",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-A01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size A",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      },
+      {
+        "pakkaustunnus": "SIM-PKG-200",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-200",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Blue",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength B",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F02",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-B01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size B",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      },
+      {
+        "pakkaustunnus": "SIM-PKG-400",
+        "vnr": {
+          "state": "missing",
+          "value": null,
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-400",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Fable",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength D",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F04",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "missing",
+          "value": null,
+          "attributes": {}
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic current-only pack",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      },
+      {
+        "pakkaustunnus": "SIM-PKG-500",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-200",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Blue",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength B",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F02",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-B01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size E revised",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      }
+    ]
+  },
+  "/api/medicine-catalogue?missing=vnr": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "total": 1,
+    "page": 1,
+    "pageSize": 50,
+    "items": [
+      {
+        "pakkaustunnus": "SIM-PKG-400",
+        "vnr": {
+          "state": "missing",
+          "value": null,
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-400",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Fable",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength D",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F04",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "missing",
+          "value": null,
+          "attributes": {}
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic current-only pack",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      }
+    ]
+  },
+  "/api/medicine-catalogue?q=amber": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "total": 1,
+    "page": 1,
+    "pageSize": 50,
+    "items": [
+      {
+        "pakkaustunnus": "SIM-PKG-100",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-100",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-100",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Amber Revised",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength A",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F01",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-A01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size A",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      }
+    ]
+  },
+  "/api/medicine-catalogue/products/SYN-PROD-100": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "product": {
+      "productReference": "SYN-PROD-100",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Amber Revised",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength A",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F01",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-A01",
+          "value": "synthetic category"
+        }
+      },
+      "administrationRoutes": [
+        {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ROUTE",
+            "id": "SIM-R01",
+            "value": "fictional route"
+          }
+        }
+      ],
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SA01",
+              "value": "fictional substance amber"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-100",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "1.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount A",
+            "attributes": {}
+          }
+        },
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "0.5",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount A2",
+            "attributes": {}
+          }
+        }
+      ],
+      "activeSubstancesVaryByPackage": false,
+      "authorizations": [
+        {
+          "branch": "Myyntilupa",
+          "status": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-AUTH",
+              "id": "SIM-ACTIVE",
+              "value": "synthetic active"
+            }
+          },
+          "grantedOn": {
+            "state": "value",
+            "value": "2098-01-01",
+            "attributes": {}
+          },
+          "endsOn": {
+            "state": "value",
+            "value": "2099-12-31",
+            "attributes": {}
+          }
+        }
+      ]
+    },
+    "packages": [
+      {
+        "pakkaustunnus": "SIM-PKG-100",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-100",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-100",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Amber Revised",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength A",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F01",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-A01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size A",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      }
+    ]
+  },
+  "/api/medicine-catalogue/products/SYN-PROD-200": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "product": {
+      "productReference": "SYN-PROD-200",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Blue",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength B",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F02",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-B01",
+          "value": "synthetic category"
+        }
+      },
+      "administrationRoutes": [
+        {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      ],
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "2.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount B",
+            "attributes": {}
+          }
+        }
+      ],
+      "activeSubstancesVaryByPackage": false,
+      "authorizations": [
+        {
+          "branch": "Rekisterointi",
+          "status": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-REG",
+              "id": "SIM-REGISTERED",
+              "value": "synthetic registered"
+            }
+          },
+          "grantedOn": {
+            "state": "value",
+            "value": "2098-02-01",
+            "attributes": {}
+          },
+          "endsOn": {
+            "state": "empty",
+            "value": "",
+            "attributes": {}
+          }
+        }
+      ]
+    },
+    "packages": [
+      {
+        "pakkaustunnus": "SIM-PKG-200",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-200",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Blue",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength B",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F02",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-B01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size B",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      },
+      {
+        "pakkaustunnus": "SIM-PKG-500",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "productReference": "SYN-PROD-200",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Blue",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength B",
+          "attributes": {}
+        },
+        "pharmaceuticalForm": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-FORM",
+            "id": "SIM-F02",
+            "value": "fictional form"
+          }
+        },
+        "atcCode": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-ATC",
+            "id": "SIM-B01",
+            "value": "synthetic category"
+          }
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size E revised",
+          "attributes": {}
+        },
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        }
+      }
+    ]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-100": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "package": {
+      "pakkaustunnus": "SIM-PKG-100",
+      "vnr": {
+        "state": "value",
+        "value": "SIM-VNR-100",
+        "attributes": {}
+      },
+      "packageSizeText": {
+        "state": "value",
+        "value": "synthetic pack size A",
+        "attributes": {}
+      },
+      "packageSize": {
+        "state": "value",
+        "value": "10",
+        "attributes": {}
+      },
+      "packageSizeMultiplier": {
+        "state": "value",
+        "value": "1",
+        "attributes": {}
+      },
+      "packageSizeUnit": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-UNIT",
+          "id": "SIM-COUNT",
+          "value": "fictional units"
+        }
+      },
+      "publicClarification": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "availability": {
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "availableFrom": {
+          "state": "value",
+          "value": "2098-12-01",
+          "attributes": {}
+        },
+        "availableUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      },
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SA01",
+              "value": "fictional substance amber"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-100",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "1.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount A",
+            "attributes": {}
+          }
+        },
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "0.5",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount A2",
+            "attributes": {}
+          }
+        }
+      ],
+      "provenance": {
+        "sourceName": "Fimea Basic Register",
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "retrievedAt": "2099-01-04T00:00:00+00:00",
+        "fileName": "current-release.xml",
+        "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+        "recordIdentifier": "SIM-PKG-100",
+        "recordLocator": "/Perusrekisteri/Pakkaus[1]",
+        "evidenceClass": "VERIFIED"
+      }
+    },
+    "product": {
+      "productReference": "SYN-PROD-100",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Amber Revised",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength A",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F01",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-A01",
+          "value": "synthetic category"
+        }
+      }
+    },
+    "authorizations": [
+      {
+        "branch": "Myyntilupa",
+        "status": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-AUTH",
+            "id": "SIM-ACTIVE",
+            "value": "synthetic active"
+          }
+        },
+        "grantedOn": {
+          "state": "value",
+          "value": "2098-01-01",
+          "attributes": {}
+        },
+        "endsOn": {
+          "state": "value",
+          "value": "2099-12-31",
+          "attributes": {}
+        }
+      }
+    ],
+    "sameVnrPackages": []
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-200": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "package": {
+      "pakkaustunnus": "SIM-PKG-200",
+      "vnr": {
+        "state": "value",
+        "value": "SIM-VNR-200",
+        "attributes": {}
+      },
+      "packageSizeText": {
+        "state": "value",
+        "value": "synthetic pack size B",
+        "attributes": {}
+      },
+      "packageSize": {
+        "state": "value",
+        "value": "20",
+        "attributes": {}
+      },
+      "packageSizeMultiplier": {
+        "state": "value",
+        "value": "1",
+        "attributes": {}
+      },
+      "packageSizeUnit": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-UNIT",
+          "id": "SIM-COUNT",
+          "value": "fictional units"
+        }
+      },
+      "publicClarification": {
+        "state": "empty",
+        "value": "",
+        "attributes": {}
+      },
+      "availability": {
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "availableFrom": {
+          "state": "value",
+          "value": "2098-12-02",
+          "attributes": {}
+        },
+        "availableUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      },
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "2.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount B",
+            "attributes": {}
+          }
+        }
+      ],
+      "provenance": {
+        "sourceName": "Fimea Basic Register",
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "retrievedAt": "2099-01-04T00:00:00+00:00",
+        "fileName": "current-release.xml",
+        "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+        "recordIdentifier": "SIM-PKG-200",
+        "recordLocator": "/Perusrekisteri/Pakkaus[2]",
+        "evidenceClass": "VERIFIED"
+      }
+    },
+    "product": {
+      "productReference": "SYN-PROD-200",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Blue",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength B",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F02",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-B01",
+          "value": "synthetic category"
+        }
+      }
+    },
+    "authorizations": [
+      {
+        "branch": "Rekisterointi",
+        "status": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-REG",
+            "id": "SIM-REGISTERED",
+            "value": "synthetic registered"
+          }
+        },
+        "grantedOn": {
+          "state": "value",
+          "value": "2098-02-01",
+          "attributes": {}
+        },
+        "endsOn": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      }
+    ],
+    "sameVnrPackages": ["SIM-PKG-500"]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-400": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "package": {
+      "pakkaustunnus": "SIM-PKG-400",
+      "vnr": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "packageSizeText": {
+        "state": "value",
+        "value": "synthetic current-only pack",
+        "attributes": {}
+      },
+      "packageSize": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "packageSizeMultiplier": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "packageSizeUnit": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "publicClarification": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      },
+      "availability": {
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "availableFrom": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "availableUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      },
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SD01",
+              "value": "fictional substance fable"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-400",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "4.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount D",
+            "attributes": {}
+          }
+        }
+      ],
+      "provenance": {
+        "sourceName": "Fimea Basic Register",
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "retrievedAt": "2099-01-04T00:00:00+00:00",
+        "fileName": "current-release.xml",
+        "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+        "recordIdentifier": "SIM-PKG-400",
+        "recordLocator": "/Perusrekisteri/Pakkaus[3]",
+        "evidenceClass": "VERIFIED"
+      }
+    },
+    "product": {
+      "productReference": "SYN-PROD-400",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Fable",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength D",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F04",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "missing",
+        "value": null,
+        "attributes": {}
+      }
+    },
+    "authorizations": [
+      {
+        "branch": "Erityislupa",
+        "status": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-PERMIT",
+            "id": "SIM-GRANTED",
+            "value": "synthetic granted"
+          }
+        },
+        "grantedOn": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "endsOn": {
+          "state": "value",
+          "value": "2099-12-31",
+          "attributes": {}
+        }
+      }
+    ],
+    "sameVnrPackages": []
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-500": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "package": {
+      "pakkaustunnus": "SIM-PKG-500",
+      "vnr": {
+        "state": "value",
+        "value": "SIM-VNR-200",
+        "attributes": {}
+      },
+      "packageSizeText": {
+        "state": "value",
+        "value": "synthetic pack size E revised",
+        "attributes": {}
+      },
+      "packageSize": {
+        "state": "value",
+        "value": "50",
+        "attributes": {}
+      },
+      "packageSizeMultiplier": {
+        "state": "value",
+        "value": "1",
+        "attributes": {}
+      },
+      "packageSizeUnit": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-UNIT",
+          "id": "SIM-COUNT",
+          "value": "fictional units"
+        }
+      },
+      "publicClarification": {
+        "state": "empty",
+        "value": "",
+        "attributes": {}
+      },
+      "availability": {
+        "available": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "availableFrom": {
+          "state": "value",
+          "value": "2098-12-03",
+          "attributes": {}
+        },
+        "availableUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      },
+      "activeSubstances": [
+        {
+          "name": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          },
+          "casNumber": {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          },
+          "quantity": {
+            "state": "value",
+            "value": "2.0",
+            "attributes": {}
+          },
+          "quantityUnit": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          },
+          "undividedStrength": {
+            "state": "value",
+            "value": "synthetic amount B",
+            "attributes": {}
+          }
+        }
+      ],
+      "provenance": {
+        "sourceName": "Fimea Basic Register",
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "retrievedAt": "2099-01-04T00:00:00+00:00",
+        "fileName": "current-release.xml",
+        "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+        "recordIdentifier": "SIM-PKG-500",
+        "recordLocator": "/Perusrekisteri/Pakkaus[4]",
+        "evidenceClass": "VERIFIED"
+      }
+    },
+    "product": {
+      "productReference": "SYN-PROD-200",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Blue",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength B",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F02",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-B01",
+          "value": "synthetic category"
+        }
+      }
+    },
+    "authorizations": [
+      {
+        "branch": "Rekisterointi",
+        "status": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-REG",
+            "id": "SIM-REGISTERED",
+            "value": "synthetic registered"
+          }
+        },
+        "grantedOn": {
+          "state": "value",
+          "value": "2098-02-01",
+          "attributes": {}
+        },
+        "endsOn": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        }
+      }
+    ],
+    "sameVnrPackages": ["SIM-PKG-200"]
+  },
+  "/api/medicine-catalogue/active-substances": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "total": 3,
+    "page": 1,
+    "pageSize": 50,
+    "items": [
+      {
+        "identity": "Aine=SIM-SA01",
+        "name": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-SUBSTANCE",
+            "id": "SIM-SA01",
+            "value": "fictional substance amber"
+          }
+        },
+        "casNumber": {
+          "state": "value",
+          "value": "SIM-CAS-100",
+          "attributes": {}
+        },
+        "occurrences": [
+          {
+            "pakkaustunnus": "SIM-PKG-100",
+            "productReference": "SYN-PROD-100",
+            "productName": {
+              "state": "value",
+              "value": "Fictional Product Amber Revised",
+              "attributes": {}
+            },
+            "position": 1,
+            "quantity": {
+              "state": "value",
+              "value": "1.0",
+              "attributes": {}
+            },
+            "quantityUnit": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-UNIT",
+                "id": "SIM-MASS",
+                "value": "synthetic units"
+              }
+            },
+            "undividedStrength": {
+              "state": "value",
+              "value": "synthetic amount A",
+              "attributes": {}
+            }
+          }
+        ]
+      },
+      {
+        "identity": "Aine=SIM-SB01",
+        "name": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-SUBSTANCE",
+            "id": "SIM-SB01",
+            "value": "fictional substance blue"
+          }
+        },
+        "casNumber": {
+          "state": "value",
+          "value": "SIM-CAS-200",
+          "attributes": {}
+        },
+        "occurrences": [
+          {
+            "pakkaustunnus": "SIM-PKG-100",
+            "productReference": "SYN-PROD-100",
+            "productName": {
+              "state": "value",
+              "value": "Fictional Product Amber Revised",
+              "attributes": {}
+            },
+            "position": 2,
+            "quantity": {
+              "state": "value",
+              "value": "0.5",
+              "attributes": {}
+            },
+            "quantityUnit": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-UNIT",
+                "id": "SIM-MASS",
+                "value": "synthetic units"
+              }
+            },
+            "undividedStrength": {
+              "state": "value",
+              "value": "synthetic amount A2",
+              "attributes": {}
+            }
+          },
+          {
+            "pakkaustunnus": "SIM-PKG-200",
+            "productReference": "SYN-PROD-200",
+            "productName": {
+              "state": "value",
+              "value": "Fictional Product Blue",
+              "attributes": {}
+            },
+            "position": 1,
+            "quantity": {
+              "state": "value",
+              "value": "2.0",
+              "attributes": {}
+            },
+            "quantityUnit": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-UNIT",
+                "id": "SIM-MASS",
+                "value": "synthetic units"
+              }
+            },
+            "undividedStrength": {
+              "state": "value",
+              "value": "synthetic amount B",
+              "attributes": {}
+            }
+          },
+          {
+            "pakkaustunnus": "SIM-PKG-500",
+            "productReference": "SYN-PROD-200",
+            "productName": {
+              "state": "value",
+              "value": "Fictional Product Blue",
+              "attributes": {}
+            },
+            "position": 1,
+            "quantity": {
+              "state": "value",
+              "value": "2.0",
+              "attributes": {}
+            },
+            "quantityUnit": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-UNIT",
+                "id": "SIM-MASS",
+                "value": "synthetic units"
+              }
+            },
+            "undividedStrength": {
+              "state": "value",
+              "value": "synthetic amount B",
+              "attributes": {}
+            }
+          }
+        ]
+      },
+      {
+        "identity": "Aine=SIM-SD01",
+        "name": {
+          "state": "empty",
+          "value": "",
+          "attributes": {
+            "listname": "SIM-SUBSTANCE",
+            "id": "SIM-SD01",
+            "value": "fictional substance fable"
+          }
+        },
+        "casNumber": {
+          "state": "value",
+          "value": "SIM-CAS-400",
+          "attributes": {}
+        },
+        "occurrences": [
+          {
+            "pakkaustunnus": "SIM-PKG-400",
+            "productReference": "SYN-PROD-400",
+            "productName": {
+              "state": "value",
+              "value": "Fictional Product Fable",
+              "attributes": {}
+            },
+            "position": 1,
+            "quantity": {
+              "state": "value",
+              "value": "4.0",
+              "attributes": {}
+            },
+            "quantityUnit": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-UNIT",
+                "id": "SIM-MASS",
+                "value": "synthetic units"
+              }
+            },
+            "undividedStrength": {
+              "state": "value",
+              "value": "synthetic amount D",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "/api/medicine-catalogue/compare?productA=SYN-PROD-100&productB=SYN-PROD-200": {
+    "release": {
+      "releaseId": "sha256-1bfe4c19afe28280a749b00aacad6ceeb52bd7ecbbbf40654455e840f58ba3ba",
+      "sourceName": "Fimea Basic Register",
+      "releaseDate": {
+        "state": "value",
+        "value": "2099-01-02",
+        "attributes": {}
+      },
+      "releaseReference": {
+        "state": "value",
+        "value": "SIM-2099-002",
+        "attributes": {}
+      },
+      "retrievedAt": "2099-01-04T00:00:00+00:00",
+      "fileName": "current-release.xml",
+      "checksum": "22e30995656f9957285d12ec00072414f0984e02bd7fd07fbaeb4bde98d26a05",
+      "chronologyEvidence": "VERIFIED"
+    },
+    "productA": {
+      "productReference": "SYN-PROD-100",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Amber Revised",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength A",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F01",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-A01",
+          "value": "synthetic category"
+        }
+      }
+    },
+    "productB": {
+      "productReference": "SYN-PROD-200",
+      "name": {
+        "state": "value",
+        "value": "Fictional Product Blue",
+        "attributes": {}
+      },
+      "strength": {
+        "state": "value",
+        "value": "synthetic strength B",
+        "attributes": {}
+      },
+      "pharmaceuticalForm": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-FORM",
+          "id": "SIM-F02",
+          "value": "fictional form"
+        }
+      },
+      "atcCode": {
+        "state": "empty",
+        "value": "",
+        "attributes": {
+          "listname": "SIM-ATC",
+          "id": "SIM-B01",
+          "value": "synthetic category"
+        }
+      }
+    },
+    "fields": [
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SA01]/Aine",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SA01",
+              "value": "fictional substance amber"
+            }
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SA01]/CASnumero",
+        "a": [
+          {
+            "state": "value",
+            "value": "SIM-CAS-100",
+            "attributes": {}
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SA01]/JakamatonVahvuus",
+        "a": [
+          {
+            "state": "value",
+            "value": "synthetic amount A",
+            "attributes": {}
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SA01]/Maara",
+        "a": [
+          {
+            "state": "value",
+            "value": "1.0",
+            "attributes": {}
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SA01]/Maarayksikko",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Aine",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          }
+        ],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-SUBSTANCE",
+              "id": "SIM-SB01",
+              "value": "fictional substance blue"
+            }
+          }
+        ],
+        "result": "SAME"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/CASnumero",
+        "a": [
+          {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          }
+        ],
+        "b": [
+          {
+            "state": "value",
+            "value": "SIM-CAS-200",
+            "attributes": {}
+          }
+        ],
+        "result": "SAME"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/JakamatonVahvuus",
+        "a": [
+          {
+            "state": "value",
+            "value": "synthetic amount A2",
+            "attributes": {}
+          }
+        ],
+        "b": [
+          {
+            "state": "value",
+            "value": "synthetic amount B",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Maara",
+        "a": [
+          {
+            "state": "value",
+            "value": "0.5",
+            "attributes": {}
+          }
+        ],
+        "b": [
+          {
+            "state": "value",
+            "value": "2.0",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Maarayksikko",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          }
+        ],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-UNIT",
+              "id": "SIM-MASS",
+              "value": "synthetic units"
+            }
+          }
+        ],
+        "result": "SAME"
+      },
+      {
+        "field": "Laakevalmiste/ATC-koodi",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-ATC",
+              "id": "SIM-A01",
+              "value": "synthetic category"
+            }
+          }
+        ],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-ATC",
+              "id": "SIM-B01",
+              "value": "synthetic category"
+            }
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Antoreitti",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-ROUTE",
+              "id": "SIM-R01",
+              "value": "fictional route"
+            }
+          }
+        ],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Kauppanimi",
+        "a": [
+          {
+            "state": "value",
+            "value": "Fictional Product Amber Revised",
+            "attributes": {}
+          }
+        ],
+        "b": [
+          {
+            "state": "value",
+            "value": "Fictional Product Blue",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Laakemuoto",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-FORM",
+              "id": "SIM-F01",
+              "value": "fictional form"
+            }
+          }
+        ],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-FORM",
+              "id": "SIM-F02",
+              "value": "fictional form"
+            }
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Myyntilupa[0]/Myontamispaiva",
+        "a": [
+          {
+            "state": "value",
+            "value": "2098-01-01",
+            "attributes": {}
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Myyntilupa[0]/Paattymispaiva",
+        "a": [
+          {
+            "state": "value",
+            "value": "2099-12-31",
+            "attributes": {}
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Myyntilupa[0]/Tila",
+        "a": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-AUTH",
+              "id": "SIM-ACTIVE",
+              "value": "synthetic active"
+            }
+          }
+        ],
+        "b": [],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Rekisterointi[0]/Myontamispaiva",
+        "a": [],
+        "b": [
+          {
+            "state": "value",
+            "value": "2098-02-01",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Rekisterointi[0]/Paattymispaiva",
+        "a": [],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Rekisterointi[0]/Tila",
+        "a": [],
+        "b": [
+          {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-REG",
+              "id": "SIM-REGISTERED",
+              "value": "synthetic registered"
+            }
+          }
+        ],
+        "result": "DIFFERENT"
+      },
+      {
+        "field": "Laakevalmiste/Vahvuus",
+        "a": [
+          {
+            "state": "value",
+            "value": "synthetic strength A",
+            "attributes": {}
+          }
+        ],
+        "b": [
+          {
+            "state": "value",
+            "value": "synthetic strength B",
+            "attributes": {}
+          }
+        ],
+        "result": "DIFFERENT"
+      }
+    ],
+    "notice": "Source fields are compared as recorded. A difference or match does not indicate therapeutic equivalence."
+  }
+}

@@ -3,6 +3,8 @@
 **Status:** Approved specification
 **Branch:** feature/interactive-medicine-catalogue
 
+**Supersedes in part:** `specs/003-app-shell-and-themes` FR-001 and FR-002 (the sidebar also lists "Medicine Catalogue", between "Open Review Cases" and "About the Data") and FR-025 (the catalogue page adds its own read-only search fields, filter selects and view, record and comparison buttons). No forms, case actions or clinical wording are added, and the rest of feature 003 stays in force.
+
 ## 1. Objective
 
 Provide a searchable, interactive, read-only catalogue of medicine products and packages from the latest validated Fimea Basic Register source release with verified chronology.

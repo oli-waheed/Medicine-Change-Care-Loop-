@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 
 from .api.change_processing_outcomes import router as change_processing_outcomes_router
+from .api.medicine_catalogue import router as medicine_catalogue_router
 from .api.open_review_cases import router as open_review_cases_router
 from .api.source_release_ingestion import router as source_release_ingestion_router
 from .config import ApplicationConfig
@@ -32,6 +33,8 @@ app.state.medication_records = _load_records(_config)
 app.include_router(open_review_cases_router)
 app.include_router(change_processing_outcomes_router)
 app.include_router(source_release_ingestion_router)
+# Feature 004: read-only medicine catalogue over the active baseline.
+app.include_router(medicine_catalogue_router)
 
 
 @app.get("/health")

@@ -12,6 +12,8 @@
 
 **Supersedes in part**: `specs/002-case-review-readability` FR-002 (only the additions listed in FR-021 of this spec are new displayed text) and FR-010 (the navigation controls and the read-only case search of FR-025 are new controls). The light-only theme of 002 remains in force.
 
+**Superseded in part by**: `specs/004-interactive-medicine-catalogue` — FR-001 and FR-002 (the sidebar also lists "Medicine Catalogue" at `/medicine-catalogue`) and FR-025 (the catalogue page's read-only search, filter and view controls).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Move around the review workspace (Priority: P1)

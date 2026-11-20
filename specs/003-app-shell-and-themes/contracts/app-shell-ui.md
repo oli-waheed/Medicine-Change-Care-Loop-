@@ -1,10 +1,13 @@
 # Application Shell and Review UI Contract
 
+> Superseded in part by feature 004: the sidebar and the page table also include Medicine Catalogue (`specs/004-interactive-medicine-catalogue/spec.md`).
+
 ## Pages and addresses
 
 | Address | Page | Tab title | Sidebar link |
 |---|---|---|---|
 | `/` | Open Review Cases | `Open Review Cases \| Medicine Change Care Loop` | "Open Review Cases" |
+| `/medicine-catalogue` | Medicine Catalogue (added by feature 004) | `Medicine Catalogue \| Medicine Change Care Loop` | "Medicine Catalogue" |
 | `/about-data` | About the Data | `About the Data \| Medicine Change Care Loop` | "About the Data" |
 | any other | Page not found | `Page not found \| Medicine Change Care Loop` | none current |
 
