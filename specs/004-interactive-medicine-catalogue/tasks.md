@@ -4,6 +4,7 @@
 
 - T009 is done (commit `c9ad6e9`): `MedicineCatalogueService.search()` matches product name (`Kauppanimi`), package identifier (`Pakkaustunnus`) and VNR, case-insensitively and by partial match; an empty query returns the whole baseline in source order; missing and empty fields are never matched; snapshots are not modified. Evidence: 8 unit tests in `tests/unit/test_medicine_catalogue_service.py`; full backend suite 199 passed; Ruff check and format clean.
 - T007 and T008 are verified by T027: 10 integration tests in `tests/integration/medicine-catalogue/test_medicine_catalogue_baseline.py` upload the synthetic fixture releases through the ingestion endpoint and check baseline selection, snapshot reconstruction, cache reuse, replacement and clearing, older and unverified releases, restart, rejection of a tampered capture, and search on a stored release. Full backend suite: 209 passed; Ruff check and format clean.
+- T001–T004 and T006 are done: findings in `research.md`, response contracts in `contracts/catalogue-api.md`. T005 has a synthetic benchmark; the measurement on a real Fimea download is still open.
 - No other task has started.
 
 **Process note**: The service was committed before T060 ("obtain explicit approval before committing or pushing"). From here on, commit only after the related tests pass, and record evidence next to each task.
@@ -11,12 +12,12 @@
 
 ## Phase 1 — Technical inspection
 
-- [ ] T001 Inspect existing backend API schemas and router conventions.
-- [ ] T002 Inspect source-release loading and snapshot reconstruction behaviour.
-- [ ] T003 Inspect product reference, VNR, and package identity fields.
-- [ ] T004 Inspect frontend routing, navigation, and existing UI components.
-- [ ] T005 Inspect captured release size and assess loading performance.
-- [ ] T006 Document the proposed API response contracts before implementation.
+- [x] T001 Inspect existing backend API schemas and router conventions. *(`research.md` §T001.)*
+- [x] T002 Inspect source-release loading and snapshot reconstruction behaviour. *(`research.md` §T002.)*
+- [x] T003 Inspect product reference, VNR, and package identity fields. *(`research.md` §T003; GTIN/NTIN are not normalised today.)*
+- [x] T004 Inspect frontend routing, navigation, and existing UI components. *(`research.md` §T004; corrected the Tailwind reference in `plan.md`.)*
+- [ ] T005 Inspect captured release size and assess loading performance. *(Synthetic benchmark in `research.md` §T005; measurement on a real Fimea download pending.)*
+- [x] T006 Document the proposed API response contracts before implementation. *(`contracts/catalogue-api.md`; proposed, for review before T019.)*
 
 ## Phase 2 — Backend catalogue service
 
