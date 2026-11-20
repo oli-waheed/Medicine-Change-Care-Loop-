@@ -63,7 +63,7 @@ description: "Task list for Application Shell and Open Review Cases Workspace"
 - [x] T024 `frontend/src/app/App.scope.test.tsx` and `frontend/src/test/clinicalWords.ts`: allowed controls and wording on every page, with a search active and with the navigation open. (FR-025, SC-009)
 - [x] T025 [P] Update the root `README.md` "Application Interface" section.
 - [x] T026 Run the automated checks and record results in `quickstart.md`. (SC-007)
-- [ ] T027 Manual checks 1–10 in `quickstart.md`. (Steps 1–9 done and recorded; step 10, the timed scan by a team member, is open.) (SC-001–SC-006, SC-008)
+- [x] T027 Manual checks 1–10 in `quickstart.md`. (Steps 1–9 done and recorded; step 10, the timed scan, done and recorded.) (SC-001–SC-006, SC-008)
 - [x] T028 Run `/speckit-converge`; record findings; resolve or document every gap. (Done 2026-11-20; see Phase 8.)
 - [x] T029 Review commit `16927e2` against the spec: restore About the Data (handoff acceptance criterion) and the original evidence-unavailable banner wording and its 002 test; fix formatting, BOM and encoding issues; stop exporting a helper from `CaseList.tsx` (lint); add the missing plan, tasks, research, contract, quickstart and checklist; add the 002 supersession notes. (FR-008, FR-023, FR-027, FR-029)
 

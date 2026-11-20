@@ -53,3 +53,12 @@ Same checks repeated after restoring About the Data and the original evidence-un
 | 10. Timed scan | **Open**: needs a team member acting as pharmacist |
 
 Issues found and fixed during verification: focus moved to the main area on first load in development mode (skip link not first); the drawer's visibility transition blocked moving focus into it; long field paths broke mid-word in narrow columns (now break after "/"); expanding the tablet sidebar squeezed the content behind it into the rail column (content now keeps its column).
+
+### 2026-11-20 — T027 timed scan (step 10)
+
+| Check | Result |
+|---|---|
+| Tester | Alison (team member acting as pharmacist), Edge |
+| A: Amber changed or removed? (goal under 5 s) | 3 s, Pass |
+| B: Cedar changed or removed? (goal under 5 s) | 4 s, Pass |
+| C: selected case, changes, classification (goal under 30 s) | 18 s, Pass |
