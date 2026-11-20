@@ -1,4 +1,4 @@
-﻿// Small inline icons; decorative only (the visible text names each item).
+// Small inline icons; decorative only (the visible text names each item).
 type IconProps = { className?: string };
 
 const common = {
@@ -23,6 +23,15 @@ export function CasesIcon({ className }: IconProps) {
   );
 }
 
+export function DataIcon({ className }: IconProps) {
+  return (
+    <svg {...common} className={className}>
+      <ellipse cx="12" cy="6" rx="7" ry="2.8" />
+      <path d="M5 6v6c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8V6" />
+      <path d="M5 12v6c0 1.6 3.1 2.8 7 2.8s7-1.2 7-2.8v-6" />
+    </svg>
+  );
+}
 
 export function MenuIcon({ className }: IconProps) {
   return (
@@ -69,4 +78,3 @@ export function ChevronIcon({ className }: IconProps) {
     </svg>
   );
 }
-

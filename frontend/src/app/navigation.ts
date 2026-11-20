@@ -1,20 +1,22 @@
-﻿import { useSyncExternalStore, type MouseEvent } from "react";
+import { useSyncExternalStore, type MouseEvent } from "react";
 
-export type PageId = "open-review-cases" | "not-found";
+export type PageId = "open-review-cases" | "about-data" | "not-found";
 
 export type NavigationItem = {
-  page: "open-review-cases";
+  page: Exclude<PageId, "not-found">;
   path: string;
   label: string;
 };
 
-// Only include pages that are implemented and available to users.
+// The only pages in the sidebar. Do not add items without a working page.
 export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
   { page: "open-review-cases", path: "/", label: "Open Review Cases" },
+  { page: "about-data", path: "/about-data", label: "About the Data" },
 ];
 
 export const PAGE_TITLES: Record<PageId, string> = {
   "open-review-cases": "Open Review Cases",
+  "about-data": "About the Data",
   "not-found": "Page not found",
 };
 
@@ -27,7 +29,9 @@ export function normalisePath(pathname: string): string {
 
 export function pageForPath(pathname: string): PageId {
   const path = normalisePath(pathname);
-  return NAVIGATION_ITEMS.find((item) => item.path === path)?.page ?? "not-found";
+  return (
+    NAVIGATION_ITEMS.find((item) => item.path === path)?.page ?? "not-found"
+  );
 }
 
 export function documentTitle(page: PageId): string {
@@ -75,7 +79,6 @@ export function handleLinkClick(
   ) {
     return;
   }
-
   event.preventDefault();
   navigate(path);
   afterNavigate?.();

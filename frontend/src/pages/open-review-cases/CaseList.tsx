@@ -3,10 +3,7 @@ import type { OpenReviewCase } from "./openReviewCases";
 import { changeSummary, evidenceUnavailable } from "./changeSummary";
 
 // Case-insensitive; every word must appear in the name, identifier or summary.
-export function matchesSearch(
-  reviewCase: OpenReviewCase,
-  query: string,
-): boolean {
+function matchesSearch(reviewCase: OpenReviewCase, query: string): boolean {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (words.length === 0) return true;
   const haystack = [

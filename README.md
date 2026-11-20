@@ -24,6 +24,7 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Detect packages that are no longer present in the register.
 - Keep an outcome for every change (`MATCHED`, `NO_MATCH`, `AMBIGUOUS`), including those that create no case.
 - Present before-and-after information and supporting source evidence, and show when that evidence is no longer available.
+- Review cases in a responsive workspace with a sidebar, case search and separate layouts for changed and removed packages (feature 003).
 - Store an unchanged daily download only once, recording each retrieval time.
 - Provide APIs for retrieving open review cases and change processing outcomes.
 
@@ -59,9 +60,15 @@ A source-data change does not automatically mean that there is a clinically sign
 
 ## Application Interface
 
-The frontend includes an Open Review Cases page.
+The frontend is a light-themed review workspace in the approved navy and teal design. A sidebar holds the product name, links to the two pages, the Fimea attribution with the CC BY 4.0 licence link, and the application version once `frontend/package.json` has a real version (the placeholder `0.0.0` is hidden). The sidebar is persistent from 1024 px wide, collapses to an icon rail with a **Sidebar** toggle on tablets, and opens from a **Menu** button on phones.
 
-It retrieves open review cases through the backend API and presents:
+- **Open Review Cases** (`/`): a searchable case queue (by medicine name, identifier or change summary; arrow keys move between cases) and the selected case.
+- **About the Data** (`/about-data`): simulated records, the Fimea data source and licence, attribution, and limitations.
+- Any other address shows **Page not found**.
+
+Changed packages and packages no longer present in the register have separate review layouts. Changed fields show their prior-release and current-release values and whether the field was added, removed or changed in the source. Every page starts with a "Skip to main content" link and can be used with the keyboard alone; text meets WCAG 2.2 AA contrast.
+
+The Open Review Cases page retrieves open review cases through the backend API and presents:
 
 - Simulated medication record information.
 - Medicine identifiers and matching information.
@@ -235,10 +242,17 @@ python -m ruff format --check src ..\tests
 From the frontend directory:
 
 ```powershell
-npm run test -- --run
+npx vitest run
 ```
 
-Expected: `Tests  10 passed (10)`.
+Expected: `Tests  54 passed (54)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
+
+Lint and format checks:
+
+```powershell
+npm run lint
+npm run format:check
+```
 
 ### Frontend Production Build
 
@@ -266,8 +280,8 @@ Medicine-Change-Care-Loop/
 |
 +-- frontend/
 |   +-- src/
+|   |   +-- app/
 |   |   +-- pages/
-|   |   +-- assets/
 |   |   +-- test/
 |   +-- package.json
 |   +-- vite.config.ts
@@ -293,11 +307,11 @@ Medicine-Change-Care-Loop/
 
 All tasks of the feature specification (T001–T036 in [tasks.md](specs/001-ingestion-case-pipeline/tasks.md)) are implemented, and the specification lists no known gaps ([spec.md](specs/001-ingestion-case-pipeline/spec.md#implementation-status)).
 
-The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend page for viewing open review cases.
+The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts.
 
 Verification:
 
-- 191 backend tests and 10 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 191 backend tests and 54 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).

@@ -303,7 +303,7 @@ describe("OpenReviewCasesPage", () => {
     render(<OpenReviewCasesPage />);
 
     expect(
-      await screen.findByText(/Source evidence is no longer stored/),
+      await screen.findByText(/Source evidence unavailable/),
     ).toBeVisible();
     expect(screen.getByText("Evidence unavailable")).toBeVisible();
     expect(screen.getAllByText(/no longer stored/).length).toBeGreaterThan(0);

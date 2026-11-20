@@ -1,5 +1,5 @@
-﻿import { appVersion } from "./appVersion";
-import { BrandMark, CasesIcon, ChevronIcon } from "./icons";
+import { appVersion } from "./appVersion";
+import { BrandMark, CasesIcon, ChevronIcon, DataIcon } from "./icons";
 import {
   NAVIGATION_ITEMS,
   PRODUCT_NAME,
@@ -9,6 +9,7 @@ import {
 
 const ICONS = {
   "open-review-cases": CasesIcon,
+  "about-data": DataIcon,
 } as const;
 
 export const LICENCE_URL = "https://creativecommons.org/licenses/by/4.0/";
@@ -30,7 +31,7 @@ export default function Sidebar({
       <div className="sidebar-brand">
         <BrandMark className="sidebar-brand-mark" />
         <span className="sidebar-brand-name">{PRODUCT_NAME}</span>
-
+        {/* Shown only on tablet widths, where the sidebar collapses to icons. */}
         <button
           type="button"
           className="sidebar-rail-toggle"
@@ -49,7 +50,6 @@ export default function Sidebar({
           {NAVIGATION_ITEMS.map((item) => {
             const Icon = ICONS[item.page];
             const current = item.page === currentPage;
-
             return (
               <li key={item.page}>
                 <a

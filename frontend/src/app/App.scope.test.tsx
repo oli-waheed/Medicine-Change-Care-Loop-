@@ -1,5 +1,5 @@
-﻿// Feature 003 (FR-023): the whole application, including the sidebar, top bar
-// and the Open Review Cases page, offers only reading and navigation controls and uses no
+// Feature 003 (FR-023): the whole application, including the sidebar, top bar
+// and About the Data, offers only reading and navigation controls and uses no
 // clinical wording. Extends the page-level T035 guard to every page.
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
@@ -90,6 +90,7 @@ const ALLOWED_BUTTONS = [/^Fictional Product \d+/, /^Menu$/, /^Sidebar$/];
 const ALLOWED_LINKS: [string, string][] = [
   ["Skip to main content", "#main-content"],
   ["Open Review Cases", "/"],
+  ["About the Data", "/about-data"],
   ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
   ["CC BY 4.0 licence", "https://creativecommons.org/licenses/by/4.0/"],
   ["Fimea open data", "https://fimea.fi/en/about_us/open-data"],
@@ -106,7 +107,7 @@ function expectOnlyAllowedControls() {
   expect(screen.queryAllByRole("switch", { hidden: true })).toHaveLength(0);
   for (const link of screen.queryAllByRole("link", { hidden: true })) {
     const pair = [link.textContent?.trim(), link.getAttribute("href")];
-    expect(ALLOWED_LINKS, `unexpected link ${pair.join(" â†’ ")}`).toContainEqual(
+    expect(ALLOWED_LINKS, `unexpected link ${pair.join(" → ")}`).toContainEqual(
       pair,
     );
   }
@@ -155,9 +156,8 @@ describe("Application clinical scope (feature 003)", () => {
     expectOnlyAllowedControls();
     fireEvent.keyDown(document, { key: "Escape" });
 
-    window.history.pushState(null, "", "/about-data");
-    window.dispatchEvent(new PopStateEvent("popstate"));
-    await screen.findByRole("heading", { level: 1, name: "Page not found" });
+    fireEvent.click(screen.getByRole("link", { name: "About the Data" }));
+    await screen.findByRole("heading", { level: 1, name: "About the Data" });
     expectOnlyAllowedControls();
 
     window.history.pushState(null, "", "/unknown");
@@ -173,5 +173,3 @@ describe("Application clinical scope (feature 003)", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 });
-
-

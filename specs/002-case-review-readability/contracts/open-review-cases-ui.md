@@ -1,5 +1,7 @@
 # Open Review Cases UI Contract
 
+> **Superseded in part by [003](../003-app-shell-and-themes/contracts/app-shell-ui.md)** (2026-11-20): "No new case actions, buttons, forms" now allows the navigation toggles and the read-only "Search cases" field defined in 003, and changed fields gain release labels and field indicators. Everything else remains in force.
+
 ## Purpose and scope
 
 This contract describes the existing pharmacist-facing Open Review Cases page after its presentation improvements. The page remains read-only except for its existing case-selection behavior. The API, case data, and workflow do not change.

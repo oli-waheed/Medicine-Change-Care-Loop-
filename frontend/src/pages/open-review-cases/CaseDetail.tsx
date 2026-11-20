@@ -37,7 +37,9 @@ export default function CaseDetail({
 
       {evidenceUnavailable(reviewCase) && (
         <p className="evidence-unavailable" role="status">
-          Source evidence is no longer stored. The values below reflect the case as recorded.
+          Source evidence unavailable. One or more raw source files behind this
+          case are no longer stored, so the values below, recorded when the case
+          was created, cannot be checked against the source again.
         </p>
       )}
 
