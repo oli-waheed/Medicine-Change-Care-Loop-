@@ -63,8 +63,8 @@ description: "Task list for Application Shell and Open Review Cases Workspace"
 - [x] T024 `frontend/src/app/App.scope.test.tsx` and `frontend/src/test/clinicalWords.ts`: allowed controls and wording on every page, with a search active and with the navigation open. (FR-025, SC-009)
 - [x] T025 [P] Update the root `README.md` "Application Interface" section.
 - [x] T026 Run the automated checks and record results in `quickstart.md`. (SC-007)
-- [ ] T027 Manual checks 1–10 in `quickstart.md`. (Steps 1–9 done and recorded; step 10, the timed scan by a team member, is open.) (SC-001–SC-006, SC-008)
-- [ ] T028 Run `/speckit-converge`; record findings; resolve or document every gap. (Open: run in Copilot after applying.)
+- [x] T027 Manual checks 1–10 in `quickstart.md`. (Steps 1–9 done and recorded; step 10, the timed scan, done and recorded.) (SC-001–SC-006, SC-008)
+- [x] T028 Run `/speckit-converge`; record findings; resolve or document every gap. (Done 2026-11-20; see Phase 8.)
 - [x] T029 Review commit `16927e2` against the spec: restore About the Data (handoff acceptance criterion) and the original evidence-unavailable banner wording and its 002 test; fix formatting, BOM and encoding issues; stop exporting a helper from `CaseList.tsx` (lint); add the missing plan, tasks, research, contract, quickstart and checklist; add the 002 supersession notes. (FR-008, FR-023, FR-027, FR-029)
 
 ## Dependencies & Execution Order
@@ -78,3 +78,10 @@ description: "Task list for Application Shell and Open Review Cases Workspace"
 1. MVP: Phases 1–3 (shell around the unchanged case page).
 2. Then US2 (layouts and indicators), US3 (search and queue keyboard), US4 (tablet, phone, keyboard).
 3. Finish with the app-level scope test, README, verification and convergence.
+
+## Phase 8: Convergence
+
+Run on 2026-11-20 against `main` (`d572cde`) by following `.github/skills/speckit-converge/SKILL.md` step by step (read-only). The Copilot Agent run gave an unreliable result, so it was not used. Result: 2 LOW findings, both in the spec text; no code gaps.
+
+- [x] T030 F1 (FR-021, partial, LOW): add the search placeholder, the sidebar tooltips and the navigation link names to FR-021's list of new texts.
+- [x] T031 F2 (spec header, partial, LOW): correct the reference to the allowed-controls requirement from FR-022 to FR-025.
