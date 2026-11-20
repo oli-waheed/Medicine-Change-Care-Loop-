@@ -77,7 +77,7 @@ Inspected on 2026-11-20 against `main` at `b8bd732`. Each section records what e
 
 ## T005 — Captured release size and loading performance
 
-**Status: synthetic benchmark done; measurement on a real Fimea file pending.**
+**Status: done.** Measured on a real Basic Register download on 2026-11-20 (see "Real release" below). The synthetic benchmark is kept for comparison.
 
 A real Basic Register download is not stored in the repository (the fixtures are 5 KB). As an indication, the fixture structure was replicated with unique identifiers and normalised with `normalize_basic_register_release()` in the project's Python 3.13 environment on a 2-core x86_64 machine:
 
@@ -92,10 +92,25 @@ A real Basic Register download is not stored in the repository (the fixtures are
 - Reconstruction is the expensive step: several seconds for a large release, and it grows faster than linearly (10× packages took 14× longer). The one-release cache in `MedicineCatalogueService` (T008) is therefore necessary. The first catalogue request after a restart or a new release pays this cost.
 - The synthetic structure is simpler than the real register, so these numbers are indicative only.
 
-**Remaining step (to complete T005)**
+**Real release (2026-11-20)**
 
-1. Save one real Basic Register XML download locally, outside the repository.
-2. Record its size: `(Get-Item <file>).Length / 1MB`.
-3. Time the reconstruction from the backend folder:
-   `python -c "import time,hashlib,sys; sys.path.insert(0,'.'); from src.services.normalize_basic_register_release import normalize_basic_register_release as n; b=open(r'<file>','rb').read(); t=time.perf_counter(); r,s=n(b,file_name='real.xml',checksum=hashlib.sha256(b).hexdigest()); print(len(s),'packages',round(time.perf_counter()-t,2),'s')"`
-4. Add the results to this section. If reconstruction takes more than about 10 s, consider warming the cache at startup or after ingestion (a plan decision, not part of this inspection).
+`Perusrekisteri.xml` with Ajopvm 2026-10-06 (Aineistoera 2026-41), downloaded from Fimea and kept outside the repository. Measured in a fresh database on a 2-core x86_64 machine with Python 3.13, by timing `normalize_basic_register_release()` on the file and by calling the catalogue API:
+
+| Measure | Result |
+|---|---|
+| File size | 190.2 MB (199,465,476 bytes) |
+| Records | 146,042 packages, 26,328 products, 4,117 active substances (187,594 occurrences) |
+| Ingestion through `/api/source-releases/ingest` | 37.2 s, `VALIDATED`, chronology `AVAILABLE` |
+| Reconstruction (`normalize_basic_register_release`) | 32.8 s, peak memory about 2.3 GB |
+| First catalogue request after start (cold cache) | 35.7 s |
+| Later requests (warm cache) | listing and search 0.12–0.37 s; product 0.08 s; package 0.05 s; comparison 0.11 s; source summary 0.6 s; substances page 0.5–0.7 s |
+
+Findings from the real data:
+
+- Every record came from the real release (no `SIM-`/`SYN-` identifiers). Search by name (`panadol`: 92 packages), by package ID (`2318`) and by VNR (`533406`, exactly one package) works. 127,703 of the 146,042 packages have no VNR element; they are shown as "Not present in source" and are never grouped by VNR.
+- Repeated substances are real: Panadol Extend (REL14315) lists Paracetamol twice (458.85 mg and 206.15 mg), and both occurrences are kept in source order.
+- Filters on form and route match the whole code value (`tabletti, kalvopäällysteinen` or code `235`); a partial word such as `tabletti` does not match. This follows the contract.
+- One substance can occur in thousands of packages (Hydrochlorothiazide: 5,452). The first substance explorer showed every occurrence table at once (3,160 rows, 1.2 MB per page, 2–5 s to render), so it was changed to request 25 substances per page, add paging, and show each substance's occurrences only on request. The first page now renders in about 1.7 s, and expanding the largest substance takes about 1.6 s.
+- In the browser at 1440 px and 375 px, the package, product and substance views had no text-contrast failures and no horizontal overflow.
+
+**Decision for later (not part of 004):** reconstruction takes over 10 s and about 2.3 GB of memory, so the first catalogue request after a restart or a new release waits about 36 s; the page shows "Loading catalogue release…" meanwhile. Warming the cache after ingestion or at startup, or storing the normalised records, would remove the wait. This is a plan decision for a later feature.

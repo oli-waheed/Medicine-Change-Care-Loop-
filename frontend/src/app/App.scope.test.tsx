@@ -102,6 +102,7 @@ const CATALOGUE_BUTTONS = [
   /^Add to comparison$/,
   /^Remove Product [AB]$/,
   /^Clear search and filters$/,
+  /^(Show occurrences \(\d+\)|Hide occurrences)$/,
   /^(Previous|Next) page$/,
 ];
 const CATALOGUE_INPUTS = [
@@ -248,6 +249,9 @@ describe("Application clinical scope (feature 003)", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Active substances" }));
     await screen.findByText("Aine=SIM-SA01");
+    fireEvent.click(
+      screen.getByRole("button", { name: "Show occurrences (3)" }),
+    );
     expectOnlyAllowedControls(true);
 
     for (const [url, options] of fetchMock.mock.calls) {

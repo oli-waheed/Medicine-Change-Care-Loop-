@@ -246,11 +246,19 @@ export function fetchPackage(pakkaustunnus: string, signal?: AbortSignal) {
   );
 }
 
-export function fetchSubstances(query: string, signal?: AbortSignal) {
-  const params = query.trim()
-    ? `?${new URLSearchParams({ q: query.trim() })}`
-    : "";
-  return getJson<SubstancePage>(`${BASE}/active-substances${params}`, signal);
+// Substances can occur in thousands of packages, so pages stay small.
+export const SUBSTANCE_PAGE_SIZE = 25;
+
+export function fetchSubstances(
+  query: string,
+  page: number,
+  signal?: AbortSignal,
+) {
+  const params = new URLSearchParams();
+  if (query.trim()) params.set("q", query.trim());
+  if (page > 1) params.set("page", String(page));
+  params.set("pageSize", String(SUBSTANCE_PAGE_SIZE));
+  return getJson<SubstancePage>(`${BASE}/active-substances?${params}`, signal);
 }
 
 export function fetchComparison(

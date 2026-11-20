@@ -317,6 +317,16 @@ describe("Medicine Catalogue (feature 004)", () => {
       fireEvent.click(
         screen.getByRole("button", { name: "Active substances" }),
       );
+      expect(
+        await screen.findByText("Showing 1–3 of 3 active substances"),
+      ).toBeVisible();
+      expect(requested()).toContain(`${API}/active-substances?pageSize=25`);
+      expect(screen.queryByRole("table")).toBeNull();
+      const toggle = screen.getByRole("button", {
+        name: "Show occurrences (3)",
+      });
+      fireEvent.click(toggle);
+      expect(toggle).toHaveAttribute("aria-expanded", "true");
       const table = await screen.findByRole("table", {
         name: "Occurrences of Aine=SIM-SB01",
       });
@@ -332,7 +342,9 @@ describe("Medicine Catalogue (feature 004)", () => {
         { target: { value: "blue" } },
       );
       await vi.waitFor(() =>
-        expect(requested()).toContain(`${API}/active-substances?q=blue`),
+        expect(requested()).toContain(
+          `${API}/active-substances?q=blue&pageSize=25`,
+        ),
       );
 
       fireEvent.click(

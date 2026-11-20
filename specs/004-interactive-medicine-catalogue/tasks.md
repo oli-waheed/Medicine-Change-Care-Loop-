@@ -2,7 +2,7 @@
 
 **Status (2026-11-20)**:
 
-- T001–T004 and T006–T059 are done. T005 has a synthetic benchmark; the measurement on a real Fimea download is still open. T060 is the user's approval and commit.
+- T001–T059 are done. T005 was measured on a real Fimea release (190 MB, 146,042 packages; first request after a restart about 36 s, later requests under 1 s). T060 is the user's approval and commit.
 - Backend: catalogue service (filters, product and package lookup, substances, comparison, source summary), schemas and six read-only GET endpoints under `/api/medicine-catalogue`; 503 for an unavailable or unreadable baseline, never a fallback. 18 API integration tests; full backend suite 227 passed; Ruff check and format clean.
 - Frontend: Medicine Catalogue page with search and filters, package and product details, active-substance explorer, two-product comparison, release and provenance, and loading, empty, error and unavailable states. 14 page tests plus a catalogue scope test; 69 frontend tests passed; TypeScript, Oxlint, Prettier and the production build clean.
 - Feature 003 FR-001/FR-002 and FR-025 are superseded in part (see `spec.md`); the clinical-wording guards are unchanged.
@@ -17,7 +17,7 @@
 - [x] T002 Inspect source-release loading and snapshot reconstruction behaviour. *(`research.md` §T002.)*
 - [x] T003 Inspect product reference, VNR, and package identity fields. *(`research.md` §T003; GTIN/NTIN are not normalised today.)*
 - [x] T004 Inspect frontend routing, navigation, and existing UI components. *(`research.md` §T004; corrected the Tailwind reference in `plan.md`.)*
-- [ ] T005 Inspect captured release size and assess loading performance. *(Synthetic benchmark in `research.md` §T005; measurement on a real Fimea download pending.)*
+- [x] T005 Inspect captured release size and assess loading performance. *(`research.md` §T005: real release 2026-10-06, 190 MB, 146,042 packages; reconstruction 32.8 s and about 2.3 GB; warm requests 0.05–0.7 s. The substance explorer was changed to pages of 25 with occurrences on request.)*
 - [x] T006 Document the proposed API response contracts before implementation. *(`contracts/catalogue-api.md`; proposed, for review before T019.)*
 
 ## Phase 2 — Backend catalogue service
@@ -88,6 +88,6 @@
 
 ## Phase 7 — Completion
 
-- [x] T058 Verify all Feature 004 acceptance criteria. *(Acceptance criteria 1–12 of `spec.md` §11 checked against the tests above; T005's real-download measurement remains open.)*
+- [x] T058 Verify all Feature 004 acceptance criteria. *(Acceptance criteria 1–12 of `spec.md` §11 checked against the tests above and against the real release of T005.)*
 - [x] T059 Summarize implementation and test results. *(Summary in the status block above.)*
 - [ ] T060 Obtain explicit approval before committing or pushing.
