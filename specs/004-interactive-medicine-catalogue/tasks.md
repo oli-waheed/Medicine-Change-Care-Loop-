@@ -3,7 +3,7 @@
 **Status (2026-11-20)**:
 
 - T009 is done (commit `c9ad6e9`): `MedicineCatalogueService.search()` matches product name (`Kauppanimi`), package identifier (`Pakkaustunnus`) and VNR, case-insensitively and by partial match; an empty query returns the whole baseline in source order; missing and empty fields are never matched; snapshots are not modified. Evidence: 8 unit tests in `tests/unit/test_medicine_catalogue_service.py`; full backend suite 199 passed; Ruff check and format clean.
-- T007 and T008 are implemented in commit `75ea1a2` but not yet verified by automated tests against a real stored release (T027), so they stay open. A manual check against the two fixture releases returned the validated baseline with 4 package snapshots, reused the cached reconstruction on the second call, and returned `None` with no validated release.
+- T007 and T008 are verified by T027: 10 integration tests in `tests/integration/medicine-catalogue/test_medicine_catalogue_baseline.py` upload the synthetic fixture releases through the ingestion endpoint and check baseline selection, snapshot reconstruction, cache reuse, replacement and clearing, older and unverified releases, restart, rejection of a tampered capture, and search on a stored release. Full backend suite: 209 passed; Ruff check and format clean.
 - No other task has started.
 
 **Process note**: The service was committed before T060 ("obtain explicit approval before committing or pushing"). From here on, commit only after the related tests pass, and record evidence next to each task.
@@ -20,8 +20,8 @@
 
 ## Phase 2 — Backend catalogue service
 
-- [ ] T007 Create the medicine catalogue service using the existing baseline selector. *(Implemented in `75ea1a2`; verification pending T027.)*
-- [ ] T008 Reconstruct snapshots using the existing captured-release loader. *(Implemented in `75ea1a2`, with an in-memory cache of one release; verification pending T027.)*
+- [x] T007 Create the medicine catalogue service using the existing baseline selector. *(`75ea1a2`; verified by T027.)*
+- [x] T008 Reconstruct snapshots using the existing captured-release loader. *(`75ea1a2`, in-memory cache of one release; verified by T027.)*
 - [x] T009 Implement catalogue search. *(`c9ad6e9`; 8 unit tests. FR-002.)*
 - [ ] T010 Implement catalogue filters.
 - [ ] T011 Implement product detail lookup.
@@ -46,7 +46,7 @@
 
 ## Phase 4 — Backend tests
 
-- [ ] T027 Test validated baseline selection and unavailable baseline, including cache reuse, cache reset when the baseline disappears, and the error when a capture cannot be reconstructed as validated. *(Next task: verifies T007, T008.)*
+- [x] T027 Test validated baseline selection and unavailable baseline, including cache reuse, cache reset when the baseline disappears, and the error when a capture cannot be reconstructed as validated. *(10 integration tests in `tests/integration/medicine-catalogue/`.)*
 - [ ] T028 Test catalogue search and filters.
 - [ ] T029 Test product and package detail lookup.
 - [ ] T030 Test active-substance exploration.
