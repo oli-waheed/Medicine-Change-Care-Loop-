@@ -1,5 +1,122 @@
+/*
+ * Design tokens for Medicine Change Care Loop (feature 003).
+ * Approved handoff: light theme only; navy #102D3B, teal #176B65, pale mint
+ * #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35, error
+ * #B74747; Inter / system sans-serif; monospace only for identifiers,
+ * checksums and technical evidence.
+ */
+
 :root {
+  /* Light only. Keeps the page readable when the OS requests dark colours. */
   color-scheme: light;
+
+  /* Handoff palette */
+  --navy: #102d3b;
+  --teal: #176b65;
+  --mint: #e8f3ef;
+  --amber: #d69b35;
+  --error: #b74747;
+
+  /* Surfaces */
+  --color-bg: #f3f6f7;
+  --color-surface: #ffffff;
+  --color-surface-muted: #eef3f4;
+  --color-border: #d5dfe2;
+  --color-border-strong: #71858e;
+
+  /* Text */
+  --color-heading: #102d3b;
+  --color-text: #1f3a47;
+  --color-text-muted: #536a75;
+
+  /* Brand */
+  --color-accent: #176b65;
+  --color-accent-strong: #12544f;
+  --color-accent-soft: #e8f3ef;
+  --color-accent-border: #176b65;
+  --color-focus: #176b65;
+
+  /* Sidebar */
+  --sidebar-bg: #102d3b;
+  --sidebar-text: #e8f0f2;
+  --sidebar-muted: #a9bec6;
+  --sidebar-border: #224655;
+  --sidebar-current-bg: #17414f;
+  --sidebar-current-text: #8fe0d4;
+  --sidebar-focus: #8fe0d4;
+
+  /* Prior (before) and current (after) values */
+  --before-bg: #fbf1f1;
+  --before-border: #ddb0b0;
+  --before-label: #8f3434;
+  --after-bg: #e8f3ef;
+  --after-border: #9ccbbf;
+  --after-label: #12544f;
+
+  /* Value states */
+  --state-missing-bg: #eef1f3;
+  --state-missing-border: #66798a;
+  --state-missing-text: #33475b;
+  --state-empty-bg: #f5f1fa;
+  --state-empty-border: #7a5ea8;
+  --state-empty-text: #4b3478;
+  --state-none-bg: #edf4fa;
+  --state-none-border: #3f7cad;
+  --state-none-text: #1f4f7a;
+  --state-unavailable-bg: #fbeff3;
+  --state-unavailable-border: #a3466a;
+  --state-unavailable-text: #7a2348;
+
+  /* Change indicators (source-data presence only) */
+  --change-added-bg: #e8f3ef;
+  --change-added-border: #176b65;
+  --change-added-text: #12544f;
+  --change-removed-bg: #fbf1f1;
+  --change-removed-border: #9a3b3b;
+  --change-removed-text: #8f3434;
+  --change-changed-bg: #eef3f4;
+  --change-changed-border: #536a75;
+  --change-changed-text: #33475b;
+
+  /* Evidence classifications */
+  --class-verified-bg: #e8f3ef;
+  --class-verified-border: #176b65;
+  --class-verified-text: #12544f;
+  --class-inferred-bg: #e7eff9;
+  --class-inferred-border: #2f62b3;
+  --class-inferred-text: #1d4a8f;
+  --class-unknown-bg: #eef1f3;
+  --class-unknown-border: #5f6f80;
+  --class-unknown-text: #3b4a5a;
+  --class-conflicting-bg: #fbeded;
+  --class-conflicting-border: #b74747;
+  --class-conflicting-text: #8f3434;
+
+  /* Amber: warnings and packages no longer present */
+  --warning-bg: #fbf2e0;
+  --warning-accent: #d69b35;
+  --warning-border: #96641a;
+  --warning-text: #6a4a0e;
+  --removed-bg: #fbf2e0;
+  --removed-accent: #d69b35;
+  --removed-border: #96641a;
+  --removed-text: #6a4a0e;
+
+  /* Errors */
+  --error-bg: #fbeded;
+  --error-border: #b74747;
+  --error-text: #8f3434;
+
+  /* Status */
+  --status-bg: #e8f3ef;
+  --status-border: #176b65;
+  --status-text: #12544f;
+
+  --shadow-card: 0 1px 2px rgb(16 45 59 / 6%), 0 4px 16px rgb(16 45 59 / 5%);
+  --shadow-drawer:
+    0 0 0 1px rgb(16 45 59 / 10%), 0 18px 48px rgb(16 45 59 / 30%);
+  --scrim: rgb(8 24 32 / 55%);
+
   font-family:
     Inter,
     ui-sans-serif,
@@ -8,8 +125,10 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-  color: #17212b;
-  background: #f3f6f7;
+  font-size: 100%;
+  line-height: 1.5;
+  color: var(--color-text);
+  background: var(--color-bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -24,13 +143,71 @@ body {
   min-width: 320px;
   min-height: 100vh;
   margin: 0;
-  background: #f3f6f7;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-button {
+button,
+input {
   font: inherit;
+}
+
+a {
+  color: var(--color-accent);
+}
+
+a:hover {
+  color: var(--color-accent-strong);
 }
 
 #root {
   min-height: 100vh;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.monospace-value,
+code {
+  font-family:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+    monospace;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 100;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-heading);
+  font-weight: 650;
+  box-shadow: var(--shadow-drawer);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .skip-link {
+    transition: transform 0.15s ease;
+  }
 }
