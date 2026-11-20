@@ -53,6 +53,8 @@ Implement the approved read-only endpoints:
 
 Use response schemas that preserve source values, provenance, and explicit missing values.
 
+The response contracts, error codes and unavailable state are defined in `contracts/catalogue-api.md` (T006). The inspection findings are in `research.md` (T001–T005).
+
 ### 2.5 Frontend
 
 Add a Medicine Catalogue navigation entry and a working catalogue page.
@@ -67,7 +69,9 @@ The interface should support:
 - VNR visibility and search.
 - Source-release and provenance information.
 
-Follow the existing React, TypeScript, Tailwind, and application-shell conventions.
+Follow the existing React, TypeScript, plain-CSS design-token and application-shell conventions. The project does not use Tailwind (`research.md`, T004).
+
+Adding the catalogue link and its search and filter controls supersedes feature 003 FR-001/FR-002 (sidebar items) and FR-025 (allowed controls) in part. Update `frontend/src/app/App.scope.test.tsx` deliberately to allow them, and keep the clinical-wording guard.
 
 ### 2.6 Performance
 
