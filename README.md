@@ -43,7 +43,7 @@ The source-ingestion and review process follows these main steps:
 3. Validate and normalize the XML data.
 4. Preserve source metadata, provenance, and checksums.
 5. Compare eligible source releases.
-6. Identify changes in medicine package information, grouped per package, including packages that are no longer present in the register.
+6. Identify changes in medicine package information, grouped per package, including VNR changes and packages that are no longer present in the register.
 7. Match each package's changes with simulated medication records.
 8. Create one review case per package update and matched record for pharmacist assessment.
 9. Present the changes and supporting evidence through the application interface.
@@ -63,7 +63,7 @@ A source-data change does not automatically mean that there is a clinically sign
 | Backend | Python 3.13, FastAPI |
 | Database | SQLite via SQLAlchemy |
 | Backend testing | pytest |
-| Workflow automation | n8n, and the backend's own daily update (feature 006) |
+| Workflow automation | The backend's own daily update (feature 006); an n8n workflow kept for reference, switched off |
 | Source format | XML |
 | Version control | Git and GitHub |
 
@@ -130,13 +130,15 @@ These links work only on your own computer while the backend is running:
 
 ## Source Ingestion Workflow
 
-The Fimea Basic Register ingestion process is automated using n8n.
+The Fimea Basic Register is downloaded automatically by the backend's daily update (see below). This is the primary scheduler (decision T016, 2026-11-21).
+
+An n8n workflow that does the same was used before feature 006. It is kept for reference and is switched off (`"active": false`); if you turn it on, the 190 MB file is downloaded twice a day.
 
 The workflow retrieves the XML source and submits it to the backend ingestion API. The backend handles source-release capture, validation, and normalization.
 
 Release order is derived by the backend from the XML's own `Ajopvm` (dataset run date). The `sourceOrder` value sent by the workflow is recorded for traceability only and is not used for chronology. Each new release with a later `Ajopvm` is compared with the stored baseline, and matching changes create review cases.
 
-The workflow includes success and failure handling for download and upload operations. It runs daily at 06:00 and uploads to `http://host.docker.internal:8000`, which works when n8n runs in Docker; when n8n is started with `npx`, change the upload URL to `http://127.0.0.1:8000/api/source-releases/ingest`. n8n 2.42.3 requires Node.js 24. See [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#4-local-n8n-scheduled-ingestion).
+The workflow includes success and failure handling for download and upload operations. When switched on, it runs daily at 06:00 and uploads to `http://host.docker.internal:8000`, which works when n8n runs in Docker; when n8n is started with `npx`, change the upload URL to `http://127.0.0.1:8000/api/source-releases/ingest`. n8n 2.42.3 requires Node.js 24. See [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#4-local-n8n-scheduled-ingestion).
 
 The workflow configuration is available in:
 
@@ -146,7 +148,7 @@ To load the latest release by hand, press **Check for new Fimea release** on Abo
 
 ### Daily automatic update (feature 006)
 
-While the backend runs, it downloads Fimea's shortage file (`Shortages.txt`) and then checks the Basic Register once a day from `DAILY_UPDATE_TIME` (default 06:00 local time). If the backend starts after that time, it runs at once; each day's run is recorded, so a restart does not repeat it. Shortage files are stored once per content in a `shortages` folder next to the source-release captures. The Medicine Shortages page also has an **Update shortage data** button. The n8n workflow keeps working as before.
+While the backend runs, it downloads Fimea's shortage file (`Shortages.txt`) and then checks the Basic Register once a day from `DAILY_UPDATE_TIME` (default 06:00 local time). If the backend starts after that time, it runs at once; each day's run is recorded, so a restart does not repeat it. Shortage files are stored once per content in a `shortages` folder next to the source-release captures. The Medicine Shortages page also has an **Update shortage data** button. The n8n workflow is switched off, so the file is downloaded once a day.
 
 ## Data Source and Licence
 
@@ -280,7 +282,7 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `286 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `289 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
@@ -365,14 +367,14 @@ Medicine-Change-Care-Loop/
 | 003 Application shell | [spec](specs/003-app-shell-and-themes/spec.md) | done |
 | 004 Interactive Medicine Catalogue | [spec](specs/004-interactive-medicine-catalogue/spec.md) | T001–T060 done |
 | 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | done (approved 2026-11-21) |
-| 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | done (approved 2026-11-21); open decisions: T016 scheduler, T018 VNR comparison |
-| 007 Recorded reviews and shortage review cases | [spec](specs/007-care-loop-review-and-shortage-cases/spec.md) | T001–T014 done; T015 (approval) open |
+| 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | done (approved 2026-11-21); T016 and T018 decided 2026-11-21 |
+| 007 Recorded reviews and shortage review cases | [spec](specs/007-care-loop-review-and-shortage-cases/spec.md) | done (approved 2026-11-21) |
 
 The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update; feature 007 ([specs/007-care-loop-review-and-shortage-cases](specs/007-care-loop-review-and-shortage-cases/spec.md)) added recorded reviews and shortage review cases.
 
 Verification:
 
-- 286 backend tests and 91 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 289 backend tests and 91 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, which the daily update now collects, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).

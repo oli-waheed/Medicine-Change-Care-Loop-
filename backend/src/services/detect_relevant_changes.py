@@ -86,6 +86,8 @@ def project_snapshot_fields(snapshot: MedicineSnapshot) -> dict[str, tuple[Sourc
     for label, substance in _labelled_substances(snapshot.active_substances):
         add(f"Laakeaine/VaikuttavaAine[{label}]", substance)
     add("Pakkaus", snapshot.package)
+    # Decision T018 (2026-11-21): VNR is compared, because shortages link by VNR.
+    result["Pakkaus/VNR-numero"] = (snapshot.vnr_numero,)
     add("Pakkaus/Kaupanolo", snapshot.package.availability)
     per_branch = Counter()
     for authorization in snapshot.authorizations:

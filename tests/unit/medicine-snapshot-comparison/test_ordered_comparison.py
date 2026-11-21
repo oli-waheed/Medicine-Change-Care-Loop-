@@ -24,8 +24,27 @@ def test_changed_name_retains_both_snapshots_and_source_evidence(snapshot_pair):
 
 def test_unchanged_fields_and_metadata_do_not_trigger(snapshot_pair):
     old, new, order = snapshot_pair
-    new = replace(new, product=old.product, vnr_numero=SourceField.of("OTHER"))
+    new = replace(new, product=old.product, product_reference=SourceField.of("OTHER"))
     assert detect_relevant_changes((old,), (new,), order=order).changes == ()
+
+
+@pytest.mark.parametrize(
+    ("before", "after"),
+    [("072811", "192152"), (None, "192152"), ("072811", None)],
+)
+def test_vnr_change_is_detected(snapshot_pair, before, after):
+    """Decision T018 (2026-11-21): VNR changed, gained or lost is a change."""
+    old, new, order = snapshot_pair
+
+    def vnr(value):
+        return SourceField.missing() if value is None else SourceField.of(value)
+
+    old = replace(old, vnr_numero=vnr(before))
+    new = replace(new, product=old.product, vnr_numero=vnr(after))
+    (change,) = detect_relevant_changes((old,), (new,), order=order).changes
+    assert change.field_name == "Pakkaus/VNR-numero"
+    assert change.prior_value == (vnr(before),)
+    assert change.current_value == (vnr(after),)
 
 
 @pytest.mark.parametrize("kind", ["missing", "unknown", "conflicting", "reversed", "same"])

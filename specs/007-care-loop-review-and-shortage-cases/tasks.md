@@ -1,6 +1,6 @@
 # Feature 007: Tasks
 
-**Status (2026-11-21)**: T001–T014 done; T015 is the user's approval and commit.
+**Status (2026-11-21)**: T001–T015 done (T015 approved by Oli on 2026-11-21 after trying the review flow).
 
 - Backend: review statuses, transitions and history; review endpoint; reviewed filter; column migration for existing databases; shortage comparison, matching and cases; 24 new tests (`tests/integration/case-review/`); full suite 286 passed; Ruff clean.
 - Frontend: review panel, status labels, "Show reviewed cases", shortage case layout; 7 new tests and two scope tests updated on purpose; 91 frontend tests passed; TypeScript, Oxlint, Prettier and build clean.
@@ -22,4 +22,4 @@
 - [x] T012 Browser and real-data checks as in the status above.
 - [x] T013 Documentation: contract, plan, README; 001, 002, 003 and 006 specs marked superseded in part.
 - [x] T014 Convergence review against the spec: FR-001–FR-016 and acceptance criteria 1–5 met; acceptance criterion 5's real-data demo was checked with a copy of the demo database. No gaps found.
-- [ ] T015 Obtain explicit approval before committing or pushing.
+- [x] T015 Obtain explicit approval before committing or pushing. *(Approved by Oli on 2026-11-21.)*

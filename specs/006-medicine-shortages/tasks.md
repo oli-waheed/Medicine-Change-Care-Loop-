@@ -1,6 +1,6 @@
 # Feature 006: Tasks
 
-**Status (2026-11-21)**: T001–T015 done (T015 approved by Oli on 2026-11-21). From the convergence review, T017 is resolved; T016 (scheduler) and T018 (VNR comparison) await team decisions.
+**Status (2026-11-21)**: T001–T015 done (T015 approved by Oli on 2026-11-21). From the convergence review, T016, T017 and T018 are resolved (T016 and T018 decided by the team on 2026-11-21).
 
 - Backend: shortage storage, parser, update and list API; daily automatic update; 25 new tests (`tests/integration/medicine-shortages/`); full backend suite 261 passed; Ruff check and format clean.
 - Frontend: Medicine Shortages page with Update button and daily status; 8 page tests and a scope test; 84 frontend tests passed; TypeScript, Oxlint, Prettier and build clean.
@@ -32,8 +32,8 @@ Real-data evidence: on the user's computer the daily update ran on 2026-11-21 at
 
 Requirements: FR-001–FR-011 and acceptance criteria 1–5 are met; no code gaps against the spec. Findings:
 
-- [ ] T016 F1 (plan "Decisions", constitution "Decisions … must be recorded with rationale", MEDIUM): two daily schedulers now download the Basic Register at 06:00, the backend's (this feature) and the n8n workflow (`workflow/n8n/fimea-basic-register-ingestion.json`, `"active": true`). Duplicate detection prevents double storage, but the 190 MB file is downloaded twice. Record the team's decision on the primary scheduler; if it is the backend, deactivate the n8n trigger and update the README "Source Ingestion Workflow".
+- [x] T016 F1 (plan "Decisions", constitution "Decisions … must be recorded with rationale", MEDIUM): two daily schedulers now download the Basic Register at 06:00, the backend's (this feature) and the n8n workflow (`workflow/n8n/fimea-basic-register-ingestion.json`, `"active": true`). Duplicate detection prevents double storage, but the 190 MB file is downloaded twice. Record the team's decision on the primary scheduler; if it is the backend, deactivate the n8n trigger and update the README "Source Ingestion Workflow". *(Decided 2026-11-21 (Oli, for the team): the backend's daily update is the primary scheduler, because it is tested, records each day's run and needs no separate service. The n8n workflow is kept for reference with `"active": false`; README updated.)*
 - [x] T017 F2 (FR-010, LOW): on Windows the schedule shows the time-zone name as "FLE Standard Time" instead of a short name. Show the UTC offset (for example "UTC+02:00") instead. *(Done: `utc_offset()` in `backend/src/api/daily_updates.py`; contract, fixture and page test updated.)*
-- [ ] T018 F3 (spec §1 objective and the validation report, LOW): shortages are linked by VNR, but change detection does not compare VNR (269 packages changed VNR between the real releases of 2026-10-06 and 2026-11-21). Record the decision on whether VNR becomes a compared field; this belongs to the comparison of feature 001, not to this feature's code.
+- [x] T018 F3 (spec §1 objective and the validation report, LOW): shortages are linked by VNR, but change detection does not compare VNR (269 packages changed VNR between the real releases of 2026-10-06 and 2026-11-21). Record the decision on whether VNR becomes a compared field; this belongs to the comparison of feature 001, not to this feature's code. *(Decided 2026-11-21 (Oli, for the team): a VNR gained, lost or changed counts as a change. `Pakkaus/VNR-numero` is now a compared field in `project_snapshot_fields()`; packages are still paired by `Pakkaustunnus` only, and VNR is never a match key. Test: `test_vnr_change_is_detected`.)*
 
 Related, outside this feature's code: the "table already exists" error when the Shortages page's first requests reach a new database together was fixed in `31e58fe`.

@@ -114,7 +114,7 @@ A pharmacist can rely on the open-case list to contain only cases supported by a
 
 ## Assumptions
 
-- Only the T005 fields documented in [research.md](research.md#change-and-matching-semantics) are compared for package/product source-value differences. Package comparison uses `Pakkaustunnus`; `VNR-numero` is supporting metadata only. Cross-release `Pakkaustunnus` stability is not assumed, and a detected difference is not a clinical-significance decision. This source does not establish leaflet/SPC clinical-content change monitoring.
+- Only the T005 fields documented in [research.md](research.md#change-and-matching-semantics) are compared for package/product source-value differences. Package comparison uses `Pakkaustunnus`; `VNR-numero` is supporting metadata only. *(Superseded in part on 2026-11-21 by decision T018 of feature 006: `Pakkaus/VNR-numero` is also a compared field. It is still never a pairing or match key.)* Cross-release `Pakkaustunnus` stability is not assumed, and a detected difference is not a clinical-significance decision. This source does not establish leaflet/SPC clinical-content change monitoring.
 - Source update information is the primary evidence for ordering snapshots; where it is unavailable or contradictory, the system reports uncertainty instead of guessing.
 - Matching criteria are deterministic and will use medicine identifiers present in both the source information and simulated medication records.
 - An open case for this feature is a case in NEW status; case handling and additional workflow states are outside this feature.

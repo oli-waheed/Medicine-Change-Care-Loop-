@@ -49,7 +49,7 @@ These are genuine differences between the two files; none was produced by the co
 ## 5. Findings
 
 1. **Detection is correct.** The independent recomputation reproduces the app's 1,915 changed and 21 removed packages exactly, with plausible before and after values.
-2. **Gap: VNR changes are not detected.** `project_snapshot_fields()` does not include `VNR-numero`. Between the releases 269 packages changed VNR: 160 gained one, 92 lost one, and 17 changed to a different VNR (e.g. 224957: 072811 → 192152). Since feature 006 links shortages by VNR, this is worth a decision.
+2. **Gap: VNR changes are not detected.** `project_snapshot_fields()` does not include `VNR-numero`. Between the releases 269 packages changed VNR: 160 gained one, 92 lost one, and 17 changed to a different VNR (e.g. 224957: 072811 → 192152). Since feature 006 links shortages by VNR, this is worth a decision. *(Decided 2026-11-21, T018: VNR is now a compared field.)*
 3. **Risk: review noise from source clean-ups.** 848 packages (44 % of the changes) differ only because Fimea restructured active-substance strength fields, and 113 packages only in spaces or letter case (e.g. "Firekol " → "Firekol", "Ibuprofen Stada" → "Ibuprofen STADA"). With real package IDs in the simulated records, each would become a review case. The differences are real and must stay visible, but a deterministic label such as "spacing or letter case only" could help reviewers. This needs a team decision; it must not hide or close anything automatically.
 4. **One pair is not yet "several daily downloads".** This validates one real pair, six weeks apart. The daily update now captures every real release, so further pairs will accumulate in the real-data database.
 

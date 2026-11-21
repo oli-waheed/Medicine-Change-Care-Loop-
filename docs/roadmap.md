@@ -14,7 +14,7 @@ amendment agreed by the team (Alison, Cassiy, Oli) before work starts.
 | 004 Interactive medicine catalogue | Search, substance explorer, product comparison over a real release | Done |
 | 005 Fimea release check | Button and service that downloads and ingests the newest release | Approved |
 | 006 Medicine shortages | Daily download of Fimea's shortage file, Shortages page, update button | Approved |
-| 007 Care loop review and shortage cases | Recorded human review (three outcomes, initials, notes, reopen) and review cases from shortage changes | Waiting for approval (T015) |
+| 007 Care loop review and shortage cases | Recorded human review (three outcomes, initials, notes, reopen) and review cases from shortage changes | Approved |
 
 Real-data validation (`docs/validation/2026-11-21-real-release-comparison.md`)
 compared the 2026-10-06 and 2026-11-21 releases. Detection was correct, but:
@@ -27,8 +27,9 @@ compared the 2026-10-06 and 2026-11-21 releases. Detection was correct, but:
 
 These fit the current constitution and use simulated records only.
 
-1. **Decide T016**: one primary scheduler (backend scheduler or n8n), not both.
-2. **Decide T018**: whether VNR becomes a compared field.
+1. ~~Decide T016~~ Decided 2026-11-21: the backend's daily update is the only
+   scheduler; the n8n workflow is switched off.
+2. ~~Decide T018~~ Decided 2026-11-21: a VNR change counts as a change.
 3. **Label source noise**: mark changes that come only from Fimea's own data
    clean-ups (field restructuring, whitespace, case) so reviewers can set them
    aside. This must come before any pilot, or pharmacists get flooded.
