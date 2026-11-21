@@ -222,3 +222,7 @@ export async function recordReviewStep(
   }
   return (await response.json()) as ReviewCase;
 }
+
+// Feature 011: read-only CSV downloads (semicolon-separated, UTF-8 with BOM).
+export const EXPORT_CASES_URL = "/api/exports/review-cases.csv";
+export const EXPORT_HISTORY_URL = "/api/exports/review-history.csv";

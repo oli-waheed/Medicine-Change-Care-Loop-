@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import {
+  EXPORT_CASES_URL,
+  EXPORT_HISTORY_URL,
   STATUS_LABELS,
   fetchOpenReviewCases,
   isReviewed,
@@ -75,6 +77,16 @@ export default function OpenReviewCasesPage() {
         </p>
         <p className="simulated-notice" role="note">
           All records shown are simulated.
+        </p>
+        {/* Feature 011: read-only CSV downloads of every case, open and reviewed. */}
+        <p className="case-exports">
+          <span>Export all cases, open and reviewed:</span>
+          <a href={EXPORT_CASES_URL} download>
+            Cases (CSV)
+          </a>
+          <a href={EXPORT_HISTORY_URL} download>
+            Review history (CSV)
+          </a>
         </p>
       </header>
 

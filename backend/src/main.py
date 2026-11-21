@@ -5,6 +5,7 @@ from fastapi import FastAPI
 from .api.change_processing_outcomes import router as change_processing_outcomes_router
 from .api.daily_updates import daily_update_lifespan
 from .api.daily_updates import router as daily_updates_router
+from .api.exports import router as exports_router
 from .api.latest_release_check import router as latest_release_check_router
 from .api.medicine_catalogue import router as medicine_catalogue_router
 from .api.medicine_shortages import router as medicine_shortages_router
@@ -51,6 +52,8 @@ app.include_router(daily_updates_router)
 app.include_router(review_cases_router)
 # Feature 010: read-only history of stored source files and release quality checks.
 app.include_router(source_history_router)
+# Feature 011: read-only CSV exports of review cases and their history.
+app.include_router(exports_router)
 
 
 @app.get("/health")

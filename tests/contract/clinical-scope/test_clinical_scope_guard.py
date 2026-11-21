@@ -100,6 +100,10 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         # Feature 010: read-only history of stored source files and release quality checks
         # (contracts/source-history-api.md).
         ("GET", "/api/source-history"),
+        # Feature 011: read-only CSV exports of cases and review history
+        # (contracts/exports-api.md).
+        ("GET", "/api/exports/review-cases.csv"),
+        ("GET", "/api/exports/review-history.csv"),
     }
 
 

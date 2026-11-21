@@ -1156,3 +1156,32 @@
   color: var(--color-text);
   line-height: 1.5;
 }
+
+/* Feature 011: CSV exports */
+.case-exports {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.6rem;
+  margin: 0.75rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.case-exports a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.25rem;
+  padding: 0.2rem 0.9rem;
+  border: 1px solid var(--navy);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--navy);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.case-exports a:hover {
+  background: var(--color-surface-muted);
+  color: var(--navy);
+}

@@ -143,6 +143,9 @@ const ALLOWED_LINKS: [string, string][] = [
   ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
   ["CC BY 4.0 licence", "https://creativecommons.org/licenses/by/4.0/"],
   ["Fimea open data", "https://fimea.fi/en/about_us/open-data"],
+  // Feature 011: read-only CSV downloads of cases and review history.
+  ["Cases (CSV)", "/api/exports/review-cases.csv"],
+  ["Review history (CSV)", "/api/exports/review-history.csv"],
 ];
 
 type Mode = "cases" | "catalogue" | "shortages";
