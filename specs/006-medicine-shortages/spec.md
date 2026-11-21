@@ -5,6 +5,8 @@
 
 **Supersedes in part:** `specs/003-app-shell-and-themes` FR-001 and FR-002 (the sidebar also lists "Medicine Shortages", between "Medicine Catalogue" and "About the Data") and FR-025 (the Shortages page adds its search field, status filter, paging and the "Update shortage data" button). No case actions or clinical wording are added; features 003–005 otherwise stay in force.
 
+**Superseded in part by:** `specs/007-care-loop-review-and-shortage-cases` — §3 "Out of scope: linking shortages to review cases": changes between accepted shortage files now create review cases for matched records.
+
 ## 1. Objective
 
 Show the medicine shortages that marketing authorisation holders report to Fimea, as Fimea publishes them in its open data, next to the matching packages of the Medicine Catalogue, and keep both the shortage data and the Basic Register up to date automatically every day.

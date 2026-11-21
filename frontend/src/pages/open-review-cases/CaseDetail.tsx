@@ -1,37 +1,57 @@
-import type { OpenReviewCase } from "./openReviewCases";
-import { evidenceUnavailable } from "./changeSummary";
+import {
+  STATUS_LABELS,
+  isShortageCase,
+  type ReviewCase,
+} from "./openReviewCases";
+import { caseVariant, evidenceUnavailable } from "./changeSummary";
 import EvidenceClassificationLabel from "./evidence/EvidenceClassificationLabel";
 import TimestampDisplay from "./evidence/TimestampDisplay";
 import ProvenancePanel from "./ProvenancePanel";
 import RemovedPackageReview from "./RemovedPackageReview";
+import ReviewPanel from "./ReviewPanel";
+import { ShortageChangeReview, ShortageProvenance } from "./ShortageCaseReview";
 import UpdatedPackageReview from "./UpdatedPackageReview";
+
+const KIND_BADGES = {
+  updated: "Updated package",
+  removed: "Removed package",
+  shortage: "Shortage",
+} as const;
 
 export default function CaseDetail({
   reviewCase,
+  initials,
+  onInitialsChange,
+  onRecorded,
 }: {
-  reviewCase: OpenReviewCase;
+  reviewCase: ReviewCase;
+  initials: string;
+  onInitialsChange: (value: string) => void;
+  onRecorded: (updated: ReviewCase, label: string) => void;
 }) {
-  const removed = reviewCase.changeSet.kind === "NO_LONGER_PRESENT";
+  const variant = caseVariant(reviewCase);
   return (
     <article
-      className={`case-evidence case-evidence--${removed ? "removed" : "updated"}`}
+      className={`case-evidence case-evidence--${variant}`}
       aria-label={`Evidence for ${reviewCase.caseId}`}
     >
       <header className="case-heading">
         <div>
-          <p className="eyebrow">Open review case</p>
+          <p className="eyebrow">Review case</p>
           <h2>{reviewCase.matchedRecord.medicineDisplay}</h2>
           <p className="case-identity">
             {reviewCase.medicineIdentifier} · {reviewCase.identifierGranularity}
           </p>
         </div>
         <div className="case-heading-badges">
-          <span
-            className={`change-kind-badge change-kind-badge--${removed ? "removed" : "updated"}`}
-          >
-            {removed ? "Removed package" : "Updated package"}
+          <span className={`change-kind-badge change-kind-badge--${variant}`}>
+            {KIND_BADGES[variant]}
           </span>
-          <span className="status-badge">{reviewCase.status}</span>
+          <span
+            className={`status-badge case-status--${reviewCase.status.toLowerCase()}`}
+          >
+            {STATUS_LABELS[reviewCase.status]}
+          </span>
         </div>
       </header>
 
@@ -82,13 +102,29 @@ export default function CaseDetail({
         </dl>
       </section>
 
-      {removed ? (
-        <RemovedPackageReview reviewCase={reviewCase} />
+      {isShortageCase(reviewCase) ? (
+        <>
+          <ShortageChangeReview reviewCase={reviewCase} />
+          <ShortageProvenance reviewCase={reviewCase} />
+        </>
       ) : (
-        <UpdatedPackageReview reviewCase={reviewCase} />
+        <>
+          {variant === "removed" ? (
+            <RemovedPackageReview reviewCase={reviewCase} />
+          ) : (
+            <UpdatedPackageReview reviewCase={reviewCase} />
+          )}
+          <ProvenancePanel reviewCase={reviewCase} />
+        </>
       )}
 
-      <ProvenancePanel reviewCase={reviewCase} />
+      <ReviewPanel
+        key={reviewCase.caseId}
+        reviewCase={reviewCase}
+        initials={initials}
+        onInitialsChange={onInitialsChange}
+        onRecorded={onRecorded}
+      />
 
       <p className="review-boundary">
         This case presents source information for pharmacist review only. It

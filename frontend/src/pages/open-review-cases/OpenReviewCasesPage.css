@@ -795,3 +795,332 @@
     overflow-y: auto;
   }
 }
+
+/* ---------- Feature 007: recorded reviews and shortage cases ---------- */
+
+.review-recorded:empty {
+  display: none;
+}
+
+.review-recorded {
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--status-border);
+  border-left: 4px solid var(--status-border);
+  border-radius: 8px;
+  background: var(--status-bg);
+  color: var(--status-text);
+  font-weight: 600;
+}
+
+.empty-state p {
+  margin: 0 0 0.5rem;
+}
+
+.case-reviewed-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.6rem 0 0;
+  color: var(--color-text);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.case-reviewed-toggle input {
+  width: 1.1rem;
+  height: 1.1rem;
+  margin: 0;
+  accent-color: var(--color-accent-strong);
+}
+
+.case-reviewed-toggle input:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+/* Status colours: open statuses in teal, reviewed outcomes muted. */
+.case-status--in_progress {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.status-badge.case-status--reviewed_no_action,
+.status-badge.case-status--reviewed_follow_up {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
+  color: var(--color-text);
+}
+
+.case-list-status.case-status--in_progress {
+  background: none;
+  color: var(--warning-text);
+}
+
+.case-list-status.case-status--reviewed_no_action,
+.case-list-status.case-status--reviewed_follow_up {
+  color: var(--color-text-muted);
+}
+
+/* Shortage cases: a dotted marker in the list, an amber badge. */
+.case-list-item--shortage::before {
+  background: repeating-linear-gradient(
+    to bottom,
+    var(--warning-accent) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+.change-kind-badge--shortage {
+  border-color: var(--warning-border);
+  background: var(--warning-bg);
+  color: var(--warning-text);
+}
+
+.shortage-change-package {
+  margin: 0 0 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.shortage-change-product {
+  color: var(--color-heading);
+  font-weight: 650;
+}
+
+.shortage-change-catalogue {
+  color: var(--color-text-muted);
+}
+
+.shortage-change-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.shortage-change-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.92rem;
+}
+
+.shortage-change-table th,
+.shortage-change-table td {
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.shortage-change-table thead th {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 650;
+}
+
+.shortage-change-table tbody th {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.shortage-change-table .field-indicator {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0 0.4rem;
+  border: 1px dashed var(--status-border);
+  border-radius: 999px;
+  color: var(--status-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.shortage-change-row--changed td {
+  background: var(--color-accent-soft);
+  font-weight: 650;
+}
+
+.shortage-change-notice {
+  margin: 0.85rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border-left: 4px solid var(--warning-accent);
+  border-radius: 6px;
+  background: var(--warning-bg);
+  color: var(--warning-text);
+  font-size: 0.9rem;
+}
+
+/* The review panel */
+.case-review {
+  min-width: 0;
+  padding: 1.1rem 1.25rem;
+  border: 1px solid var(--color-border);
+  border-top: 4px solid var(--color-accent);
+  border-radius: 12px;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-card);
+}
+
+.case-review-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.case-review-heading h3 {
+  margin: 0;
+}
+
+.case-review-help,
+.review-field-help {
+  margin: 0.5rem 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+}
+
+.review-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 9rem) minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+  margin-top: 0.85rem;
+}
+
+@media (width < 640px) {
+  .review-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.review-field {
+  display: grid;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.review-field label {
+  color: var(--color-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.review-field input,
+.review-field textarea {
+  width: 100%;
+  min-width: 0;
+  padding: 0.45rem 0.65rem;
+  border: 1px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.review-field textarea {
+  resize: vertical;
+}
+
+.review-field input:focus-visible,
+.review-field textarea:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.review-action {
+  min-height: 2.6rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--navy);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--navy);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.review-action--reviewed_no_action,
+.review-action--reviewed_follow_up {
+  background: var(--navy);
+  color: #ffffff;
+}
+
+.review-action:hover:not(:disabled) {
+  border-color: var(--color-accent-strong);
+  background: var(--color-accent-strong);
+  color: #ffffff;
+}
+
+.review-action:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.review-action:disabled {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  cursor: progress;
+}
+
+.review-error {
+  margin: 0.75rem 0 0;
+  padding: 0.55rem 0.8rem;
+  border: 1px solid var(--error-border);
+  border-left-width: 4px;
+  border-radius: 8px;
+  background: var(--error-bg);
+  color: var(--error-text);
+}
+
+.case-evidence h4.review-history-heading {
+  margin: 1.1rem 0 0.5rem;
+  color: var(--color-heading);
+  font-size: 0.92rem;
+  font-weight: 650;
+}
+
+.review-history {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.review-history li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 0.6rem;
+  padding: 0.5rem 0.7rem;
+  border-left: 3px solid var(--color-border-strong);
+  background: var(--color-surface-muted);
+  border-radius: 0 6px 6px 0;
+}
+
+.review-history-time {
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+}
+
+.review-history-step {
+  color: var(--color-heading);
+  font-weight: 650;
+}
+
+.review-history-who {
+  color: var(--color-text-muted);
+}
+
+.review-history-note {
+  flex-basis: 100%;
+  margin: 0.15rem 0 0;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}

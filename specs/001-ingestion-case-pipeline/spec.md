@@ -6,6 +6,8 @@
 
 **Status**: Implemented as a prototype (T001–T036, 2026-11-18). See [Implementation status](#implementation-status).
 
+**Superseded in part by**: `specs/007-care-loop-review-and-shortage-cases` — NEW is no longer the only case status: a pharmacist can record In progress and two Reviewed outcomes, with initials, a note and a kept history. The system still only creates NEW cases and never changes a status; later releases never change or close a case.
+
 **Input**: User description: "Build the ingestion-to-case pipeline for the Medicine Change Care Loop prototype, from scheduled ingestion of selected official Finnish medicine information through change detection and simulated medication matching to a pharmacist-facing, evidence-based review case list."
 
 ## User Scenarios & Testing *(mandatory)*

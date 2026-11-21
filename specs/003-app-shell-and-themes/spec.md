@@ -18,6 +18,8 @@
 
 **Superseded in part by**: `specs/006-medicine-shortages` — FR-001 and FR-002 (the sidebar also lists "Medicine Shortages" at `/medicine-shortages`) and FR-025 (the Shortages page's search, status filter, paging and "Update shortage data" button).
 
+**Superseded in part by**: `specs/007-care-loop-review-and-shortage-cases` — FR-025 (Open Review Cases adds the review steps, the initials and note fields and "Show reviewed cases").
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Move around the review workspace (Priority: P1)

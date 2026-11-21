@@ -9,6 +9,7 @@ from .api.latest_release_check import router as latest_release_check_router
 from .api.medicine_catalogue import router as medicine_catalogue_router
 from .api.medicine_shortages import router as medicine_shortages_router
 from .api.open_review_cases import router as open_review_cases_router
+from .api.review_cases import router as review_cases_router
 from .api.source_release_ingestion import router as source_release_ingestion_router
 from .config import ApplicationConfig
 from .services.pipeline_store import PipelineStore
@@ -45,6 +46,8 @@ app.include_router(latest_release_check_router)
 # Feature 006: Fimea shortage data and the daily automatic update.
 app.include_router(medicine_shortages_router)
 app.include_router(daily_updates_router)
+# Feature 007: a pharmacist records a review step (the only operation that changes a case).
+app.include_router(review_cases_router)
 
 
 @app.get("/health")

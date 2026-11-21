@@ -97,7 +97,8 @@ def with_evidence_availability(payload: dict, available_checksums: set[str]) -> 
     stored. If either source is gone, the case is reported as UNAVAILABLE so it is
     not presented as fully verified evidence.
     """
-    result = {**payload, "sources": {}}
+    # Feature 007: cases from Fimea shortage data carry caseType SHORTAGE.
+    result = {**payload, "caseType": payload.get("caseType", "RELEASE"), "sources": {}}
     for side, source in payload["sources"].items():
         result["sources"][side] = {
             **source,

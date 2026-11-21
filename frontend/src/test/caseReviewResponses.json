@@ -1,0 +1,348 @@
+[
+  {
+    "caseId": "CASE-606444efd7178cd2e1fcf3cbcf7a479ad15dfdd443ed8f76df0c78aa43703162",
+    "createdAt": "2026-11-21T13:12:44.481824+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-500",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-500",
+      "personReference": "SIM-PERSON-500",
+      "medicineDisplay": "Fictional Product Blue"
+    },
+    "changeSet": {
+      "changeSetId": "8a69373cb977cb865abf998a80693cdea82779ca7d1973a4a0aa6668a9329eac",
+      "kind": "FIELDS_CHANGED",
+      "detectedAt": "2026-11-21T13:12:44.481203+00:00",
+      "changes": [
+        {
+          "changeId": "e7e602a4ed4217da6262c61506a2a78e6644bd7fba766fe0b46bb783ba660ad9",
+          "field": "Pakkaus/Pakkauskokoteksti",
+          "before": [
+            {
+              "state": "value",
+              "value": "synthetic pack size E",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "synthetic pack size E revised",
+              "attributes": {}
+            }
+          ]
+        }
+      ],
+      "lastKnownFields": null
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-001",
+          "attributes": {}
+        },
+        "fileName": "Perusrekisteri.xml",
+        "checksum": "845854a4871efe3883e5e43aaeabbe75dd5a7cd725d98dc83c16ff2baf9d15cb",
+        "recordIdentifier": "SIM-PKG-500",
+        "recordLocator": "/Perusrekisteri/Pakkaus[4]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T04:00:00+00:00",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "fileName": "Perusrekisteri.xml",
+        "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+        "recordIdentifier": "SIM-PKG-500",
+        "recordLocator": "/Perusrekisteri/Pakkaus[4]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T04:00:00+00:00",
+        "evidenceAvailable": true
+      }
+    },
+    "sourceOrder": {
+      "prior": 20990101,
+      "current": 20990102,
+      "basis": "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. Caller-declared order and retrieval timestamps were not used. Prior Ajopvm 2099-01-01; current Ajopvm 2099-01-02.",
+      "evidenceClass": "VERIFIED"
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-606444efd7178cd2e1fcf3cbcf7a479ad15dfdd443ed8f76df0c78aa43703162",
+      "caseId": "CASE-606444efd7178cd2e1fcf3cbcf7a479ad15dfdd443ed8f76df0c78aa43703162",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:12:44.481824+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-606444efd7178cd2e1fcf3cbcf7a479ad15dfdd443ed8f76df0c78aa43703162",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:12:44.481824+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "caseType": "RELEASE",
+    "evidenceAvailability": "AVAILABLE"
+  },
+  {
+    "caseId": "CASE-c78ad3b2b70d62112445c8be58f3e2f67757e9592c2c8808ee88d0728a0195f6",
+    "createdAt": "2026-11-21T13:12:44.481824+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-100",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-100",
+      "personReference": "SIM-PERSON-100",
+      "medicineDisplay": "Fictional Product Amber"
+    },
+    "changeSet": {
+      "changeSetId": "9896fce0c38267a6fd9d8fde81b2848f771d13ce5acdfb33c5bcb7ce1c4f6f07",
+      "kind": "FIELDS_CHANGED",
+      "detectedAt": "2026-11-21T13:12:44.481203+00:00",
+      "changes": [
+        {
+          "changeId": "a90f1e0a703b14a54b67bce275adc57549b36f77f8cf62be40dd096f121957b0",
+          "field": "Laakevalmiste/Kauppanimi",
+          "before": [
+            {
+              "state": "value",
+              "value": "Fictional Product Amber",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "Fictional Product Amber Revised",
+              "attributes": {}
+            }
+          ]
+        },
+        {
+          "changeId": "9b4129d7e6f56ad4fa0b2560adfeec605d4189b99974b4a30c61ce0e315f3a83",
+          "field": "Pakkaus/JulkinenTarkenne",
+          "before": [
+            {
+              "state": "value",
+              "value": "synthetic detail A",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "missing",
+              "value": null,
+              "attributes": {}
+            }
+          ]
+        }
+      ],
+      "lastKnownFields": null
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-001",
+          "attributes": {}
+        },
+        "fileName": "Perusrekisteri.xml",
+        "checksum": "845854a4871efe3883e5e43aaeabbe75dd5a7cd725d98dc83c16ff2baf9d15cb",
+        "recordIdentifier": "SIM-PKG-100",
+        "recordLocator": "/Perusrekisteri/Pakkaus[1]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T04:00:00+00:00",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "fileName": "Perusrekisteri.xml",
+        "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+        "recordIdentifier": "SIM-PKG-100",
+        "recordLocator": "/Perusrekisteri/Pakkaus[1]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T04:00:00+00:00",
+        "evidenceAvailable": true
+      }
+    },
+    "sourceOrder": {
+      "prior": 20990101,
+      "current": 20990102,
+      "basis": "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. Caller-declared order and retrieval timestamps were not used. Prior Ajopvm 2099-01-01; current Ajopvm 2099-01-02.",
+      "evidenceClass": "VERIFIED"
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-c78ad3b2b70d62112445c8be58f3e2f67757e9592c2c8808ee88d0728a0195f6",
+      "caseId": "CASE-c78ad3b2b70d62112445c8be58f3e2f67757e9592c2c8808ee88d0728a0195f6",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:12:44.481824+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-c78ad3b2b70d62112445c8be58f3e2f67757e9592c2c8808ee88d0728a0195f6",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:12:44.481824+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "caseType": "RELEASE",
+    "evidenceAvailability": "AVAILABLE"
+  },
+  {
+    "caseId": "CASE-57c1fa634bab2e6a442f0609423a7d18764afe2d0f2c261145f7427b1944830c",
+    "caseType": "SHORTAGE",
+    "createdAt": "2026-11-21T13:12:44.516258+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-500",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-500",
+      "personReference": "SIM-PERSON-500",
+      "medicineDisplay": "Fictional Product Blue"
+    },
+    "shortageChange": {
+      "changeSetId": "b27ac8f6da9c431ab463cc806e71fcd2be3793de1a362c895efcb4401d249cac",
+      "kind": "SHORTAGE_CHANGED",
+      "vnr": "SIM-VNR-500",
+      "changedColumns": ["Valid"],
+      "before": {
+        "line": 4,
+        "valid": "E",
+        "unavailableFrom": "2099-01-10",
+        "endingDate": "2099-01-31",
+        "notificationDate": "2099-01-02",
+        "updated": "2099-01-02",
+        "company": "Fictional Pharma Oy"
+      },
+      "after": {
+        "line": 3,
+        "valid": "K",
+        "unavailableFrom": "2099-01-10",
+        "endingDate": "2099-01-31",
+        "notificationDate": "2099-01-02",
+        "updated": "2099-01-05",
+        "company": "Fictional Pharma Oy"
+      },
+      "detectedAt": "2026-11-21T13:12:44.516258+00:00",
+      "package": {
+        "pakkaustunnus": "SIM-PKG-500",
+        "productName": {
+          "state": "value",
+          "value": "Fictional Product Blue",
+          "attributes": {}
+        },
+        "strength": {
+          "state": "value",
+          "value": "synthetic strength B",
+          "attributes": {}
+        },
+        "packageSizeText": {
+          "state": "value",
+          "value": "synthetic pack size E revised",
+          "attributes": {}
+        }
+      },
+      "catalogue": {
+        "releaseId": "sha256-4702339f05cfe3edc9cfe6263d1f062c585cc40c18627a3f299325a073998fe3",
+        "releaseDate": "2099-01-02"
+      },
+      "notice": "Dates and status are the company's report to Fimea, shown as published; the end date is an estimate."
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea shortage data (Shortages.txt)",
+        "sourceUrl": "https://data.pilvi.fimea.fi/avoin-data/Shortages.txt",
+        "fileName": "Shortages.txt",
+        "checksum": "96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+        "captureReference": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+        "retrievedAt": "2099-01-05T04:00:00+00:00",
+        "lineNumber": 4,
+        "licence": "CC BY 4.0",
+        "evidenceClass": "VERIFIED",
+        "note": "Row as published in this file.",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea shortage data (Shortages.txt)",
+        "sourceUrl": "https://data.pilvi.fimea.fi/avoin-data/Shortages.txt",
+        "fileName": "Shortages.txt",
+        "checksum": "ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+        "captureReference": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+        "retrievedAt": "2099-01-06T04:00:00+00:00",
+        "lineNumber": 3,
+        "licence": "CC BY 4.0",
+        "evidenceClass": "VERIFIED",
+        "note": "Row as published in this file.",
+        "evidenceAvailable": true
+      }
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-57c1fa634bab2e6a442f0609423a7d18764afe2d0f2c261145f7427b1944830c",
+      "caseId": "CASE-57c1fa634bab2e6a442f0609423a7d18764afe2d0f2c261145f7427b1944830c",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:12:44.516258+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-57c1fa634bab2e6a442f0609423a7d18764afe2d0f2c261145f7427b1944830c",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:12:44.516258+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "evidenceAvailability": "AVAILABLE"
+  }
+]

@@ -57,6 +57,9 @@ class CaseStatusEventRow(Base):
     from_status: Mapped[str | None] = mapped_column(String(20))
     to_status: Mapped[str] = mapped_column(String(20))
     occurred_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    # Feature 007: who recorded a human status change, and why.
+    reviewer_initials: Mapped[str | None] = mapped_column(String(10))
+    note: Mapped[str | None] = mapped_column(Text)
 
 
 class ChangeProcessingOutcomeRow(Base):

@@ -10,7 +10,7 @@ from ..services.daily_updates import DailyUpdateScheduler, local_now
 from ..services.latest_release_check import status_response
 from ..services.medicine_shortages import update_status_response
 from .latest_release_check import latest_release_check, start_latest_release_check
-from .medicine_shortages import shortage_update
+from .medicine_shortages import shortage_update, start_shortage_update
 
 router = APIRouter(prefix="/api/daily-updates", tags=["daily-updates"])
 
@@ -20,9 +20,8 @@ _WAIT_SECONDS = 30 * 60
 
 def run_daily_jobs(app: FastAPI) -> dict:
     """Shortages first (small), then the Basic Register. Waits for both."""
-    config: ApplicationConfig = app.state.source_release_config
     update = shortage_update(app)
-    update.start(app.state.store, config, trigger="SCHEDULE")
+    start_shortage_update(app, trigger="SCHEDULE")
     shortages = update_status_response(update.wait(_WAIT_SECONDS))
 
     start_latest_release_check(app)

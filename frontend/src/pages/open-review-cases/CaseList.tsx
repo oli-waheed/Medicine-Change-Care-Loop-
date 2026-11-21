@@ -1,15 +1,20 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
-import type { OpenReviewCase } from "./openReviewCases";
-import { changeSummary, evidenceUnavailable } from "./changeSummary";
+import { STATUS_LABELS, type ReviewCase } from "./openReviewCases";
+import {
+  caseVariant,
+  changeSummary,
+  evidenceUnavailable,
+} from "./changeSummary";
 
 // Case-insensitive; every word must appear in the name, identifier or summary.
-function matchesSearch(reviewCase: OpenReviewCase, query: string): boolean {
+function matchesSearch(reviewCase: ReviewCase, query: string): boolean {
   const words = query.toLowerCase().split(/\s+/).filter(Boolean);
   if (words.length === 0) return true;
   const haystack = [
     reviewCase.matchedRecord.medicineDisplay,
     reviewCase.medicineIdentifier,
     changeSummary(reviewCase),
+    STATUS_LABELS[reviewCase.status],
   ]
     .join(" ")
     .toLowerCase();
@@ -22,11 +27,16 @@ export default function CaseList({
   cases,
   selectedId,
   onSelect,
+  includeReviewed,
+  onIncludeReviewedChange,
 }: {
-  cases: OpenReviewCase[];
+  cases: ReviewCase[];
   selectedId: string | null;
   onSelect: (caseId: string) => void;
+  includeReviewed: boolean;
+  onIncludeReviewedChange: (include: boolean) => void;
 }) {
+  const reviewedId = useId();
   const [query, setQuery] = useState("");
   const searchId = useId();
   const listRef = useRef<HTMLDivElement>(null);
@@ -75,6 +85,15 @@ export default function CaseList({
           onChange={(event) => setQuery(event.target.value)}
         />
       </div>
+      <div className="case-reviewed-toggle">
+        <input
+          id={reviewedId}
+          type="checkbox"
+          checked={includeReviewed}
+          onChange={(event) => onIncludeReviewedChange(event.target.checked)}
+        />
+        <label htmlFor={reviewedId}>Show reviewed cases</label>
+      </div>
       <p className="case-search-status" role="status">
         {filtering ? `Showing ${visible.length} of ${cases.length}` : ""}
       </p>
@@ -82,11 +101,7 @@ export default function CaseList({
       <div className="case-queue" ref={listRef} onKeyDown={onQueueKeyDown}>
         {visible.map((reviewCase) => (
           <button
-            className={`case-list-item case-list-item--${
-              reviewCase.changeSet.kind === "NO_LONGER_PRESENT"
-                ? "removed"
-                : "updated"
-            }`}
+            className={`case-list-item case-list-item--${caseVariant(reviewCase)}`}
             type="button"
             key={reviewCase.caseId}
             aria-pressed={reviewCase.caseId === selectedId}
@@ -104,7 +119,11 @@ export default function CaseList({
             {evidenceUnavailable(reviewCase) && (
               <span className="case-list-warning">Evidence unavailable</span>
             )}
-            <span className="case-list-status">{reviewCase.status}</span>
+            <span
+              className={`case-list-status case-status--${reviewCase.status.toLowerCase()}`}
+            >
+              {STATUS_LABELS[reviewCase.status]}
+            </span>
           </button>
         ))}
         {filtering && visible.length === 0 && (

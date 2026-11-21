@@ -103,13 +103,16 @@ function reviewCase(
   };
 }
 
-describe("OpenReviewCasesPage clinical scope (T035)", () => {
+describe("OpenReviewCasesPage clinical scope (T035, updated by feature 007)", () => {
   afterEach(() => {
     cleanup();
     vi.unstubAllGlobals();
   });
 
-  it("only reads cases, offers no case actions and uses no clinical wording", async () => {
+  // Feature 007 updated this guard on purpose: a reviewer can now record a
+  // review step. The only case actions are the review buttons, which need the
+  // reviewer's initials; there is still no form, priority or clinical choice.
+  it("offers only case selection and the review steps, with no clinical wording", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => [
@@ -124,33 +127,53 @@ describe("OpenReviewCasesPage clinical scope (T035)", () => {
     render(<OpenReviewCasesPage />);
     await screen.findByText("Cases (2)");
 
-    // The page's only controls are the case-selection buttons in the case
-    // list: one per case, each naming the package it selects.
     const caseList = screen.getByRole("navigation", {
       name: "Open review cases",
     });
-    const buttons = within(caseList).getAllByRole("button");
-    expect(buttons).toHaveLength(2);
-    expect(screen.getAllByRole("button")).toEqual(buttons);
-    for (const button of buttons) {
+    const caseButtons = within(caseList).getAllByRole("button");
+    expect(caseButtons).toHaveLength(2);
+    const reviewButtons = [
+      "Mark in progress",
+      "Reviewed – no action needed",
+      "Reviewed – follow-up needed",
+    ];
+    for (const button of caseButtons) {
       expect(button.textContent).toMatch(/SIM-PKG-/);
       fireEvent.click(button);
+      expect(
+        screen
+          .getAllByRole("button")
+          .filter((item) => !caseButtons.includes(item))
+          .map((item) => item.textContent),
+      ).toEqual(reviewButtons);
       expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
     }
 
-    // No form controls that could set status, priority or a decision. The
-    // only input is the read-only case search (feature 003), which filters
-    // the cases already loaded and sends nothing.
+    // Form controls: the read-only case search, the "Show reviewed cases"
+    // switch, and the reviewer's initials and note. No select, no form.
+    const inputs = Array.from(document.querySelectorAll("input"));
+    expect(
+      inputs.map((input) => [input.type, input.labels?.[0]?.textContent]),
+    ).toEqual([
+      ["search", "Search cases"],
+      ["checkbox", "Show reviewed cases"],
+      ["text", "Your initials"],
+    ]);
+    expect(
+      Array.from(document.querySelectorAll("textarea")).map(
+        (area) => area.labels?.[0]?.textContent,
+      ),
+    ).toEqual(["Note"]);
+    expect(document.querySelectorAll("select, form")).toHaveLength(0);
+
+    // Searching, selecting and typing send nothing: one read on load.
     const search = screen.getByRole("searchbox", { name: "Search cases" });
-    expect(document.querySelectorAll("input")).toEqual(
-      document.querySelectorAll('input[type="search"]'),
-    );
-    expect(document.querySelectorAll("input")).toHaveLength(1);
-    expect(document.querySelectorAll("select, textarea, form")).toHaveLength(0);
     fireEvent.change(search, { target: { value: "SIM-PKG-300" } });
     expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
     fireEvent.change(search, { target: { value: "" } });
-    // The view never changes data: one read on load, nothing on selection.
+    fireEvent.change(screen.getByRole("textbox", { name: "Your initials" }), {
+      target: { value: "AB" },
+    });
     expect(fetchMock).toHaveBeenCalledTimes(1);
     const [url, options] = fetchMock.mock.calls[0];
     expect(url).toBe("/api/open-review-cases");

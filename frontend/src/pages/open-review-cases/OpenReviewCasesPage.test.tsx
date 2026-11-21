@@ -152,7 +152,7 @@ describe("OpenReviewCasesPage", () => {
     );
     render(<OpenReviewCasesPage />);
     expect(
-      await screen.findByText("There are no NEW review cases."),
+      await screen.findByText("There are no open review cases."),
     ).toBeVisible();
   });
 

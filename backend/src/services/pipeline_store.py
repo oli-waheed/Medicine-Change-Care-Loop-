@@ -5,10 +5,11 @@ import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
-from sqlalchemy import create_engine, event, select
+from sqlalchemy import create_engine, event, inspect, select, text, update
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
+from ..domain.case_status_event import OPEN_STATUSES, CaseStatusEvent
 from ..domain.review_case import ReviewCase
 from ..models import (
     Base,
@@ -33,6 +34,33 @@ def _as_utc(value: datetime) -> datetime:
     if value.tzinfo is None or value.utcoffset() is None:
         return value.replace(tzinfo=UTC)
     return value.astimezone(UTC)
+
+
+# Columns added to existing tables after their first release. ``create_all`` only
+# creates missing tables, so an existing database gets these columns here (they
+# are all nullable, so existing rows stay valid).
+_ADDED_COLUMNS = {
+    "case_status_events": {"reviewer_initials": "VARCHAR(10)", "note": "TEXT"},  # feature 007
+}
+
+
+def _add_missing_columns(engine: Engine) -> None:
+    inspector = inspect(engine)
+    with engine.begin() as connection:
+        for table, columns in _ADDED_COLUMNS.items():
+            present = {column["name"] for column in inspector.get_columns(table)}
+            for name, column_type in columns.items():
+                if name not in present:
+                    connection.execute(text(f"ALTER TABLE {table} ADD COLUMN {name} {column_type}"))
+
+
+class CaseTransitionError(Exception):
+    """A requested status change is not allowed or the case has changed meanwhile."""
+
+    def __init__(self, code: str, message: str, current_status: str | None = None) -> None:
+        super().__init__(message)
+        self.code = code
+        self.current_status = current_status
 
 
 class PipelineStore:
@@ -73,6 +101,7 @@ class PipelineStore:
                 connection.execute("PRAGMA foreign_keys=ON")
 
         Base.metadata.create_all(engine)
+        _add_missing_columns(engine)
         self._engine = engine
         self._sessions = sessionmaker(engine, expire_on_commit=False)
 
@@ -296,24 +325,117 @@ class PipelineStore:
             )
 
     def available_file_checksums(self) -> set[str]:
-        """Checksums of raw files that are still present in the capture store."""
+        """Checksums of raw files that are still present in the capture store.
+
+        Includes stored shortage files (feature 007), whose cases cite them.
+        """
+        with self._session() as session:
+            shortage_files = session.scalars(select(ShortageCaptureRow)).all()
         return {
             checksum
             for row in self.captures()
             for checksum, path in self._capture_files(row)
             if path.is_file()
+        } | {
+            row.checksum.removeprefix("sha256-")
+            for row in shortage_files
+            if Path(row.file_path).is_file()
         }
 
     # --- read side ---------------------------------------------------------------
 
     def open_case_payloads(self) -> list[dict]:
+        """Cases still to be reviewed (NEW and IN_PROGRESS), oldest first."""
+        return self.case_payloads(include_reviewed=False)
+
+    def case_payloads(self, *, include_reviewed: bool) -> list[dict]:
+        """Stored case views with their current status and full status history."""
         with self._session() as session:
-            rows = session.scalars(
-                select(ReviewCaseRow)
-                .where(ReviewCaseRow.status == "NEW")
-                .order_by(ReviewCaseRow.created_at, ReviewCaseRow.case_id)
-            ).all()
-            return [row.evidence_payload for row in rows]
+            query = select(ReviewCaseRow).order_by(ReviewCaseRow.created_at, ReviewCaseRow.case_id)
+            if not include_reviewed:
+                query = query.where(
+                    ReviewCaseRow.status.in_(sorted(status.value for status in OPEN_STATUSES))
+                )
+            rows = session.scalars(query).all()
+            events = self._events_by_case(session, [row.case_id for row in rows])
+            return [
+                {
+                    **row.evidence_payload,
+                    "status": row.status,
+                    "statusHistory": events.get(row.case_id, []),
+                }
+                for row in rows
+            ]
+
+    def case_payload(self, case_id: str) -> dict | None:
+        with self._session() as session:
+            row = session.get(ReviewCaseRow, case_id)
+            if row is None:
+                return None
+            events = self._events_by_case(session, [case_id])
+            return {**row.evidence_payload, "status": row.status, "statusHistory": events[case_id]}
+
+    @staticmethod
+    def _events_by_case(session: Session, case_ids: list[str]) -> dict[str, list[dict]]:
+        result: dict[str, list[dict]] = {case_id: [] for case_id in case_ids}
+        if not case_ids:
+            return result
+        rows = session.scalars(
+            select(CaseStatusEventRow)
+            .where(CaseStatusEventRow.case_id.in_(case_ids))
+            .order_by(CaseStatusEventRow.occurred_at, CaseStatusEventRow.event_id)
+        ).all()
+        for row in rows:
+            result[row.case_id].append(
+                {
+                    "eventId": row.event_id,
+                    "fromStatus": row.from_status,
+                    "toStatus": row.to_status,
+                    "occurredAt": _as_utc(row.occurred_at).isoformat(),
+                    "reviewerInitials": row.reviewer_initials,
+                    "note": row.note,
+                }
+            )
+        return result
+
+    def record_status_event(self, event: CaseStatusEvent) -> None:
+        """Apply a person's status change if the case still has ``event.from_status``.
+
+        The check and the change are one statement in one transaction, so two
+        reviewers can never overwrite each other (FR-004). Raises
+        ``CaseTransitionError``: NOT_FOUND, or STALE_STATUS with the current status.
+        """
+        with self._session() as session, session.begin():
+            changed = session.execute(
+                update(ReviewCaseRow)
+                .where(
+                    ReviewCaseRow.case_id == event.case_id,
+                    ReviewCaseRow.status == event.from_status.value,
+                )
+                .values(status=event.to_status.value)
+            ).rowcount
+            if changed != 1:
+                current = session.scalar(
+                    select(ReviewCaseRow.status).where(ReviewCaseRow.case_id == event.case_id)
+                )
+                if current is None:
+                    raise CaseTransitionError("CASE_NOT_FOUND", "No case has this identifier.")
+                raise CaseTransitionError(
+                    "STALE_STATUS",
+                    "The case's status has changed since it was loaded; reload and try again.",
+                    current,
+                )
+            session.add(
+                CaseStatusEventRow(
+                    event_id=event.event_id,
+                    case_id=event.case_id,
+                    from_status=event.from_status.value,
+                    to_status=event.to_status.value,
+                    occurred_at=_as_utc(event.occurred_at),
+                    reviewer_initials=event.reviewer_initials,
+                    note=(event.note or "").strip() or None,
+                )
+            )
 
     def status_events(self, case_id: str) -> list[CaseStatusEventRow]:
         with self._session() as session:
@@ -439,3 +561,64 @@ class PipelineStore:
                 .order_by(DailyUpdateRunRow.started_at.desc(), DailyUpdateRunRow.id.desc())
                 .limit(1)
             ).first()
+
+    # --- shortage review cases (feature 007) ----------------------------------------
+
+    def record_shortage_review(self, cases: list[dict], outcomes: list[dict]) -> int:
+        """Store shortage cases (each with its NEW event) and outcomes in one transaction.
+
+        A case or outcome that already exists is skipped, so processing the same
+        pair of files again adds nothing. Returns the number of cases inserted.
+        """
+        inserted = 0
+        with self._session() as session, session.begin():
+            for case in cases:
+                if session.scalar(
+                    select(ReviewCaseRow.case_id).where(
+                        ReviewCaseRow.idempotency_key == case["idempotency_key"]
+                    )
+                ):
+                    continue
+                session.add(
+                    ReviewCaseRow(
+                        case_id=case["case_id"],
+                        idempotency_key=case["idempotency_key"],
+                        status="NEW",
+                        created_at=_as_utc(case["created_at"]),
+                        medicine_key=case["medicine_key"],
+                        record_id=case["record_id"],
+                        change_set_id=case["change_set_id"],
+                        change_kind=case["change_kind"],
+                        prior_file_checksum=case["prior_file_checksum"],
+                        current_file_checksum=case["current_file_checksum"],
+                        evidence_payload=case["payload"],
+                    )
+                )
+                session.flush()
+                session.add(
+                    CaseStatusEventRow(
+                        event_id=case["event_id"],
+                        case_id=case["case_id"],
+                        from_status=None,
+                        to_status="NEW",
+                        occurred_at=_as_utc(case["created_at"]),
+                    )
+                )
+                inserted += 1
+            for outcome in outcomes:
+                if session.get(ChangeProcessingOutcomeRow, outcome["outcomeId"]) is not None:
+                    continue
+                session.add(
+                    ChangeProcessingOutcomeRow(
+                        outcome_id=outcome["outcomeId"],
+                        result=outcome["result"],
+                        reason=outcome["reason"],
+                        medicine_key=outcome["medicineIdentifier"],
+                        change_kind=outcome["changeKind"],
+                        record_ids=[r["recordId"] for r in outcome["simulatedRecords"]],
+                        case_ids=outcome["caseIds"],
+                        detected_at=_as_utc(datetime.fromisoformat(outcome["detectedAt"])),
+                        evidence_payload=outcome,
+                    )
+                )
+        return inserted

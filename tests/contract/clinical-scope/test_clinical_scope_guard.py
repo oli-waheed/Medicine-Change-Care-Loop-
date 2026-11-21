@@ -94,12 +94,21 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         ("GET", "/api/shortages/update"),
         ("POST", "/api/shortages/update"),
         ("GET", "/api/daily-updates"),
+        # Feature 007: the one operation that changes a case, a pharmacist's review step
+        # (contracts/review-api.md). The system never calls it.
+        ("POST", "/api/review-cases/{case_id}/status-events"),
     }
 
 
-def test_new_is_the_only_case_status():
-    # Adding a status is a deliberate, reviewed change to this feature's scope.
-    assert [status.value for status in CaseStatus] == ["NEW"]
+def test_case_statuses_are_new_and_the_three_review_outcomes():
+    # Adding a status is a deliberate, reviewed change to scope. Feature 007 added the
+    # three statuses a pharmacist sets; the system itself only ever creates NEW.
+    assert [status.value for status in CaseStatus] == [
+        "NEW",
+        "IN_PROGRESS",
+        "REVIEWED_NO_ACTION",
+        "REVIEWED_FOLLOW_UP",
+    ]
 
 
 def test_later_releases_never_change_or_close_an_existing_case(isolated_app):

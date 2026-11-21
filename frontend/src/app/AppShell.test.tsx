@@ -37,7 +37,7 @@ describe("Application shell (feature 003)", () => {
   describe("sidebar and navigation", () => {
     it("shows the product name, four links and the attribution, with no theme switch", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       const sidebar = screen.getByRole("complementary", { name: "Sidebar" });
       expect(
         within(sidebar).getByText("Medicine Change Care Loop"),
@@ -60,13 +60,13 @@ describe("Application shell (feature 003)", () => {
 
     it("hides the placeholder version 0.0.0", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       expect(screen.queryByText(/^Version /)).toBeNull();
     });
 
     it("marks the current page and moves between pages without new case requests", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       expect(document.title).toBe(
         "Open Review Cases | Medicine Change Care Loop",
       );
@@ -89,7 +89,7 @@ describe("Application shell (feature 003)", () => {
 
     it("returns to the previous page with the browser back button", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       fireEvent.click(sidebarLinks()[3]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
       act(() => {
@@ -128,7 +128,7 @@ describe("Application shell (feature 003)", () => {
 
     it("leaves modified clicks to the browser", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       fireEvent.click(sidebarLinks()[3], { ctrlKey: true });
       expect(window.location.pathname).toBe("/");
     });
@@ -137,7 +137,7 @@ describe("Application shell (feature 003)", () => {
   describe("navigation toggle and keyboard access", () => {
     it("does not move focus on first load, but does after navigating", async () => {
       renderAt("/");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
       expect(document.body).toHaveFocus();
       fireEvent.click(sidebarLinks()[3]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
@@ -204,7 +204,7 @@ describe("Application shell (feature 003)", () => {
       fireEvent.click(menu);
       fireEvent.click(sidebarLinks()[0]);
       expect(menu).toHaveAttribute("aria-expanded", "false");
-      await screen.findByText("There are no NEW review cases.");
+      await screen.findByText("There are no open review cases.");
     });
 
     it("expands and collapses the tablet sidebar with its own toggle", () => {

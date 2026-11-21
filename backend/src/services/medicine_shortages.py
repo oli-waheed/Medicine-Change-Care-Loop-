@@ -202,18 +202,28 @@ def store_shortage_file(
     }
 
 
+# review(prior_capture, current_capture) -> summary; feature 007 creates cases with it.
+Review = Callable[[ShortageCaptureRow, ShortageCaptureRow], dict]
+
+
 def update_shortages(
     *,
     store: PipelineStore,
     config: ApplicationConfig,
     download: Callable[[str, int, BinaryIO], int] = download_release,
     now: Callable[[], datetime] = lambda: datetime.now(UTC),
+    review: Review | None = None,
 ) -> dict:
-    """Download the shortage file and store it. Raises DownloadError on download failure."""
+    """Download the shortage file and store it. Raises DownloadError on download failure.
+
+    If the active file changes as a result, ``review`` compares the previous and
+    the new active file (feature 007); its summary is returned as ``review``.
+    """
 
     temporary_path: Path | None = None
     try:
         retrieved_at = now()
+        previous = store.active_shortage_capture()
         with tempfile.NamedTemporaryFile(
             prefix="shortages-", suffix=".txt", delete=False
         ) as temporary_file:
@@ -230,7 +240,16 @@ def update_shortages(
             source_url=config.fimea_shortages_url,
             retrieved_at=retrieved_at,
         )
-        return {**outcome, "downloadedBytes": size}
+        result = {**outcome, "downloadedBytes": size}
+        current = store.active_shortage_capture()
+        if (
+            review is not None
+            and previous is not None
+            and current is not None
+            and previous.checksum != current.checksum
+        ):
+            result["review"] = review(previous, current)
+        return result
     finally:
         if temporary_path is not None:
             temporary_path.unlink(missing_ok=True)
@@ -276,7 +295,11 @@ class ShortageUpdate:
             return self._status
 
     def start(
-        self, store: PipelineStore, config: ApplicationConfig, trigger: str = "BUTTON"
+        self,
+        store: PipelineStore,
+        config: ApplicationConfig,
+        trigger: str = "BUTTON",
+        review: Review | None = None,
     ) -> tuple[UpdateStatus, bool]:
         with self._lock:
             if self._status.running:
@@ -286,7 +309,10 @@ class ShortageUpdate:
             )
             status = self._status
             self._thread = threading.Thread(
-                target=self._run, args=(store, config), name="shortage-update", daemon=True
+                target=self._run,
+                args=(store, config, review),
+                name="shortage-update",
+                daemon=True,
             )
             self._thread.start()
         return status, True
@@ -301,10 +327,10 @@ class ShortageUpdate:
         with self._lock:
             self._status = replace(self._status, finished_at=self.now(), **changes)
 
-    def _run(self, store: PipelineStore, config: ApplicationConfig) -> None:
+    def _run(self, store: PipelineStore, config: ApplicationConfig, review) -> None:
         try:
             result = update_shortages(
-                store=store, config=config, download=self.download, now=self.now
+                store=store, config=config, download=self.download, now=self.now, review=review
             )
         except DownloadError as error:
             self._finish(phase=UpdatePhase.FAILED, error=str(error))

@@ -1,5 +1,10 @@
 import { useEffect, useState } from "react";
-import { fetchOpenReviewCases, type OpenReviewCase } from "./openReviewCases";
+import {
+  STATUS_LABELS,
+  fetchOpenReviewCases,
+  isReviewed,
+  type ReviewCase,
+} from "./openReviewCases";
 import CaseDetail from "./CaseDetail";
 import CaseList from "./CaseList";
 import "./OpenReviewCasesPage.css";
@@ -7,14 +12,17 @@ import "./OpenReviewCasesPage.css";
 // Loads the open cases once, keeps the selection, and shows the loading,
 // error and empty states. Case presentation lives in CaseList and CaseDetail.
 export default function OpenReviewCasesPage() {
-  const [cases, setCases] = useState<OpenReviewCase[]>([]);
+  const [cases, setCases] = useState<ReviewCase[]>([]);
+  const [includeReviewed, setIncludeReviewed] = useState(false);
+  const [initials, setInitials] = useState("");
+  const [recorded, setRecorded] = useState<string | null>(null);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const controller = new AbortController();
-    fetchOpenReviewCases(controller.signal)
+    fetchOpenReviewCases(controller.signal, includeReviewed)
       .then((result) => {
         setCases(result);
         setSelectedId((selected) =>
@@ -34,7 +42,25 @@ export default function OpenReviewCasesPage() {
       })
       .finally(() => setLoading(false));
     return () => controller.abort();
-  }, []);
+  }, [includeReviewed]);
+
+  // Feature 007: show the recorded step at once; a reviewed case leaves the
+  // default list but stays findable with "Show reviewed cases".
+  function onRecorded(updated: ReviewCase, label: string) {
+    setRecorded(
+      `Recorded for ${updated.matchedRecord.medicineDisplay}: ${label}. Status: ${STATUS_LABELS[updated.status]}.`,
+    );
+    const next =
+      !includeReviewed && isReviewed(updated.status)
+        ? cases.filter((item) => item.caseId !== updated.caseId)
+        : cases.map((item) =>
+            item.caseId === updated.caseId ? updated : item,
+          );
+    setCases(next);
+    if (!next.some((item) => item.caseId === selectedId)) {
+      setSelectedId(next[0]?.caseId ?? null);
+    }
+  }
 
   const selectedCase = cases.find((item) => item.caseId === selectedId);
 
@@ -62,17 +88,46 @@ export default function OpenReviewCasesPage() {
           {error}
         </p>
       )}
+      <p className="review-recorded" role="status">
+        {recorded ?? ""}
+      </p>
       {!loading && !error && cases.length === 0 && (
-        <p className="empty-state">There are no NEW review cases.</p>
+        <div className="empty-state">
+          <p>
+            {includeReviewed
+              ? "There are no review cases."
+              : "There are no open review cases."}
+          </p>
+          <label className="case-reviewed-toggle">
+            <input
+              type="checkbox"
+              checked={includeReviewed}
+              onChange={(event) => setIncludeReviewed(event.target.checked)}
+            />
+            Show reviewed cases
+          </label>
+        </div>
       )}
       {!loading && !error && cases.length > 0 && (
         <div className="case-layout">
           <CaseList
             cases={cases}
             selectedId={selectedId}
-            onSelect={setSelectedId}
+            onSelect={(caseId) => {
+              setRecorded(null);
+              setSelectedId(caseId);
+            }}
+            includeReviewed={includeReviewed}
+            onIncludeReviewedChange={setIncludeReviewed}
           />
-          {selectedCase && <CaseDetail reviewCase={selectedCase} />}
+          {selectedCase && (
+            <CaseDetail
+              reviewCase={selectedCase}
+              initials={initials}
+              onInitialsChange={setInitials}
+              onRecorded={onRecorded}
+            />
+          )}
         </div>
       )}
     </div>

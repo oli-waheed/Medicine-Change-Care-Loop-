@@ -6,18 +6,24 @@ the latest file on request. Nothing here reads, changes or closes review cases.
 """
 
 from collections import Counter
-from datetime import UTC
+from datetime import UTC, datetime
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request, status
 from fastapi.responses import JSONResponse
 
 from ..config import ApplicationConfig
+from ..models import ShortageCaptureRow
 from ..schemas.medicine_catalogue import source_value
 from ..services.medicine_shortages import (
     ShortageFileReader,
     ShortageRecord,
     ShortageUpdate,
     update_status_response,
+)
+from ..services.shortage_review_cases import (
+    build_shortage_review,
+    detect_shortage_changes,
+    read_capture,
 )
 from .medicine_catalogue import catalogue_service
 
@@ -34,6 +40,45 @@ def shortage_update(app: FastAPI) -> ShortageUpdate:
         update = ShortageUpdate()
         app.state.shortage_update = update
     return update
+
+
+def shortage_review(app: FastAPI):
+    """Feature 007: compare two active shortage files and store cases and outcomes."""
+
+    def review(prior: ShortageCaptureRow, current: ShortageCaptureRow) -> dict:
+        service = catalogue_service(app)
+        try:
+            baseline = service.get_baseline()
+        except (ValueError, OSError):
+            baseline = None
+        packages = service.packages_by_vnr(baseline) if baseline is not None else None
+        prior_records, current_records = read_capture(prior), read_capture(current)
+        cases, outcomes = build_shortage_review(
+            prior_capture=prior,
+            prior_records=prior_records,
+            current_capture=current,
+            current_records=current_records,
+            baseline=baseline,
+            packages_by_vnr=packages,
+            records=tuple(app.state.medication_records),
+            now=datetime.now(UTC),
+        )
+        created = app.state.store.record_shortage_review(cases, outcomes)
+        return {
+            "comparedWith": prior.checksum,
+            "changes": len(detect_shortage_changes(prior_records, current_records)),
+            "outcomes": len(outcomes),
+            "reviewCasesCreated": created,
+        }
+
+    return review
+
+
+def start_shortage_update(app: FastAPI, trigger: str = "BUTTON"):
+    config: ApplicationConfig = app.state.source_release_config
+    return shortage_update(app).start(
+        app.state.store, config, trigger=trigger, review=shortage_review(app)
+    )
 
 
 def _reader(app: FastAPI) -> ShortageFileReader:
@@ -183,10 +228,9 @@ def get_shortage_update(request: Request) -> dict:
 
 
 @router.post("/update", status_code=status.HTTP_202_ACCEPTED)
-def start_shortage_update(request: Request) -> JSONResponse:
+def start_shortage_update_endpoint(request: Request) -> JSONResponse:
     """Download the latest shortage file now, unless an update is already running."""
-    config: ApplicationConfig = request.app.state.source_release_config
-    current, started = shortage_update(request.app).start(request.app.state.store, config)
+    current, started = start_shortage_update(request.app)
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content={**update_status_response(current), "started": started},

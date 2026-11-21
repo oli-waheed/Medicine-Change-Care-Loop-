@@ -97,6 +97,10 @@ const ALLOWED_BUTTONS = [
   /^Menu$/,
   /^Sidebar$/,
   /^Check for new Fimea release$/,
+  // Feature 007: a reviewer records a review step on a case.
+  /^Mark in progress$/,
+  /^Reviewed – (no action|follow-up) needed$/,
+  /^Reopen$/,
 ];
 // Feature 004: catalogue reading controls (open records, switch views, page).
 const CATALOGUE_BUTTONS = [
@@ -187,12 +191,23 @@ function expectOnlyAllowedControls(mode: Mode = "cases") {
     }
     expect(document.querySelectorAll("textarea, form")).toHaveLength(0);
   } else {
-    // The only form control allowed is the read-only case search.
+    // The case search, and (feature 007) the "Show reviewed cases" switch and
+    // the reviewer's initials and note. Never a select or a form.
+    const allowed = [
+      ["search", "Search cases"],
+      ["checkbox", "Show reviewed cases"],
+      ["text", "Your initials"],
+    ];
     for (const input of document.querySelectorAll("input")) {
-      expect(input).toHaveAttribute("type", "search");
-      expect(input).toHaveAccessibleName("Search cases");
+      expect(allowed).toContainEqual([
+        input.getAttribute("type"),
+        input.labels?.[0]?.textContent,
+      ]);
     }
-    expect(document.querySelectorAll("select, textarea, form")).toHaveLength(0);
+    for (const area of document.querySelectorAll("textarea")) {
+      expect(area.labels?.[0]?.textContent).toBe("Note");
+    }
+    expect(document.querySelectorAll("select, form")).toHaveLength(0);
   }
   expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
 }
