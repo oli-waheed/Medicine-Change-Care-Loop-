@@ -1,5 +1,7 @@
 # Medicine Change Care Loop
 
+[![CI](https://github.com/oli-waheed/Medicine-Change-Care-Loop-/actions/workflows/ci.yml/badge.svg)](https://github.com/oli-waheed/Medicine-Change-Care-Loop-/actions/workflows/ci.yml)
+
 A software development project exploring how changes in official medicine information can be captured, compared, and presented for pharmacist review.
 
 ## Overview
@@ -274,6 +276,8 @@ During local development, Vite proxies requests beginning with `/api` to the Fas
 Keep both backend and frontend development servers running while using the application.
 
 ## Testing
+
+Every push and pull request runs all the checks below on GitHub (`.github/workflows/ci.yml`): backend tests, Ruff check and format, frontend tests, Oxlint, Prettier, type check and build. The result shows on the commit and in the **Actions** tab; the badge at the top shows the latest run.
 
 ### Backend Tests
 

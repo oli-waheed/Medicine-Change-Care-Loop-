@@ -36,7 +36,8 @@ These fit the current constitution and use simulated records only.
    clean-ups (field restructuring, whitespace, case) so reviewers can set them
    aside. This must come before any pilot, or pharmacists get flooded.
 4. **Keep the weekly progress log current** (`docs/development-notes`).
-5. **Continuous integration**: run backend and frontend tests and linters on
+5. ~~Continuous integration~~ Done: `.github/workflows/ci.yml` (2026-11-21).
+   **Continuous integration**: run backend and frontend tests and linters on
    every push.
 
 ## 3. Pharmacy direction (after the course, or by amendment)
