@@ -47,6 +47,11 @@ class ComparisonResult:
     change_sets: tuple[PackageChangeSet, ...] = ()
 
 
+# Feature 015: read for linking records, not compared. Whether the holder becomes
+# a compared field is a team decision, like T018 for VNR.
+_NOT_COMPARED = frozenset({"haltija"})
+
+
 def project_snapshot_fields(snapshot: MedicineSnapshot) -> dict[str, tuple[SourceField, ...]]:
     names = {
         "kauppanimi": "Kauppanimi",
@@ -75,6 +80,8 @@ def project_snapshot_fields(snapshot: MedicineSnapshot) -> dict[str, tuple[Sourc
 
     def add(prefix, value):
         for field in fields(value):
+            if field.name in _NOT_COMPARED:
+                continue
             item = getattr(value, field.name)
             if isinstance(item, SourceField):
                 result[f"{prefix}/{names[field.name]}"] = (item,)

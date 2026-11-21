@@ -29,6 +29,7 @@ clinical decisions.
 | 012 New since your last visit | Marks new cases, shortages and source files per browser | Waiting for approval (T006) |
 | 013 Package timeline | Each package's changes across compared releases, with values | Waiting for approval (T007) |
 | 014 Completeness, structure and shortage coverage | Field-completeness and source-structure checks; "not listed is not available" on Medicine Shortages | Waiting for approval (T006) |
+| 015 Medicine change impact explorer | Linked records of a package or product, each verified, possible or missing | Waiting for approval (T007) |
 
 Decisions already taken: the backend's daily update is the only scheduler
 (T016); a VNR change counts as a change (T018); CI runs on every push.
@@ -59,7 +60,7 @@ packages changed; 957 of them carry a clean-up label (feature 008).
 
 | Proposed | Feature | Notes |
 |---|---|---|
-| 015 | **Medicine change impact explorer** | Links already in the data: package, product, VNR, active-substance code, strength, form, authorisation holder. Shows verified links, possible links and missing information separately. No graph database needed. |
+| ~~015~~ Built (2026-11-21) | **Medicine change impact explorer** | Links already in the data: package, product, VNR, active-substance code, strength, form, authorisation holder. Shows verified links, possible links and missing information separately. No graph database needed. |
 | 016 | **Supply signals** | Facts side by side for a package or substance: shortage reported and since when, how long earlier shortages lasted, authorisation status, packages with the same VNR or substance. **No prediction and no "risk" score**: the clinical-scope guards forbid such wording, and an unvalidated indicator would look like a clinical assessment. |
 | 017 | **Read-only medicine intelligence API** | Documented, versioned endpoints for changes, shortages and quality checks; the base for route B in §3.2. |
 | 018 | **Portfolio release** | Architecture and data-flow diagrams, a guided demo, the limitations and safety statement, interview findings. |
@@ -109,7 +110,7 @@ a proposal until enacted.
 
 ### 3.3 Foundation work both routes need
 
-Proposed as a feature after 018 (numbers 001–014 are used):
+Proposed as a feature after 018 (numbers 001–015 are used):
 
 - organisations and user accounts with role-based permissions;
 - an audit log of who reviewed what and when (feature 007 records initials and

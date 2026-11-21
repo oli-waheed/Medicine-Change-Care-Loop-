@@ -279,6 +279,71 @@ export function fetchPackageHistory(
   );
 }
 
+// Feature 015: records linked to a package or product.
+export type LinkCertainty = "VERIFIED" | "POSSIBLE" | "MISSING";
+
+export type LinkedPackage = {
+  pakkaustunnus: string;
+  productReference: string;
+  name: SourceField;
+  strength: SourceField;
+  packageSizeText: SourceField;
+  vnr: SourceField;
+};
+
+export type LinkedProduct = {
+  productReference: string;
+  name: SourceField;
+  strength: SourceField;
+  form: SourceField;
+  holders: string[];
+  packageCount: number;
+};
+
+export type LinkedShortage = {
+  line: number;
+  vnr: string;
+  valid: string;
+  unavailableFrom: string;
+  endingDate: string;
+  updated: string;
+  company: string;
+};
+
+export type LinkGroup = {
+  id: string;
+  label: string;
+  certainty: LinkCertainty;
+  basis: string;
+  total: number;
+  note: string | null;
+} & (
+  | { itemKind: "package"; items: LinkedPackage[] }
+  | { itemKind: "product"; items: LinkedProduct[] }
+  | { itemKind: "shortage"; items: LinkedShortage[] }
+  | { itemKind: "none"; items: [] }
+);
+
+export type LinkedRecords = {
+  releaseId: string;
+  anchorPackages: string[];
+  shortageSource: { captureReference: string; lastRetrievedAt: string } | null;
+  notice: string;
+  groups: LinkGroup[];
+};
+
+export function fetchLinks(
+  kind: "package" | "product",
+  id: string,
+  signal?: AbortSignal,
+) {
+  const segment = kind === "package" ? "packages" : "products";
+  return getJson<LinkedRecords>(
+    `${BASE}/${segment}/${encodeURIComponent(id)}/links`,
+    signal,
+  );
+}
+
 // Substances can occur in thousands of packages, so pages stay small.
 export const SUBSTANCE_PAGE_SIZE = 25;
 

@@ -3,6 +3,7 @@
 // (missing VNR on SIM-PKG-400, SIM-PKG-200/500 sharing a VNR, two substances
 // on SYN-PROD-100). Only synthetic fixtures; no Fimea data.
 import responses from "./catalogueResponses.json";
+import LINKS from "./linkedRecordsResponses.json";
 import HISTORIES from "./packageHistoryResponses.json";
 
 const RESPONSES = responses as Record<string, unknown>;
@@ -28,6 +29,22 @@ export function catalogueFetch(url: string): FakeResponse {
   if (url in RESPONSES) return reply(200, RESPONSES[url]);
   // Feature 013: package histories captured from the real backend over three
   // synthetic releases; other packages have none.
+  // Feature 015: linked records captured from the real backend over the
+  // synthetic links release; other records have none.
+  if (url.endsWith("/links")) {
+    const links = (LINKS as Record<string, unknown>)[url];
+    return reply(
+      200,
+      links ?? {
+        releaseId: "synthetic",
+        anchorPackages: [],
+        shortageSource: null,
+        notice:
+          "Links show shared identifiers and values in Fimea's source only. They say nothing about whether one product can be used in place of another.",
+        groups: [],
+      },
+    );
+  }
   if (url.endsWith("/history")) {
     const history = (HISTORIES as Record<string, unknown>)[url];
     return reply(

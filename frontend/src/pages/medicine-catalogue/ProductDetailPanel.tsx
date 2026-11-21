@@ -5,16 +5,19 @@ import {
   SubstanceTable,
 } from "./catalogueParts";
 import { CatalogueErrorMessage, LoadingMessage } from "./CatalogueStates";
+import LinkedRecordsCard from "./LinkedRecordsCard";
 import { fetchProduct, type ProductSummary } from "./medicineCatalogue";
 import { useCatalogueRequest } from "./useCatalogueRequest";
 
 export default function ProductDetailPanel({
   productReference,
   onOpenPackage,
+  onOpenProduct,
   onAddToComparison,
 }: {
   productReference: string;
   onOpenPackage: (pakkaustunnus: string) => void;
+  onOpenProduct?: (productReference: string) => void;
   onAddToComparison: (product: ProductSummary) => void;
 }) {
   const state = useCatalogueRequest(`product:${productReference}`, (signal) =>
@@ -113,6 +116,15 @@ export default function ProductDetailPanel({
         <h3>Authorization and registration</h3>
         <AuthorizationList items={product.authorizations} />
       </section>
+
+      {product.productReference && (
+        <LinkedRecordsCard
+          kind="product"
+          id={product.productReference}
+          onOpenPackage={onOpenPackage}
+          onOpenProduct={onOpenProduct}
+        />
+      )}
     </article>
   );
 }

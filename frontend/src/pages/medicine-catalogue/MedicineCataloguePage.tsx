@@ -135,6 +135,7 @@ export default function MedicineCataloguePage() {
                 key={detail.id}
                 productReference={detail.id}
                 onOpenPackage={(id) => show({ kind: "package", id })}
+                onOpenProduct={(id) => show({ kind: "product", id })}
                 onAddToComparison={addToComparison}
               />
             )}

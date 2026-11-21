@@ -1,0 +1,625 @@
+{
+  "/api/medicine-catalogue/packages/SIM-PKG-L11/links": {
+    "releaseId": "sha256-fcc91b3da409a765d3629d03120b823317b0635df1787fd31241f25f59c21e4f",
+    "anchorPackages": ["SIM-PKG-L11"],
+    "shortageSource": {
+      "captureReference": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+      "lastRetrievedAt": "2099-02-01T07:00:00"
+    },
+    "notice": "Links show shared identifiers and values in Fimea's source only. They say nothing about whether one product can be used in place of another.",
+    "groups": [
+      {
+        "id": "SAME_PRODUCT",
+        "label": "Other packages of the same product",
+        "certainty": "VERIFIED",
+        "basis": "Same product reference (Laakevalmiste) in this release.",
+        "itemKind": "package",
+        "total": 1,
+        "items": [
+          {
+            "pakkaustunnus": "SIM-PKG-L12",
+            "productReference": "SYN-PROD-L1",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 10",
+              "attributes": {}
+            },
+            "packageSizeText": {
+              "state": "value",
+              "value": "synthetic pack SIM-PKG-L12",
+              "attributes": {}
+            },
+            "vnr": {
+              "state": "value",
+              "value": "SIM-VNR-L12",
+              "attributes": {}
+            }
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_VNR",
+        "label": "Other packages with the same VNR",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same VNR (SIM-VNR-200).",
+        "itemKind": "package",
+        "total": 1,
+        "items": [
+          {
+            "pakkaustunnus": "SIM-PKG-L21",
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "packageSizeText": {
+              "state": "value",
+              "value": "synthetic pack SIM-PKG-L21",
+              "attributes": {}
+            },
+            "vnr": {
+              "state": "value",
+              "value": "SIM-VNR-200",
+              "attributes": {}
+            }
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_SUBSTANCES",
+        "label": "Products with the same active substances (other strengths and forms)",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same set of active-substance codes (Aine id).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SHARES_SUBSTANCE",
+        "label": "Products that share at least one active substance",
+        "certainty": "VERIFIED",
+        "basis": "At least one active-substance code (Aine id) in common, but not all.",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L3",
+            "name": {
+              "state": "value",
+              "value": "Fictional Combo",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 5/5",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["fictional  pharma OY"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_HOLDER",
+        "label": "Other products of the same holder",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same holder text (Fictional Pharma Oy).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SIMILAR_HOLDER",
+        "label": "Holder written differently",
+        "certainty": "POSSIBLE",
+        "basis": "The holder text differs only in spaces or letter case.",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L3",
+            "name": {
+              "state": "value",
+              "value": "Fictional Combo",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 5/5",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["fictional  pharma OY"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_NAME",
+        "label": "Other product records with the same trade name",
+        "certainty": "POSSIBLE",
+        "basis": "Only the trade name matches (ignoring spaces and letter case).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SHORTAGES",
+        "label": "Shortages reported to Fimea",
+        "certainty": "VERIFIED",
+        "basis": "Rows of the shortage file with the same VNR (SIM-VNR-200), as published.",
+        "itemKind": "shortage",
+        "total": 1,
+        "items": [
+          {
+            "line": 2,
+            "vnr": "SIM-VNR-200",
+            "valid": "K",
+            "unavailableFrom": "2099-01-01",
+            "endingDate": "2099-02-15",
+            "updated": "2099-01-02",
+            "company": "Fictional Pharma Oy"
+          }
+        ],
+        "note": null
+      }
+    ]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-L41/links": {
+    "releaseId": "sha256-fcc91b3da409a765d3629d03120b823317b0635df1787fd31241f25f59c21e4f",
+    "anchorPackages": ["SIM-PKG-L41"],
+    "shortageSource": {
+      "captureReference": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+      "lastRetrievedAt": "2099-02-01T07:00:00"
+    },
+    "notice": "Links show shared identifiers and values in Fimea's source only. They say nothing about whether one product can be used in place of another.",
+    "groups": [
+      {
+        "id": "SAME_PRODUCT",
+        "label": "Other packages of the same product",
+        "certainty": "VERIFIED",
+        "basis": "Same product reference (Laakevalmiste) in this release.",
+        "itemKind": "package",
+        "total": 0,
+        "items": [],
+        "note": null
+      },
+      {
+        "id": "SAME_VNR",
+        "label": "Other packages with the same VNR",
+        "certainty": "MISSING",
+        "basis": "No VNR in the source for this record, so no VNR link can be made.",
+        "itemKind": "none",
+        "total": 0,
+        "items": [],
+        "note": null
+      },
+      {
+        "id": "SUBSTANCE_BY_NAME",
+        "label": "Products with an active substance of the same name",
+        "certainty": "POSSIBLE",
+        "basis": "Some active substances have no code in the source; these share only the name.",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L5",
+            "name": {
+              "state": "value",
+              "value": "Fictional Plainmate",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 2",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Synthetic Medicines Ab"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_HOLDER",
+        "label": "Other products of the same holder",
+        "certainty": "MISSING",
+        "basis": "No holder (Haltija) is recorded for this record in the source.",
+        "itemKind": "none",
+        "total": 0,
+        "items": [],
+        "note": null
+      },
+      {
+        "id": "SAME_NAME",
+        "label": "Other product records with the same trade name",
+        "certainty": "POSSIBLE",
+        "basis": "Only the trade name matches (ignoring spaces and letter case).",
+        "itemKind": "product",
+        "total": 0,
+        "items": [],
+        "note": null
+      },
+      {
+        "id": "SHORTAGES",
+        "label": "Shortages reported to Fimea",
+        "certainty": "MISSING",
+        "basis": "No VNR in the source, so Fimea's shortage file cannot be linked.",
+        "itemKind": "none",
+        "total": 0,
+        "items": [],
+        "note": null
+      }
+    ]
+  },
+  "/api/medicine-catalogue/products/SYN-PROD-L1/links": {
+    "releaseId": "sha256-fcc91b3da409a765d3629d03120b823317b0635df1787fd31241f25f59c21e4f",
+    "anchorPackages": ["SIM-PKG-L11", "SIM-PKG-L12"],
+    "shortageSource": {
+      "captureReference": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+      "lastRetrievedAt": "2099-02-01T07:00:00"
+    },
+    "notice": "Links show shared identifiers and values in Fimea's source only. They say nothing about whether one product can be used in place of another.",
+    "groups": [
+      {
+        "id": "SAME_PRODUCT",
+        "label": "Other packages of the same product",
+        "certainty": "VERIFIED",
+        "basis": "Same product reference (Laakevalmiste) in this release.",
+        "itemKind": "package",
+        "total": 0,
+        "items": [],
+        "note": null
+      },
+      {
+        "id": "SAME_VNR",
+        "label": "Other packages with the same VNR",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same VNR (SIM-VNR-200, SIM-VNR-L12).",
+        "itemKind": "package",
+        "total": 1,
+        "items": [
+          {
+            "pakkaustunnus": "SIM-PKG-L21",
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "packageSizeText": {
+              "state": "value",
+              "value": "synthetic pack SIM-PKG-L21",
+              "attributes": {}
+            },
+            "vnr": {
+              "state": "value",
+              "value": "SIM-VNR-200",
+              "attributes": {}
+            }
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_SUBSTANCES",
+        "label": "Products with the same active substances (other strengths and forms)",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same set of active-substance codes (Aine id).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SHARES_SUBSTANCE",
+        "label": "Products that share at least one active substance",
+        "certainty": "VERIFIED",
+        "basis": "At least one active-substance code (Aine id) in common, but not all.",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L3",
+            "name": {
+              "state": "value",
+              "value": "Fictional Combo",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 5/5",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["fictional  pharma OY"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_HOLDER",
+        "label": "Other products of the same holder",
+        "certainty": "VERIFIED",
+        "basis": "Exactly the same holder text (Fictional Pharma Oy).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SIMILAR_HOLDER",
+        "label": "Holder written differently",
+        "certainty": "POSSIBLE",
+        "basis": "The holder text differs only in spaces or letter case.",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L3",
+            "name": {
+              "state": "value",
+              "value": "Fictional Combo",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 5/5",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["fictional  pharma OY"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SAME_NAME",
+        "label": "Other product records with the same trade name",
+        "certainty": "POSSIBLE",
+        "basis": "Only the trade name matches (ignoring spaces and letter case).",
+        "itemKind": "product",
+        "total": 1,
+        "items": [
+          {
+            "productReference": "SYN-PROD-L2",
+            "name": {
+              "state": "value",
+              "value": "Fictional Linkol",
+              "attributes": {}
+            },
+            "strength": {
+              "state": "value",
+              "value": "synthetic strength 20",
+              "attributes": {}
+            },
+            "form": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-FORM",
+                "id": "SIM-F01",
+                "value": "fictional form"
+              }
+            },
+            "holders": ["Fictional Pharma Oy"],
+            "packageCount": 1
+          }
+        ],
+        "note": null
+      },
+      {
+        "id": "SHORTAGES",
+        "label": "Shortages reported to Fimea",
+        "certainty": "VERIFIED",
+        "basis": "Rows of the shortage file with the same VNR (SIM-VNR-200, SIM-VNR-L12), as published.",
+        "itemKind": "shortage",
+        "total": 1,
+        "items": [
+          {
+            "line": 2,
+            "vnr": "SIM-VNR-200",
+            "valid": "K",
+            "unavailableFrom": "2099-01-01",
+            "endingDate": "2099-02-15",
+            "updated": "2099-01-02",
+            "company": "Fictional Pharma Oy"
+          }
+        ],
+        "note": null
+      }
+    ]
+  }
+}

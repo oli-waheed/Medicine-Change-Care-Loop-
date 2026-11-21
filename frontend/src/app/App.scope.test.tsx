@@ -119,6 +119,8 @@ const CATALOGUE_BUTTONS = [
   /^Clear search and filters$/,
   /^(Show occurrences \(\d+\)|Hide occurrences)$/,
   /^(Previous|Next) page$/,
+  // Feature 015: unfold or fold a long group of linked records.
+  /^(Show more \(\d+\)|Show fewer)$/,
 ];
 const CATALOGUE_INPUTS = [
   "Search medicines",

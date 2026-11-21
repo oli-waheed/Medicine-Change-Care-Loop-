@@ -16,6 +16,7 @@ from ..services.medicine_catalogue import (
     CatalogueUnavailableError,
     MedicineCatalogueService,
 )
+from ..services.medicine_links import LinkIndexCache, links_for
 from ..services.source_cleanup_labels import cleanup_label, formatting_only
 
 router = APIRouter(prefix="/api/medicine-catalogue", tags=["medicine-catalogue"])
@@ -134,6 +135,71 @@ def get_package(request: Request, pakkaustunnus: str) -> dict[str, object]:
             detail={"code": "PACKAGE_NOT_FOUND", "releaseId": baseline.release_id},
         )
     return schema.package_detail(baseline, view)
+
+
+def _links(request: Request, baseline, anchors) -> dict[str, object]:
+    """Feature 015: groups of records linked to the anchor package(s)."""
+
+    from .medicine_shortages import _reader  # the shortage page's cached reader
+
+    app = request.app
+    cache = getattr(app.state, "link_index_cache", None)
+    if cache is None:
+        cache = app.state.link_index_cache = LinkIndexCache()
+    index = cache.get(baseline.release_id, baseline.snapshots)
+    try:
+        active = _reader(app).active(app.state.store)
+        shortages = active.records if active is not None else None
+        shortage_source = (
+            {
+                "captureReference": active.capture.checksum,
+                "lastRetrievedAt": active.capture.last_retrieved_at.isoformat(),
+            }
+            if active is not None
+            else None
+        )
+    except (ValueError, OSError):
+        shortages, shortage_source = None, None
+    return {
+        "releaseId": baseline.release_id,
+        "anchorPackages": [a.pakkaustunnus for a in anchors],
+        "shortageSource": shortage_source,
+        "notice": (
+            "Links show shared identifiers and values in Fimea's source only. They say "
+            "nothing about whether one product can be used in place of another."
+        ),
+        "groups": links_for(index, anchors, shortages=shortages),
+    }
+
+
+@router.get("/packages/{pakkaustunnus}/links")
+def get_package_links(request: Request, pakkaustunnus: str) -> dict[str, object]:
+    """Feature 015: records linked to one package (read-only)."""
+
+    service = _service(request)
+    baseline = _baseline(service)
+    view = service.package(pakkaustunnus)
+    if view is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "PACKAGE_NOT_FOUND", "releaseId": baseline.release_id},
+        )
+    return _links(request, baseline, (view.snapshot,))
+
+
+@router.get("/products/{product_reference}/links")
+def get_product_links(request: Request, product_reference: str) -> dict[str, object]:
+    """Feature 015: records linked to all packages of one product (read-only)."""
+
+    service = _service(request)
+    baseline = _baseline(service)
+    view = service.product(product_reference)
+    if view is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "PRODUCT_NOT_FOUND", "releaseId": baseline.release_id},
+        )
+    return _links(request, baseline, view.packages)
 
 
 @router.get("/packages/{pakkaustunnus}/history")

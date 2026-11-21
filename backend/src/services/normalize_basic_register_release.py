@@ -152,6 +152,7 @@ def normalize_basic_register_release(
                     field(item, "Tila"),
                     field(item, "Myontamispaiva"),
                     field(item, "Paattymispaiva"),
+                    field(item, "Haltija"),
                 )
                 for item in product
                 if item.tag in _BRANCHES

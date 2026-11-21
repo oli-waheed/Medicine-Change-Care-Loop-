@@ -7,6 +7,7 @@ import {
   SubstanceTable,
 } from "./catalogueParts";
 import { CatalogueErrorMessage, LoadingMessage } from "./CatalogueStates";
+import LinkedRecordsCard from "./LinkedRecordsCard";
 import PackageHistoryCard from "./PackageHistoryCard";
 import { fetchPackage } from "./medicineCatalogue";
 import { useCatalogueRequest } from "./useCatalogueRequest";
@@ -126,6 +127,13 @@ export default function PackageDetailPanel({
         <h3>Authorization and registration</h3>
         <AuthorizationList items={authorizations} />
       </section>
+
+      <LinkedRecordsCard
+        kind="package"
+        id={pkg.pakkaustunnus}
+        onOpenPackage={onOpenPackage}
+        onOpenProduct={onOpenProduct}
+      />
 
       <PackageHistoryCard pakkaustunnus={pkg.pakkaustunnus} />
 

@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Feature 015: synthetic release for linked records. SYN-PROD-L1 and -L2 share
+     the same substance code, holder and trade name; SIM-PKG-L11 and -L21 share a
+     VNR that the synthetic shortage file lists; SYN-PROD-L3 shares one substance
+     and has the holder written differently; SYN-PROD-L4 has no VNR, no holder and
+     a substance without a code, whose name SYN-PROD-L5 shares. -->
+<Perusrekisteri>
+  <Versiotiedot>
+    <Ajopvm>2099-02-01</Ajopvm>
+    <Aineistoera>SIM-2099-020</Aineistoera>
+    <Kkera>synthetic links batch</Kkera>
+    <Kattavuus>1</Kattavuus>
+  </Versiotiedot>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L1">
+    <Pakkaustunnus>SIM-PKG-L11</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-200</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L11</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L1"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L1">
+    <Pakkaustunnus>SIM-PKG-L12</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-L12</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L12</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L1"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L2">
+    <Pakkaustunnus>SIM-PKG-L21</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-200</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L21</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L1"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L3">
+    <Pakkaustunnus>SIM-PKG-L31</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-L31</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L31</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L3"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L4">
+    <Pakkaustunnus>SIM-PKG-L41</Pakkaustunnus>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L41</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L4"/>
+  </Pakkaus>
+  <Pakkaus Laakevalmiste-ref="SYN-PROD-L5">
+    <Pakkaustunnus>SIM-PKG-L51</Pakkaustunnus>
+    <VNR-numero>SIM-VNR-L51</VNR-numero>
+    <Pakkauskokoteksti>synthetic pack SIM-PKG-L51</Pakkauskokoteksti>
+    <Kaupanolo>
+      <Kaupan>1</Kaupan>
+      <Kauppaantulopaiva>2099-01-01</Kauppaantulopaiva>
+      <Kaupastapoistumispaiva/>
+    </Kaupanolo>
+    <Pakkaus_Laakeaine Laakeaine-ref="SYN-SUB-L5"/>
+  </Pakkaus>
+  <Laakevalmiste id="SYN-PROD-L1">
+    <Kauppanimi>Fictional Linkol</Kauppanimi>
+    <Vahvuus>synthetic strength 10</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva/>
+      <Haltija>Fictional Pharma Oy</Haltija>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-L2">
+    <Kauppanimi>Fictional Linkol</Kauppanimi>
+    <Vahvuus>synthetic strength 20</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva/>
+      <Haltija>Fictional Pharma Oy</Haltija>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-L3">
+    <Kauppanimi>Fictional Combo</Kauppanimi>
+    <Vahvuus>synthetic strength 5/5</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva/>
+      <Haltija>fictional  pharma OY</Haltija>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-L4">
+    <Kauppanimi>Fictional Nocode</Kauppanimi>
+    <Vahvuus>synthetic strength 1</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva/>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakevalmiste id="SYN-PROD-L5">
+    <Kauppanimi>Fictional Plainmate</Kauppanimi>
+    <Vahvuus>synthetic strength 2</Vahvuus>
+    <Laakemuoto listname="SIM-FORM" id="SIM-F01" value="fictional form"/>
+    <Myyntilupa>
+      <Tila listname="SIM-AUTH" id="SIM-ACTIVE" value="synthetic active"/>
+      <Myontamispaiva>2098-01-01</Myontamispaiva>
+      <Paattymispaiva/>
+      <Haltija>Synthetic Medicines Ab</Haltija>
+    </Myyntilupa>
+  </Laakevalmiste>
+  <Laakeaine id="SYN-SUB-L1">
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SL01" value="fictional substance link"/>
+      <JakamatonVahvuus>synthetic amount</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+  <Laakeaine id="SYN-SUB-L3">
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SL01" value="fictional substance link"/>
+      <JakamatonVahvuus>synthetic amount</JakamatonVahvuus>
+    </VaikuttavaAine>
+    <VaikuttavaAine>
+      <Aine listname="SIM-SUBSTANCE" id="SIM-SL02" value="fictional substance other"/>
+      <JakamatonVahvuus>synthetic amount</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+  <Laakeaine id="SYN-SUB-L4">
+    <VaikuttavaAine>
+      <Aine>Fictional substance plain</Aine>
+      <JakamatonVahvuus>synthetic amount</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+  <Laakeaine id="SYN-SUB-L5">
+    <VaikuttavaAine>
+      <Aine>fictional substance  plain</Aine>
+      <JakamatonVahvuus>synthetic amount</JakamatonVahvuus>
+    </VaikuttavaAine>
+  </Laakeaine>
+</Perusrekisteri>

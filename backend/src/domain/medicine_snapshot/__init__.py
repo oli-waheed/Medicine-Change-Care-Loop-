@@ -44,6 +44,9 @@ class AuthorizationRegistrationFields:
     tila: SourceField
     myontamis_paiva: SourceField
     paattymis_paiva: SourceField
+    # Feature 015: the authorisation or registration holder (Haltija). Read for
+    # linking records only; it is not a compared field (see detect_relevant_changes).
+    haltija: SourceField = SourceField.missing()
 
 
 @dataclass(frozen=True, slots=True)
