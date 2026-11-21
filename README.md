@@ -8,11 +8,13 @@ Medicine Change Care Loop is a prototype that monitors changes in medicine infor
 
 The system captures official source releases, preserves their original data and provenance, and supports the identification of changes between comparable medicine package records. Relevant changes can be linked to simulated medication records and presented as review cases with supporting evidence.
 
+The same validated release can be browsed in a read-only Medicine Catalogue, and Fimea's open shortage data is shown next to the matching catalogue packages. The backend keeps both sources up to date with a daily automatic update.
+
 The project focuses on traceability, evidence quality, and pharmacist-led review.
 
 ## Key Features
 
-- Retrieve the Fimea Basic Register XML source.
+- Retrieve the Fimea Basic Register XML source and Fimea's open shortage data.
 - Capture and preserve original source-release files.
 - Calculate and store source-file checksums.
 - Validate and normalize source data.
@@ -29,7 +31,7 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Check Fimea for a new release from About the Data with one button, which downloads and loads it like the daily workflow (feature 005).
 - See the medicine shortages reported to Fimea, matched to catalogue packages by VNR, on a Medicine Shortages page with an update button; the backend updates the shortage data and the Basic Register automatically every day (feature 006).
 - Store an unchanged daily download only once, recording each retrieval time.
-- Provide APIs for retrieving open review cases and change processing outcomes.
+- Provide APIs for review cases, change processing outcomes, the medicine catalogue, shortage data and the update status.
 
 ## How It Works
 
@@ -45,6 +47,8 @@ The source-ingestion and review process follows these main steps:
 8. Create one review case per package update and matched record for pharmacist assessment.
 9. Present the changes and supporting evidence through the application interface.
 
+Alongside this, the latest validated release is available as a read-only Medicine Catalogue, and Fimea's shortage file is downloaded, checked, stored once per content and matched to catalogue packages by VNR. Once a day the backend updates both automatically (feature 006); each can also be updated with a button.
+
 A source-data change does not automatically mean that there is a clinically significant change.
 
 ## Technology Stack
@@ -57,16 +61,18 @@ A source-data change does not automatically mean that there is a clinically sign
 | Backend | Python 3.13, FastAPI |
 | Database | SQLite via SQLAlchemy |
 | Backend testing | pytest |
-| Workflow automation | n8n |
+| Workflow automation | n8n, and the backend's own daily update (feature 006) |
 | Source format | XML |
 | Version control | Git and GitHub |
 
 ## Application Interface
 
-The frontend is a light-themed review workspace in the approved navy and teal design. A sidebar holds the product name, links to the two pages, the Fimea attribution with the CC BY 4.0 licence link, and the application version once `frontend/package.json` has a real version (the placeholder `0.0.0` is hidden). The sidebar is persistent from 1024 px wide, collapses to an icon rail with a **Sidebar** toggle on tablets, and opens from a **Menu** button on phones.
+The frontend is a light-themed review workspace in the approved navy and teal design. A sidebar holds the project logo (a gold bird, crescent and bowl of Hygieia, `frontend/src/assets/brand-logo.png`) and product name, links to the four pages, the Fimea attribution with the CC BY 4.0 licence link, and the application version once `frontend/package.json` has a real version (the placeholder `0.0.0` is hidden). The sidebar is persistent from 1024 px wide, collapses to an icon rail with a **Sidebar** toggle on tablets, and opens from a **Menu** button on phones.
 
 - **Open Review Cases** (`/`): a searchable case queue (by medicine name, identifier or change summary; arrow keys move between cases) and the selected case.
-- **About the Data** (`/about-data`): simulated records, the Fimea data source and licence, attribution, and limitations.
+- **Medicine Catalogue** (`/medicine-catalogue`): packages, products and active substances of the active validated release as the source records them; search, filters, package and product records with provenance, and a two-product comparison (feature 004).
+- **Medicine Shortages** (`/medicine-shortages`): the shortages in Fimea's open shortage file, in the file's order and as published, with the matching catalogue packages by VNR; search, a status filter, the **Update shortage data** button and the daily update's last run (feature 006).
+- **About the Data** (`/about-data`): simulated records, the Fimea data sources and licence, attribution, limitations, and the **Check for new Fimea release** button (feature 005).
 - Any other address shows **Page not found**.
 
 Changed packages and packages no longer present in the register have separate review layouts. Changed fields show their prior-release and current-release values and whether the field was added, removed or changed in the source. Every page starts with a "Skip to main content" link and can be used with the keyboard alone; text meets WCAG 2.2 AA contrast.
@@ -143,10 +149,12 @@ While the backend runs, it downloads Fimea's shortage file (`Shortages.txt`) and
 
 Source data: **Basic register for medicinal products (Perusrekisteri), Finnish Medicines Agency Fimea**, published as open data under the [Creative Commons Attribution 4.0 (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/) licence ([Fimea open data](https://fimea.fi/en/about_us/open-data)).
 
+Shortage data: **Fimea's open shortage data** (`Shortages.txt`), under the same licence. It lists the shortages that marketing authorisation holders report to Fimea, by VNR. Its dates and status are the companies' reports, shown as published; the end date is an estimate.
+
 - When presenting or sharing results, name Fimea as the licensor, the material ("Basic register for medicinal products"), and the release date of the data used. Each review case shows the release date (`Ajopvm`) and retrieval time of its source files.
 - This project changes the presentation of the data: it normalizes selected fields and compares successive releases. The comparisons are this project's, not Fimea's.
 - Fimea notes that individual errors may occur in the register and does not guarantee that the online data is complete or up to date.
-- The test fixtures in `tests/fixtures/` are synthetic and are not Fimea data.
+- The test fixtures in `tests/fixtures/` (including `tests/fixtures/fimea-shortages/`) are synthetic and are not Fimea data.
 
 ## Safety and Project Scope
 
@@ -157,7 +165,7 @@ The following boundaries apply:
 - Only synthetic medication records are used.
 - No patient-identifiable information is processed.
 - The system does not diagnose medical conditions.
-- The system does not recommend treatments or medicine substitutions.
+- The system does not recommend treatments or medicine substitutions; the shortage page lists packages only and does not point to other products.
 - The system does not make autonomous clinical decisions.
 - Pharmacists remain responsible for reviewing and assessing the presented information.
 - Source-data changes are not automatically considered clinically significant.
@@ -201,7 +209,7 @@ The backend runs at `http://127.0.0.1:8000` while the server is running. It has 
 
 #### Backend configuration and data
 
-Cases, case status events and the source-release capture history are stored in SQLite, so they survive a restart. Raw source files are stored as immutable captures on disk; after a restart, the comparison baseline is rebuilt from its captured raw file, which is checked against its recorded checksum first. A download whose content is already captured, such as an unchanged daily file, is not stored again; only its retrieval time is recorded. If a raw file is later removed, the cases that rely on it are shown as having unavailable evidence.
+Cases, case status events, the source-release capture history, the shortage downloads and the daily update runs are stored in SQLite, so they survive a restart. Raw source files are stored as immutable captures on disk; after a restart, the comparison baseline is rebuilt from its captured raw file, which is checked against its recorded checksum first. A download whose content is already captured, such as an unchanged daily file, is not stored again; only its retrieval time is recorded. If a raw file is later removed, the cases that rely on it are shown as having unavailable evidence.
 
 | Environment variable | Default | Purpose |
 |---|---|---|
@@ -209,11 +217,27 @@ Cases, case status events and the source-release capture history are stored in S
 | `SOURCE_RELEASE_STORAGE_DIR` | `backend/data/source-releases` | Immutable raw-release captures. |
 | `SIMULATED_MEDICATION_RECORDS_PATH` | `backend/seed/simulated-medication-records.json` | Fictional medication records used for matching. Without this file no cases can be created. |
 | `MAX_SOURCE_RELEASE_UPLOAD_BYTES` | `262144000` | Upload and download size limit. |
+| `FIMEA_RELEASE_URL` | `https://data.pilvi.fimea.fi/avoin-data/Perusrekisteri.xml` | Basic Register address used by "Check for new Fimea release" (feature 005) and the daily update (feature 006); the n8n workflow's address. |
 | `FIMEA_SHORTAGES_URL` | `https://data.pilvi.fimea.fi/avoin-data/Shortages.txt` | Fimea's open-data shortage file (feature 006). |
 | `DAILY_UPDATE_TIME` | `06:00` | Local time of the daily automatic update of the shortage file and the Basic Register; `off` disables it. |
-| `FIMEA_RELEASE_URL` | `https://data.pilvi.fimea.fi/avoin-data/Perusrekisteri.xml` | Address used by "Check for new Fimea release" (the n8n workflow's address). |
 
 `backend/data/` is git-ignored. Delete it to start from an empty state; the schema is created automatically. The schema is not migrated automatically: after pulling a change to the case model, delete `backend/data/` once.
+
+#### Running with real Fimea data
+
+Keep real Fimea data in its own database. The synthetic test releases are dated 2099, so in the default database they stay newer than any real release and hide it. In PowerShell, set both variables in the window that starts the backend:
+
+```powershell
+$env:DATABASE_URL = "sqlite:///backend/data/real/real.sqlite3"
+$env:SOURCE_RELEASE_STORAGE_DIR = "backend/data/real/source-releases"
+uvicorn backend.src.main:app
+```
+
+The settings apply only to that window; a new window without them uses the test database again. The real database fills itself: the daily update downloads both the Basic Register and the shortage file, and **Check for new Fimea release** and **Update shortage data** do the same on request. Be aware of the size of a real release (measured on the 2026-10-06 release, feature 004 T005):
+
+- The Basic Register file is about 190 MB (about 146,000 packages). Loading it takes one to two minutes and about 2.3 GB of memory.
+- A backend started after `DAILY_UPDATE_TIME` runs that day's update at once, so the first start of the day downloads both files.
+- After a restart, the first catalogue request rebuilds the release (about 35 seconds); the daily update and the release check prepare it in advance. The shortage list does not wait: it shows the shortages first and adds the catalogue packages when ready.
 
 The seed records match the synthetic test fixtures: `SIM-PKG-100` produces a case with several field changes and `SIM-PKG-300` a case for a package that is no longer present in the register. To see cases from live Fimea data, add fictional records whose `Pakkaustunnus` is a real public package identifier from the register. Never add real patient data.
 
@@ -305,6 +329,7 @@ Medicine-Change-Care-Loop/
 +-- frontend/
 |   +-- src/
 |   |   +-- app/
+|   |   +-- assets/
 |   |   +-- pages/
 |   |   +-- test/
 |   +-- package.json
@@ -320,6 +345,7 @@ Medicine-Change-Care-Loop/
 |   +-- integration/
 |
 +-- specs/
+|   +-- 001-ingestion-case-pipeline/ ... 006-medicine-shortages/
 +-- project-plans/
 +-- docs/
 |   +-- development-notes/
@@ -329,7 +355,14 @@ Medicine-Change-Care-Loop/
 
 ## Project Status
 
-All tasks of the feature specification (T001–T036 in [tasks.md](specs/001-ingestion-case-pipeline/tasks.md)) are implemented, and the specification lists no known gaps ([spec.md](specs/001-ingestion-case-pipeline/spec.md#implementation-status)).
+| Feature | Specification | Tasks |
+|---|---|---|
+| 001 Ingestion-to-case pipeline | [spec](specs/001-ingestion-case-pipeline/spec.md) | T001–T036 done |
+| 002 Case review readability | [spec](specs/002-case-review-readability/spec.md) | done |
+| 003 Application shell | [spec](specs/003-app-shell-and-themes/spec.md) | done |
+| 004 Interactive Medicine Catalogue | [spec](specs/004-interactive-medicine-catalogue/spec.md) | T001–T060 done |
+| 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | T001–T012 done; T013 (approval) open |
+| 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | T001–T014 done; T015 (approval) open |
 
 The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update.
 
@@ -338,7 +371,7 @@ Verification:
 - 261 backend tests and 84 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
-Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
+One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, which the daily update now collects, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
 
 ## Academic Context
 
