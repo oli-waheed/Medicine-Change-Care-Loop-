@@ -16,6 +16,8 @@ from ..models import (
     CaseStatusEventRow,
     ChangeProcessingOutcomeRow,
     DailyUpdateRunRow,
+    PackageHistoryEventRow,
+    PackageHistoryPairRow,
     ReleaseQualityCheckRow,
     ReviewCaseRow,
     ShortageCaptureRow,
@@ -149,6 +151,7 @@ class PipelineStore:
         cases: tuple[ReviewCase, ...] = (),
         processing_outcomes: tuple[ChangeProcessingOutcome, ...] = (),
         quality_check: dict | None = None,
+        package_history=None,
     ) -> tuple[ReviewCase, ...]:
         """Record a capture, its new cases and its matching outcomes in one transaction.
 
@@ -183,6 +186,8 @@ class PipelineStore:
             self._insert_outcomes(session, processing_outcomes)
             if quality_check is not None:
                 self._insert_quality_check(session, quality_check)
+            if package_history is not None:
+                self._insert_package_history(session, package_history)
             return inserted
 
     def add_cases(self, cases: tuple[ReviewCase, ...]) -> tuple[ReviewCase, ...]:
@@ -531,6 +536,71 @@ class PipelineStore:
     def capture_files(self, row: SourceReleaseCaptureRow) -> tuple[tuple[str, Path], ...]:
         """``(checksum, raw file path)`` of a capture's files, from its manifest."""
         return self._capture_files(row)
+
+    # --- package history (feature 013) ------------------------------------------------
+
+    @staticmethod
+    def _insert_package_history(session: Session, history) -> bool:
+        pair = history.pair
+        if session.get(PackageHistoryPairRow, pair["pairId"]) is not None:
+            return False
+        session.add(
+            PackageHistoryPairRow(
+                pair_id=pair["pairId"],
+                prior_release_id=pair["priorReleaseId"],
+                current_release_id=pair["currentReleaseId"],
+                prior_release_date=pair["priorReleaseDate"],
+                current_release_date=pair["currentReleaseDate"],
+                recorded_at=datetime.now(UTC),
+                event_count=len(history.events),
+            )
+        )
+        session.flush()
+        session.add_all(
+            PackageHistoryEventRow(
+                event_id=event["eventId"],
+                pair_id=pair["pairId"],
+                pakkaustunnus=event["pakkaustunnus"],
+                kind=event["kind"],
+                changes=event["changes"],
+            )
+            for event in history.events
+        )
+        return True
+
+    def record_package_history(self, history) -> bool:
+        """Store one pair's package history once; returns False if already stored."""
+        with self._session() as session, session.begin():
+            return self._insert_package_history(session, history)
+
+    def has_package_history(self, pair_id: str) -> bool:
+        with self._session() as session:
+            return session.get(PackageHistoryPairRow, pair_id) is not None
+
+    def package_history_pairs(self) -> list[PackageHistoryPairRow]:
+        """Recorded pairs, newest release first."""
+        with self._session() as session:
+            rows = list(session.scalars(select(PackageHistoryPairRow)))
+        return sorted(rows, key=lambda row: row.current_release_date or "", reverse=True)
+
+    def package_history_events(
+        self, pakkaustunnus: str
+    ) -> list[tuple[PackageHistoryPairRow, PackageHistoryEventRow]]:
+        """One package's recorded events with their pair, newest release first."""
+        with self._session() as session:
+            rows = session.execute(
+                select(PackageHistoryPairRow, PackageHistoryEventRow)
+                .join(
+                    PackageHistoryEventRow,
+                    PackageHistoryEventRow.pair_id == PackageHistoryPairRow.pair_id,
+                )
+                .where(PackageHistoryEventRow.pakkaustunnus == pakkaustunnus)
+            ).all()
+        return sorted(
+            ((pair, event) for pair, event in rows),
+            key=lambda item: item[0].current_release_date or "",
+            reverse=True,
+        )
 
     def shortage_captures(self) -> list[ShortageCaptureRow]:
         with self._session() as session:

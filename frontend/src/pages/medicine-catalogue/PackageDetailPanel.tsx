@@ -7,6 +7,7 @@ import {
   SubstanceTable,
 } from "./catalogueParts";
 import { CatalogueErrorMessage, LoadingMessage } from "./CatalogueStates";
+import PackageHistoryCard from "./PackageHistoryCard";
 import { fetchPackage } from "./medicineCatalogue";
 import { useCatalogueRequest } from "./useCatalogueRequest";
 
@@ -125,6 +126,8 @@ export default function PackageDetailPanel({
         <h3>Authorization and registration</h3>
         <AuthorizationList items={authorizations} />
       </section>
+
+      <PackageHistoryCard pakkaustunnus={pkg.pakkaustunnus} />
 
       <ProvenanceCard provenance={pkg.provenance} />
     </article>

@@ -3,6 +3,7 @@
 // (missing VNR on SIM-PKG-400, SIM-PKG-200/500 sharing a VNR, two substances
 // on SYN-PROD-100). Only synthetic fixtures; no Fimea data.
 import responses from "./catalogueResponses.json";
+import HISTORIES from "./packageHistoryResponses.json";
 
 const RESPONSES = responses as Record<string, unknown>;
 const LISTING = "/api/medicine-catalogue";
@@ -25,6 +26,19 @@ export function catalogueResponse<T>(url: string): T {
 // the full listing so tests can assert on the query string that was sent.
 export function catalogueFetch(url: string): FakeResponse {
   if (url in RESPONSES) return reply(200, RESPONSES[url]);
+  // Feature 013: package histories captured from the real backend over three
+  // synthetic releases; other packages have none.
+  if (url.endsWith("/history")) {
+    const history = (HISTORIES as Record<string, unknown>)[url];
+    return reply(
+      200,
+      history ?? {
+        pakkaustunnus: decodeURIComponent(url.split("/").at(-2) ?? ""),
+        comparedPairs: [],
+        events: [],
+      },
+    );
+  }
   if (url.startsWith(`${LISTING}?`)) return reply(200, RESPONSES[LISTING]);
   if (url.startsWith(`${LISTING}/active-substances`))
     return reply(200, RESPONSES[`${LISTING}/active-substances`]);

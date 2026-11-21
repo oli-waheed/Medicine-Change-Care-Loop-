@@ -16,6 +16,7 @@ from ..services.medicine_catalogue import (
     CatalogueUnavailableError,
     MedicineCatalogueService,
 )
+from ..services.source_cleanup_labels import cleanup_label, formatting_only
 
 router = APIRouter(prefix="/api/medicine-catalogue", tags=["medicine-catalogue"])
 
@@ -133,6 +134,43 @@ def get_package(request: Request, pakkaustunnus: str) -> dict[str, object]:
             detail={"code": "PACKAGE_NOT_FOUND", "releaseId": baseline.release_id},
         )
     return schema.package_detail(baseline, view)
+
+
+@router.get("/packages/{pakkaustunnus}/history")
+def get_package_history(request: Request, pakkaustunnus: str) -> dict[str, object]:
+    """Feature 013: the package's recorded changes across compared releases.
+
+    Read from stored history, so it answers without the catalogue release in memory.
+    """
+
+    store = request.app.state.store
+    pairs = store.package_history_pairs()
+    events = []
+    for pair, event in store.package_history_events(pakkaustunnus):
+        label = cleanup_label(event.changes)
+        events.append(
+            {
+                "priorReleaseDate": pair.prior_release_date,
+                "currentReleaseDate": pair.current_release_date,
+                "kind": event.kind,
+                "cleanupLabel": label.value if label else None,
+                "changes": [
+                    {**change, "formattingOnly": formatting_only(change["before"], change["after"])}
+                    for change in event.changes
+                ],
+            }
+        )
+    return {
+        "pakkaustunnus": pakkaustunnus,
+        "comparedPairs": [
+            {
+                "priorReleaseDate": pair.prior_release_date,
+                "currentReleaseDate": pair.current_release_date,
+            }
+            for pair in pairs
+        ],
+        "events": events,
+    }
 
 
 @router.get("/active-substances")

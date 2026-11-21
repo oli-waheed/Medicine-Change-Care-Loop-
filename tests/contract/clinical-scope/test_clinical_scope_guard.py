@@ -104,6 +104,8 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         # (contracts/exports-api.md).
         ("GET", "/api/exports/review-cases.csv"),
         ("GET", "/api/exports/review-history.csv"),
+        # Feature 013: a package's recorded changes across releases (read-only).
+        ("GET", "/api/medicine-catalogue/packages/{pakkaustunnus}/history"),
     }
 
 

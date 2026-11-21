@@ -20,6 +20,7 @@ amendment agreed by the team (Alison, Cassiy, Oli) before work starts.
 | 010 Source History and release quality checks | Page of stored source files; automatic check of each new release pair | Waiting for approval (T009) |
 | 011 CSV exports | Cases and review history as CSV for reports and records | Waiting for approval (T006) |
 | 012 New since your last visit | Marks new cases, shortages and source files per browser | Waiting for approval (T006) |
+| 013 Package timeline | Each package's changes across compared releases, with values | Waiting for approval (T007) |
 
 Real-data validation (`docs/validation/2026-11-21-real-release-comparison.md`)
 compared the 2026-10-06 and 2026-11-21 releases. Detection was correct, but:

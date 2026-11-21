@@ -246,6 +246,39 @@ export function fetchPackage(pakkaustunnus: string, signal?: AbortSignal) {
   );
 }
 
+// Feature 013: a package's recorded changes across compared releases.
+export type PackageHistoryEvent = {
+  priorReleaseDate: string | null;
+  currentReleaseDate: string | null;
+  kind: "FIELDS_CHANGED" | "NO_LONGER_PRESENT" | "NEWLY_PRESENT";
+  cleanupLabel: "FORMATTING_ONLY" | "ACTIVE_SUBSTANCE_ONLY" | null;
+  changes: {
+    field: string;
+    before: SourceField[];
+    after: SourceField[];
+    formattingOnly: boolean;
+  }[];
+};
+
+export type PackageHistory = {
+  pakkaustunnus: string;
+  comparedPairs: {
+    priorReleaseDate: string | null;
+    currentReleaseDate: string | null;
+  }[];
+  events: PackageHistoryEvent[];
+};
+
+export function fetchPackageHistory(
+  pakkaustunnus: string,
+  signal?: AbortSignal,
+) {
+  return getJson<PackageHistory>(
+    `${BASE}/packages/${encodeURIComponent(pakkaustunnus)}/history`,
+    signal,
+  );
+}
+
 // Substances can occur in thousands of packages, so pages stay small.
 export const SUBSTANCE_PAGE_SIZE = 25;
 

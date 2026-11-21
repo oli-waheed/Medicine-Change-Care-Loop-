@@ -17,6 +17,7 @@ from ..services.ingest_source_release import (
     source_order_key,
     validate_release_metadata,
 )
+from ..services.package_history import PackageHistory, build_package_history
 from ..services.pipeline_store import PipelineStore
 from ..services.release_quality_checks import build_quality_check
 from .ingestion_to_review import run_ingested_release_to_review
@@ -31,10 +32,18 @@ class IngestedFile:
     review_cases_created: int = 0
 
 
+@dataclass(frozen=True, slots=True)
+class _Comparison:
+    cases: tuple = ()
+    outcomes: tuple = ()
+    quality_check: dict | None = None  # feature 010
+    package_history: PackageHistory | None = None  # feature 013
+
+
 def _compare_with_baseline(
     store: PipelineStore, outcome: IngestionOutcome, medication_records: tuple
-) -> tuple[tuple, tuple, dict | None]:
-    """Return ``(review cases, matching outcomes, quality check)`` against the baseline.
+) -> _Comparison:
+    """Return the cases, matching outcomes, quality check and package history.
 
     Only releases with backend-derived (Ajopvm) chronology are compared, and only
     when strictly newer than the baseline. Older, equal-dated and UNKNOWN-order
@@ -42,10 +51,10 @@ def _compare_with_baseline(
     """
     current_key = source_order_key(outcome.source_order)
     if current_key is None:
-        return (), (), None
+        return _Comparison()
     baseline_row = store.comparison_baseline()
     if baseline_row is None or baseline_row.source_order_key >= current_key:
-        return (), (), None
+        return _Comparison()
     baseline = reload_captured_release(baseline_row.capture_directory)
     if baseline.processing_status is not ProcessingStatus.VALIDATED:
         raise RuntimeError(f"Stored baseline no longer validates: {baseline.failure_detail}")
@@ -55,15 +64,21 @@ def _compare_with_baseline(
         medication_records,
         open_cases=[],
     )
-    # Feature 010: check the pair's data quality with the same comparison.
-    quality_check = build_quality_check(
-        prior=baseline,
-        current=outcome,
-        prior_release_id=baseline_row.release_id,
-        current_release_id=outcome.captured_release.release_id,
-        comparison=result.comparison,
+    # Features 010 and 013: the pair's quality check and package history, from
+    # the same comparison.
+    pair = {
+        "prior": baseline,
+        "current": outcome,
+        "prior_release_id": baseline_row.release_id,
+        "current_release_id": outcome.captured_release.release_id,
+        "comparison": result.comparison,
+    }
+    return _Comparison(
+        result.created_cases,
+        result.outcomes,
+        build_quality_check(**pair),
+        build_package_history(**pair),
     )
-    return result.created_cases, result.outcomes, quality_check
 
 
 def ingest_release_file(
@@ -125,13 +140,20 @@ def ingest_release_file(
     )
     cases: tuple = ()
     if outcome.captured_release is not None and not store.is_known_release(captured_reference):
-        cases, processing_outcomes, quality_check = (
+        compared = (
             _compare_with_baseline(store, outcome, medication_records)
             if outcome.processing_status is ProcessingStatus.VALIDATED
-            else ((), (), None)
+            else _Comparison()
         )
-        # Capture, cases, matching outcomes and the quality check: one transaction.
-        store.record_ingestion(outcome, cases, processing_outcomes, quality_check)
+        cases = compared.cases
+        # Capture, cases, outcomes, quality check and package history: one transaction.
+        store.record_ingestion(
+            outcome,
+            cases,
+            compared.outcomes,
+            compared.quality_check,
+            compared.package_history,
+        )
 
     release = outcome.source_release
     return IngestedFile(

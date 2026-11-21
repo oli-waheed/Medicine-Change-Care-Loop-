@@ -69,11 +69,12 @@ Status on 2026-11-21.
 - **Feature 007** (21 Nov): pharmacists can record a review on a case (in progress, two reviewed outcomes, reopen) with initials and a note; changes in shortage data create review cases. Approved.
 - **Decisions** (21 Nov): T016, the backend's daily update is the only scheduler and the n8n workflow is switched off; T018, a VNR change now counts as a change.
 - **Feature 008** (21 Nov): labels for likely source clean-ups ("Spacing or letter case only", "Active-substance fields only") and an optional switch to set them aside. Approved after checking it on the real-data demo.
+- **Features 009–013** (21 Nov, evening): a faster, lighter catalogue (a real release now reads in about 12 s and 400 MB instead of 33 s and 2.3 GB); Source History with automatic quality checks of each new release; CSV exports of cases and review history; marks for what is new since the last visit; and each package's change history in the catalogue. Waiting for approval.
 - **Other**: navy and green colour palette; a comparison helper (`backend/tools/compare_releases.py`) for later real releases; new gold logo; a fix for the error when a new database's first requests arrive together; GitHub Actions CI on every push; `docs/roadmap.md`, covering the course plan and a possible pharmacy direction.
 
 ### Current Status
 
-- Features 001–008 are done and approved.
+- Features 001–008 are done and approved; 009–013 wait for approval.
 - 308 backend and 96 frontend tests pass; every push is checked by CI.
 - The app runs on simulated records. Real Fimea data is kept in a separate database that is not committed.
 
@@ -81,6 +82,6 @@ Status on 2026-11-21.
 
 1. Check the CI run on GitHub after the next push.
 2. When Fimea publishes the next release, run `backend/tools/compare_releases.py` and add the result to the validation report and the README's "remaining validation".
-3. Consider a faster catalogue (built once per release instead of after every restart).
+3. Try features 009–013 with the real-data demo and approve them.
 4. Discuss `docs/roadmap.md` as a team: whether the pharmacy direction (stock matching) belongs in the course, which would need a constitution amendment.
 5. Keep this log updated every week.

@@ -1,0 +1,190 @@
+{
+  "/api/medicine-catalogue/packages/SIM-PKG-100/history": {
+    "pakkaustunnus": "SIM-PKG-100",
+    "comparedPairs": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03"
+      },
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02"
+      }
+    ],
+    "events": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03",
+        "kind": "FIELDS_CHANGED",
+        "cleanupLabel": "FORMATTING_ONLY",
+        "changes": [
+          {
+            "field": "Laakevalmiste/Kauppanimi",
+            "before": [
+              {
+                "state": "value",
+                "value": "Fictional Product Amber Revised",
+                "attributes": {}
+              }
+            ],
+            "after": [
+              {
+                "state": "value",
+                "value": "Fictional  product AMBER revised ",
+                "attributes": {}
+              }
+            ],
+            "formattingOnly": true
+          }
+        ]
+      },
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02",
+        "kind": "FIELDS_CHANGED",
+        "cleanupLabel": null,
+        "changes": [
+          {
+            "field": "Laakevalmiste/Kauppanimi",
+            "before": [
+              {
+                "state": "value",
+                "value": "Fictional Product Amber",
+                "attributes": {}
+              }
+            ],
+            "after": [
+              {
+                "state": "value",
+                "value": "Fictional Product Amber Revised",
+                "attributes": {}
+              }
+            ],
+            "formattingOnly": false
+          },
+          {
+            "field": "Pakkaus/JulkinenTarkenne",
+            "before": [
+              {
+                "state": "value",
+                "value": "synthetic detail A",
+                "attributes": {}
+              }
+            ],
+            "after": [
+              {
+                "state": "missing",
+                "value": null,
+                "attributes": {}
+              }
+            ],
+            "formattingOnly": false
+          }
+        ]
+      }
+    ]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-200/history": {
+    "pakkaustunnus": "SIM-PKG-200",
+    "comparedPairs": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03"
+      },
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02"
+      }
+    ],
+    "events": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03",
+        "kind": "FIELDS_CHANGED",
+        "cleanupLabel": "ACTIVE_SUBSTANCE_ONLY",
+        "changes": [
+          {
+            "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/JakamatonVahvuus",
+            "before": [
+              {
+                "state": "value",
+                "value": "synthetic amount B",
+                "attributes": {}
+              }
+            ],
+            "after": [
+              {
+                "state": "value",
+                "value": "synthetic amount B (split)",
+                "attributes": {}
+              }
+            ],
+            "formattingOnly": false
+          },
+          {
+            "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Maara",
+            "before": [
+              {
+                "state": "value",
+                "value": "2.0",
+                "attributes": {}
+              }
+            ],
+            "after": [
+              {
+                "state": "value",
+                "value": "2.00",
+                "attributes": {}
+              }
+            ],
+            "formattingOnly": false
+          }
+        ]
+      }
+    ]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-300/history": {
+    "pakkaustunnus": "SIM-PKG-300",
+    "comparedPairs": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03"
+      },
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02"
+      }
+    ],
+    "events": [
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02",
+        "kind": "NO_LONGER_PRESENT",
+        "cleanupLabel": null,
+        "changes": []
+      }
+    ]
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-400/history": {
+    "pakkaustunnus": "SIM-PKG-400",
+    "comparedPairs": [
+      {
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-03"
+      },
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02"
+      }
+    ],
+    "events": [
+      {
+        "priorReleaseDate": "2099-01-01",
+        "currentReleaseDate": "2099-01-02",
+        "kind": "NEWLY_PRESENT",
+        "cleanupLabel": null,
+        "changes": []
+      }
+    ]
+  }
+}
