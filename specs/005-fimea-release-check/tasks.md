@@ -1,6 +1,6 @@
 # Feature 005: Tasks
 
-**Status (2026-11-21)**: T001–T012 done; T013 is the user's approval and commit.
+**Status (2026-11-21)**: T001–T012 done; T013 is the user's approval and commit. Convergence (Phase 2) found one LOW spec-text item, T014.
 
 - Backend: shared `ingest_release_file()` used by the upload endpoint and the check; `LatestReleaseCheck` service; `GET`/`POST /api/source-releases/latest-check`; `FIMEA_RELEASE_URL`. 9 new integration tests; full backend suite 236 passed; Ruff check and format clean.
 - Frontend: "Fimea release updates" on About the Data. 6 new tests; 75 frontend tests passed; TypeScript, Oxlint, Prettier and build clean.
@@ -21,3 +21,15 @@
 - [x] T011 Browser check of About the Data at 320, 768 and 1440 px: no contrast failures, no horizontal overflow; real-release end-to-end run as in the status above.
 - [x] T012 Documentation: README (feature, endpoints, `FIMEA_RELEASE_URL`, test counts); 003 spec marked superseded in part.
 - [ ] T013 Obtain explicit approval before committing or pushing.
+
+## Phase 2: Convergence
+
+Run on 2026-11-21 against `main` (`31e58fe`) by following `.github/skills/speckit-converge/SKILL.md` step by step (read-only assessment of FR-001–FR-010, the acceptance criteria, the plan and the constitution). Re-verified on that commit: `python -m pytest` 262 passed, `npx vitest run` 84 passed, TypeScript, Oxlint, Prettier and build clean.
+
+Real-data evidence: on the user's computer the app downloaded Fimea's release of 2026-11-21 (200,598,770 bytes) into the real-data database at 12:22 (Helsinki) and compared it with the 2026-10-06 release; a later download of the same file was recognised as already captured (`docs/validation/2026-11-21-real-release-comparison.md`).
+
+Requirements: FR-001–FR-010 and acceptance criteria 1–6 are met; no code gaps. One finding, in the spec text:
+
+- [ ] T014 F1 (spec §2 "Out of scope", LOW): "Scheduling (the n8n workflow remains the daily, automatic route)" is superseded by feature 006, which added the backend's daily update using this check. Add a "Superseded in part by `specs/006-medicine-shortages`" note to the spec header.
+
+Related, outside this feature's code: the "table already exists" error when several first requests reach a new database was fixed in `31e58fe` (`PipelineStore`, test `tests/unit/test_pipeline_store_first_use.py`).

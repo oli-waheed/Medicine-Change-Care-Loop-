@@ -1,6 +1,6 @@
 # Feature 006: Tasks
 
-**Status (2026-11-21)**: T001–T014 done; T015 is the user's approval and commit.
+**Status (2026-11-21)**: T001–T014 done; T015 is the user's approval and commit. Convergence (Phase 2) found one MEDIUM decision (T016, scheduler) and two LOW items (T017, T018).
 
 - Backend: shortage storage, parser, update and list API; daily automatic update; 25 new tests (`tests/integration/medicine-shortages/`); full backend suite 261 passed; Ruff check and format clean.
 - Frontend: Medicine Shortages page with Update button and daily status; 8 page tests and a scope test; 84 frontend tests passed; TypeScript, Oxlint, Prettier and build clean.
@@ -23,3 +23,17 @@
 - [x] T013 Browser check with the real file and release at 320, 375, 768, 1024 and 1440 px.
 - [x] T014 Documentation: README (feature, endpoints, settings, daily update, test counts); 003 spec marked superseded in part.
 - [ ] T015 Obtain explicit approval before committing or pushing.
+
+## Phase 2: Convergence
+
+Run on 2026-11-21 against `main` (`31e58fe`) by following `.github/skills/speckit-converge/SKILL.md` step by step (read-only assessment of FR-001–FR-011, the acceptance criteria, the plan and the constitution). Re-verified on that commit: `python -m pytest` 262 passed, `npx vitest run` 84 passed, TypeScript, Oxlint, Prettier and build clean.
+
+Real-data evidence: on the user's computer the daily update ran on 2026-11-21 at 13:03 (Helsinki) against Fimea itself: the shortage file was downloaded and accepted (751 shortages, 64,454 bytes) and the Basic Register check found the 2026-11-21 release already captured. A demo database built from the two real releases with fictional records produced 5 review cases.
+
+Requirements: FR-001–FR-011 and acceptance criteria 1–5 are met; no code gaps against the spec. Findings:
+
+- [ ] T016 F1 (plan "Decisions", constitution "Decisions … must be recorded with rationale", MEDIUM): two daily schedulers now download the Basic Register at 06:00, the backend's (this feature) and the n8n workflow (`workflow/n8n/fimea-basic-register-ingestion.json`, `"active": true`). Duplicate detection prevents double storage, but the 190 MB file is downloaded twice. Record the team's decision on the primary scheduler; if it is the backend, deactivate the n8n trigger and update the README "Source Ingestion Workflow".
+- [ ] T017 F2 (FR-010, LOW): on Windows the schedule shows the time-zone name as "FLE Standard Time" instead of a short name. Show the UTC offset (for example "UTC+02:00") instead.
+- [ ] T018 F3 (spec §1 objective and the validation report, LOW): shortages are linked by VNR, but change detection does not compare VNR (269 packages changed VNR between the real releases of 2026-10-06 and 2026-11-21). Record the decision on whether VNR becomes a compared field; this belongs to the comparison of feature 001, not to this feature's code.
+
+Related, outside this feature's code: the "table already exists" error when the Shortages page's first requests reach a new database together was fixed in `31e58fe`.
