@@ -20,7 +20,7 @@
 - [x] T010 Verify: `python -m pytest` 236 passed; Ruff clean; `npx vitest run` 75 passed; `npx tsc -b`, Oxlint, Prettier, `npm run build` clean.
 - [x] T011 Browser check of About the Data at 320, 768 and 1440 px: no contrast failures, no horizontal overflow; real-release end-to-end run as in the status above.
 - [x] T012 Documentation: README (feature, endpoints, `FIMEA_RELEASE_URL`, test counts); 003 spec marked superseded in part.
-- [ ] T013 Obtain explicit approval before committing or pushing.
+- [x] T013 Obtain explicit approval before committing or pushing. *(Approved by Oli on 2026-11-21 after the Phase 2 convergence review; T014 remains open.)*
 
 ## Phase 2: Convergence
 

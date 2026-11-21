@@ -22,7 +22,7 @@
 - [x] T012 Verify: `python -m pytest` 261 passed; Ruff clean; `npx vitest run` 84 passed; `npx tsc -b`, Oxlint, Prettier, `npm run build` clean.
 - [x] T013 Browser check with the real file and release at 320, 375, 768, 1024 and 1440 px.
 - [x] T014 Documentation: README (feature, endpoints, settings, daily update, test counts); 003 spec marked superseded in part.
-- [ ] T015 Obtain explicit approval before committing or pushing.
+- [x] T015 Obtain explicit approval before committing or pushing. *(Approved by Oli on 2026-11-21 after the Phase 2 convergence review; T016-T018 remain open.)*
 
 ## Phase 2: Convergence
 
