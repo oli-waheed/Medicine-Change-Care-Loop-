@@ -109,6 +109,9 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         # Feature 015: records linked to a package or product (read-only).
         ("GET", "/api/medicine-catalogue/packages/{pakkaustunnus}/links"),
         ("GET", "/api/medicine-catalogue/products/{product_reference}/links"),
+        # Feature 016: shortage and register facts side by side (read-only, no forecast).
+        ("GET", "/api/medicine-catalogue/packages/{pakkaustunnus}/supply-signals"),
+        ("GET", "/api/medicine-catalogue/products/{product_reference}/supply-signals"),
     }
 
 

@@ -4,6 +4,7 @@
 // on SYN-PROD-100). Only synthetic fixtures; no Fimea data.
 import responses from "./catalogueResponses.json";
 import LINKS from "./linkedRecordsResponses.json";
+import SUPPLY from "./supplySignalsResponses.json";
 import HISTORIES from "./packageHistoryResponses.json";
 
 const RESPONSES = responses as Record<string, unknown>;
@@ -31,6 +32,14 @@ export function catalogueFetch(url: string): FakeResponse {
   // synthetic releases; other packages have none.
   // Feature 015: linked records captured from the real backend over the
   // synthetic links release; other records have none.
+  // Feature 016: supply signals captured from the real backend (asOf fixed to
+  // 2099-01-21 and the day counts recomputed for it); others answer 404.
+  if (url.endsWith("/supply-signals")) {
+    const supply = (SUPPLY as Record<string, unknown>)[url];
+    return supply
+      ? reply(200, supply)
+      : reply(404, { detail: { code: "PACKAGE_NOT_FOUND" } });
+  }
   if (url.endsWith("/links")) {
     const links = (LINKS as Record<string, unknown>)[url];
     return reply(

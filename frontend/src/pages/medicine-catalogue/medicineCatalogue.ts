@@ -344,6 +344,73 @@ export function fetchLinks(
   );
 }
 
+// Feature 016: supply signals (facts only, no forecast).
+export type SupplySignals = {
+  releaseId: string;
+  anchorPackages: string[];
+  asOf: string;
+  notice: string;
+  vnrs: string[];
+  status: "LISTED" | "NOT_LISTED" | "NO_VNR" | "NO_FILE";
+  shortageFile: { captureReference: string; lastRetrievedAt: string } | null;
+  current: (LinkedShortage & {
+    notificationDate: string;
+    daysSinceUnavailableFrom: number | null;
+    daysUntilEstimatedEnd: number | null;
+  })[];
+  listings: {
+    vnr: string;
+    firstSeen: string;
+    lastSeen: string;
+    downloads: number;
+    listedNow: boolean;
+    unavailableFromFirst: string;
+    endingDateLast: string;
+    listedDays: number | null;
+  }[];
+  downloadsChecked: number;
+  unreadableDownloads: number;
+  register: {
+    pakkaustunnus: string;
+    vnr: SourceField;
+    onMarket: SourceField;
+    marketedFrom: SourceField;
+    marketedUntil: SourceField;
+    authorisations: {
+      branch: string;
+      status: SourceField;
+      endDate: SourceField;
+    }[];
+  }[];
+  registerChanges: {
+    pakkaustunnus: string;
+    priorReleaseDate: string | null;
+    currentReleaseDate: string | null;
+    kind: string;
+    field: string | null;
+    before: SourceField[];
+    after: SourceField[];
+  }[];
+  related: {
+    sameSubstanceProducts: number;
+    listedNow: number;
+    available: boolean;
+    items: (LinkedProduct & { listedVnrs: string[] })[];
+  };
+};
+
+export function fetchSupplySignals(
+  kind: "package" | "product",
+  id: string,
+  signal?: AbortSignal,
+) {
+  const segment = kind === "package" ? "packages" : "products";
+  return getJson<SupplySignals>(
+    `${BASE}/${segment}/${encodeURIComponent(id)}/supply-signals`,
+    signal,
+  );
+}
+
 // Substances can occur in thousands of packages, so pages stay small.
 export const SUBSTANCE_PAGE_SIZE = 25;
 

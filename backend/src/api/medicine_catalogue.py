@@ -5,6 +5,7 @@ verified chronology. None of them writes to the store, triggers ingestion, or
 changes cases, outcomes or the baseline (FR-010).
 """
 
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
@@ -18,6 +19,7 @@ from ..services.medicine_catalogue import (
 )
 from ..services.medicine_links import LinkIndexCache, links_for
 from ..services.source_cleanup_labels import cleanup_label, formatting_only
+from ..services.supply_signals import StoredShortageFiles, supply_signals
 
 router = APIRouter(prefix="/api/medicine-catalogue", tags=["medicine-catalogue"])
 
@@ -200,6 +202,66 @@ def get_product_links(request: Request, product_reference: str) -> dict[str, obj
             detail={"code": "PRODUCT_NOT_FOUND", "releaseId": baseline.release_id},
         )
     return _links(request, baseline, view.packages)
+
+
+def _supply(request: Request, baseline, anchors) -> dict[str, object]:
+    """Feature 016: supply facts for the anchor package(s)."""
+
+    from .medicine_shortages import _reader
+
+    app = request.app
+    cache = getattr(app.state, "link_index_cache", None)
+    if cache is None:
+        cache = app.state.link_index_cache = LinkIndexCache()
+    files = getattr(app.state, "stored_shortage_files", None)
+    if files is None:
+        files = app.state.stored_shortage_files = StoredShortageFiles()
+    try:
+        active = _reader(app).active(app.state.store)
+    except (ValueError, OSError):
+        active = None
+    return {
+        "releaseId": baseline.release_id,
+        "anchorPackages": [a.pakkaustunnus for a in anchors],
+        **supply_signals(
+            store=app.state.store,
+            files=files,
+            index=cache.get(baseline.release_id, baseline.snapshots),
+            anchors=anchors,
+            active=active,
+            today=datetime.now(UTC).date(),
+        ),
+    }
+
+
+@router.get("/packages/{pakkaustunnus}/supply-signals")
+def get_package_supply_signals(request: Request, pakkaustunnus: str) -> dict[str, object]:
+    """Feature 016: shortage and register facts for one package (read-only)."""
+
+    service = _service(request)
+    baseline = _baseline(service)
+    view = service.package(pakkaustunnus)
+    if view is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "PACKAGE_NOT_FOUND", "releaseId": baseline.release_id},
+        )
+    return _supply(request, baseline, (view.snapshot,))
+
+
+@router.get("/products/{product_reference}/supply-signals")
+def get_product_supply_signals(request: Request, product_reference: str) -> dict[str, object]:
+    """Feature 016: shortage and register facts for all packages of a product."""
+
+    service = _service(request)
+    baseline = _baseline(service)
+    view = service.product(product_reference)
+    if view is None:
+        raise HTTPException(
+            status_code=404,
+            detail={"code": "PRODUCT_NOT_FOUND", "releaseId": baseline.release_id},
+        )
+    return _supply(request, baseline, view.packages)
 
 
 @router.get("/packages/{pakkaustunnus}/history")

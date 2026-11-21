@@ -1,0 +1,538 @@
+{
+  "/api/medicine-catalogue/packages/SIM-PKG-L11/supply-signals": {
+    "releaseId": "sha256-c706b4370a23eb2bf17cabeba6ce09e3930ea2fcf9027a316fd230982ad55485",
+    "anchorPackages": ["SIM-PKG-L11"],
+    "asOf": "2099-01-21",
+    "notice": "Facts from Fimea's files as published, side by side. Dates and status in the shortage file are the company's report; the end date is an estimate. Nothing here is a forecast, and a medicine not listed is not shown to be available.",
+    "vnrs": ["SIM-VNR-200"],
+    "status": "LISTED",
+    "shortageFile": {
+      "captureReference": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+      "lastRetrievedAt": "2099-01-02T05:00:00+00:00"
+    },
+    "current": [
+      {
+        "line": 2,
+        "vnr": "SIM-VNR-200",
+        "valid": "K",
+        "unavailableFrom": "2099-01-01",
+        "endingDate": "2099-03-31",
+        "notificationDate": "2098-12-01",
+        "updated": "2099-01-05",
+        "company": "Fictional Pharma Oy",
+        "daysSinceUnavailableFrom": 20,
+        "daysUntilEstimatedEnd": 69
+      }
+    ],
+    "listings": [
+      {
+        "vnr": "SIM-VNR-200",
+        "firstSeen": "2099-01-01T05:00:00+00:00",
+        "lastSeen": "2099-01-02T05:00:00+00:00",
+        "downloads": 2,
+        "listedNow": true,
+        "unavailableFromFirst": "2099-01-01",
+        "endingDateLast": "2099-03-31",
+        "listedDays": 1
+      }
+    ],
+    "downloadsChecked": 2,
+    "unreadableDownloads": 0,
+    "register": [
+      {
+        "pakkaustunnus": "SIM-PKG-L11",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "empty",
+              "value": "",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ],
+    "registerChanges": [],
+    "related": {
+      "sameSubstanceProducts": 1,
+      "listedNow": 1,
+      "items": [
+        {
+          "productReference": "SYN-PROD-L2",
+          "name": {
+            "state": "value",
+            "value": "Fictional Linkol",
+            "attributes": {}
+          },
+          "strength": {
+            "state": "value",
+            "value": "synthetic strength 20",
+            "attributes": {}
+          },
+          "form": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-FORM",
+              "id": "SIM-F01",
+              "value": "fictional form"
+            }
+          },
+          "holders": ["Fictional Pharma Oy"],
+          "packageCount": 1,
+          "listedVnrs": ["SIM-VNR-200"]
+        }
+      ],
+      "available": true
+    }
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-L12/supply-signals": {
+    "releaseId": "sha256-c706b4370a23eb2bf17cabeba6ce09e3930ea2fcf9027a316fd230982ad55485",
+    "anchorPackages": ["SIM-PKG-L12"],
+    "asOf": "2099-01-21",
+    "notice": "Facts from Fimea's files as published, side by side. Dates and status in the shortage file are the company's report; the end date is an estimate. Nothing here is a forecast, and a medicine not listed is not shown to be available.",
+    "vnrs": ["SIM-VNR-L12"],
+    "status": "NOT_LISTED",
+    "shortageFile": {
+      "captureReference": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+      "lastRetrievedAt": "2099-01-02T05:00:00+00:00"
+    },
+    "current": [],
+    "listings": [],
+    "downloadsChecked": 2,
+    "unreadableDownloads": 0,
+    "register": [
+      {
+        "pakkaustunnus": "SIM-PKG-L12",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-L12",
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "empty",
+              "value": "",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ],
+    "registerChanges": [],
+    "related": {
+      "sameSubstanceProducts": 1,
+      "listedNow": 1,
+      "items": [
+        {
+          "productReference": "SYN-PROD-L2",
+          "name": {
+            "state": "value",
+            "value": "Fictional Linkol",
+            "attributes": {}
+          },
+          "strength": {
+            "state": "value",
+            "value": "synthetic strength 20",
+            "attributes": {}
+          },
+          "form": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-FORM",
+              "id": "SIM-F01",
+              "value": "fictional form"
+            }
+          },
+          "holders": ["Fictional Pharma Oy"],
+          "packageCount": 1,
+          "listedVnrs": ["SIM-VNR-200"]
+        }
+      ],
+      "available": true
+    }
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-L41/supply-signals": {
+    "releaseId": "sha256-c706b4370a23eb2bf17cabeba6ce09e3930ea2fcf9027a316fd230982ad55485",
+    "anchorPackages": ["SIM-PKG-L41"],
+    "asOf": "2099-01-21",
+    "notice": "Facts from Fimea's files as published, side by side. Dates and status in the shortage file are the company's report; the end date is an estimate. Nothing here is a forecast, and a medicine not listed is not shown to be available.",
+    "vnrs": [],
+    "status": "NO_VNR",
+    "shortageFile": {
+      "captureReference": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+      "lastRetrievedAt": "2099-01-02T05:00:00+00:00"
+    },
+    "current": [],
+    "listings": [],
+    "downloadsChecked": 0,
+    "unreadableDownloads": 0,
+    "register": [
+      {
+        "pakkaustunnus": "SIM-PKG-L41",
+        "vnr": {
+          "state": "missing",
+          "value": null,
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "empty",
+              "value": "",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ],
+    "registerChanges": [],
+    "related": {
+      "sameSubstanceProducts": 0,
+      "listedNow": 0,
+      "items": [],
+      "available": false
+    }
+  },
+  "/api/medicine-catalogue/products/SYN-PROD-L1/supply-signals": {
+    "releaseId": "sha256-c706b4370a23eb2bf17cabeba6ce09e3930ea2fcf9027a316fd230982ad55485",
+    "anchorPackages": ["SIM-PKG-L11", "SIM-PKG-L12"],
+    "asOf": "2099-01-21",
+    "notice": "Facts from Fimea's files as published, side by side. Dates and status in the shortage file are the company's report; the end date is an estimate. Nothing here is a forecast, and a medicine not listed is not shown to be available.",
+    "vnrs": ["SIM-VNR-200", "SIM-VNR-L12"],
+    "status": "LISTED",
+    "shortageFile": {
+      "captureReference": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+      "lastRetrievedAt": "2099-01-02T05:00:00+00:00"
+    },
+    "current": [
+      {
+        "line": 2,
+        "vnr": "SIM-VNR-200",
+        "valid": "K",
+        "unavailableFrom": "2099-01-01",
+        "endingDate": "2099-03-31",
+        "notificationDate": "2098-12-01",
+        "updated": "2099-01-05",
+        "company": "Fictional Pharma Oy",
+        "daysSinceUnavailableFrom": 20,
+        "daysUntilEstimatedEnd": 69
+      }
+    ],
+    "listings": [
+      {
+        "vnr": "SIM-VNR-200",
+        "firstSeen": "2099-01-01T05:00:00+00:00",
+        "lastSeen": "2099-01-02T05:00:00+00:00",
+        "downloads": 2,
+        "listedNow": true,
+        "unavailableFromFirst": "2099-01-01",
+        "endingDateLast": "2099-03-31",
+        "listedDays": 1
+      }
+    ],
+    "downloadsChecked": 2,
+    "unreadableDownloads": 0,
+    "register": [
+      {
+        "pakkaustunnus": "SIM-PKG-L11",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-200",
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "empty",
+              "value": "",
+              "attributes": {}
+            }
+          }
+        ]
+      },
+      {
+        "pakkaustunnus": "SIM-PKG-L12",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-L12",
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "1",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2099-01-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "empty",
+              "value": "",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ],
+    "registerChanges": [],
+    "related": {
+      "sameSubstanceProducts": 1,
+      "listedNow": 1,
+      "items": [
+        {
+          "productReference": "SYN-PROD-L2",
+          "name": {
+            "state": "value",
+            "value": "Fictional Linkol",
+            "attributes": {}
+          },
+          "strength": {
+            "state": "value",
+            "value": "synthetic strength 20",
+            "attributes": {}
+          },
+          "form": {
+            "state": "empty",
+            "value": "",
+            "attributes": {
+              "listname": "SIM-FORM",
+              "id": "SIM-F01",
+              "value": "fictional form"
+            }
+          },
+          "holders": ["Fictional Pharma Oy"],
+          "packageCount": 1,
+          "listedVnrs": ["SIM-VNR-200"]
+        }
+      ],
+      "available": true
+    }
+  },
+  "/api/medicine-catalogue/packages/SIM-PKG-100/supply-signals": {
+    "releaseId": "sha256-bb32bc854e4eb639cb78125ad388005ac3f1b77ce1ba87fa3959f2c4108edf88",
+    "anchorPackages": ["SIM-PKG-100"],
+    "asOf": "2099-01-21",
+    "notice": "Facts from Fimea's files as published, side by side. Dates and status in the shortage file are the company's report; the end date is an estimate. Nothing here is a forecast, and a medicine not listed is not shown to be available.",
+    "vnrs": ["SIM-VNR-100"],
+    "status": "NOT_LISTED",
+    "shortageFile": {
+      "captureReference": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+      "lastRetrievedAt": "2099-01-02T05:00:00+00:00"
+    },
+    "current": [],
+    "listings": [
+      {
+        "vnr": "SIM-VNR-100",
+        "firstSeen": "2099-01-01T05:00:00+00:00",
+        "lastSeen": "2099-01-01T05:00:00+00:00",
+        "downloads": 1,
+        "listedNow": false,
+        "unavailableFromFirst": "2099-01-20",
+        "endingDateLast": "2099-02-28",
+        "listedDays": 0
+      }
+    ],
+    "downloadsChecked": 2,
+    "unreadableDownloads": 0,
+    "register": [
+      {
+        "pakkaustunnus": "SIM-PKG-100",
+        "vnr": {
+          "state": "value",
+          "value": "SIM-VNR-100",
+          "attributes": {}
+        },
+        "onMarket": {
+          "state": "value",
+          "value": "0",
+          "attributes": {}
+        },
+        "marketedFrom": {
+          "state": "value",
+          "value": "2098-12-01",
+          "attributes": {}
+        },
+        "marketedUntil": {
+          "state": "empty",
+          "value": "",
+          "attributes": {}
+        },
+        "authorisations": [
+          {
+            "branch": "Myyntilupa",
+            "status": {
+              "state": "empty",
+              "value": "",
+              "attributes": {
+                "listname": "SIM-AUTH",
+                "id": "SIM-ACTIVE",
+                "value": "synthetic active"
+              }
+            },
+            "endDate": {
+              "state": "value",
+              "value": "2099-12-31",
+              "attributes": {}
+            }
+          }
+        ]
+      }
+    ],
+    "registerChanges": [
+      {
+        "pakkaustunnus": "SIM-PKG-100",
+        "priorReleaseDate": "2099-01-02",
+        "currentReleaseDate": "2099-01-09",
+        "kind": "FIELDS_CHANGED",
+        "field": "Pakkaus/Kaupanolo/Kaupan",
+        "before": [
+          {
+            "state": "value",
+            "value": "1",
+            "attributes": {}
+          }
+        ],
+        "after": [
+          {
+            "state": "value",
+            "value": "0",
+            "attributes": {}
+          }
+        ]
+      }
+    ],
+    "related": {
+      "sameSubstanceProducts": 0,
+      "listedNow": 0,
+      "items": [],
+      "available": true
+    }
+  }
+}

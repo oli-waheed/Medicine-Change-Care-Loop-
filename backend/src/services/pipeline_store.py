@@ -665,6 +665,20 @@ class PipelineStore:
                 .limit(1)
             ).first()
 
+    def shortage_timeline(self) -> list[tuple[datetime, ShortageCaptureRow]]:
+        """Every download of an accepted shortage file, oldest first (feature 016)."""
+        with self._session() as session:
+            rows = session.execute(
+                select(ShortageRetrievalRow.retrieved_at, ShortageCaptureRow)
+                .join(
+                    ShortageCaptureRow,
+                    ShortageCaptureRow.sequence == ShortageRetrievalRow.capture_sequence,
+                )
+                .where(ShortageCaptureRow.processing_status == "VALIDATED")
+                .order_by(ShortageRetrievalRow.retrieved_at, ShortageRetrievalRow.id)
+            ).all()
+        return [(_as_utc(when), capture) for when, capture in rows]
+
     def shortage_retrieval_count(self, capture_sequence: int) -> int:
         with self._session() as session:
             return len(

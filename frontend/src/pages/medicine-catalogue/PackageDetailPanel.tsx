@@ -8,6 +8,7 @@ import {
 } from "./catalogueParts";
 import { CatalogueErrorMessage, LoadingMessage } from "./CatalogueStates";
 import LinkedRecordsCard from "./LinkedRecordsCard";
+import SupplySignalsCard from "./SupplySignalsCard";
 import PackageHistoryCard from "./PackageHistoryCard";
 import { fetchPackage } from "./medicineCatalogue";
 import { useCatalogueRequest } from "./useCatalogueRequest";
@@ -127,6 +128,12 @@ export default function PackageDetailPanel({
         <h3>Authorization and registration</h3>
         <AuthorizationList items={authorizations} />
       </section>
+
+      <SupplySignalsCard
+        kind="package"
+        id={pkg.pakkaustunnus}
+        onOpenProduct={onOpenProduct}
+      />
 
       <LinkedRecordsCard
         kind="package"
