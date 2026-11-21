@@ -239,7 +239,7 @@ The settings apply only to that window; a new window without them uses the test 
 - A backend started after `DAILY_UPDATE_TIME` runs that day's update at once, so the first start of the day downloads both files.
 - After a restart, the first catalogue request rebuilds the release (about 35 seconds); the daily update and the release check prepare it in advance. The shortage list does not wait: it shows the shortages first and adds the catalogue packages when ready.
 
-The seed records match the synthetic test fixtures: `SIM-PKG-100` produces a case with several field changes and `SIM-PKG-300` a case for a package that is no longer present in the register. To see cases from live Fimea data, add fictional records whose `Pakkaustunnus` is a real public package identifier from the register. Never add real patient data.
+The seed records match the synthetic test fixtures: `SIM-PKG-100` produces a case with several field changes and `SIM-PKG-300` a case for a package that is no longer present in the register. To see cases from live Fimea data, put fictional records whose `Pakkaustunnus` is a real public package identifier in a separate file outside the repository (for example `backend/data/real/real-demo-records.json`) and point `SIMULATED_MEDICATION_RECORDS_PATH` to it. Files in `backend/seed/` must keep `SIM-` identifiers; a test checks this. Cases are created when a newer release is compared, so load the older release first, then the newer one, into a new database (see [the validation report](docs/validation/2026-11-21-real-release-comparison.md)). Never add real patient data.
 
 ### Frontend
 
@@ -277,7 +277,7 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `261 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `262 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
@@ -368,7 +368,7 @@ The implementation includes source-release ingestion, source-data normalization,
 
 Verification:
 
-- 261 backend tests and 84 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 262 backend tests and 84 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, which the daily update now collects, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).

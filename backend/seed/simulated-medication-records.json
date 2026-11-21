@@ -1,6 +1,6 @@
 {
   "dataset": "SIMULATED - fictional medication records for local demo only",
-  "note": "Pakkaustunnus is the only match key. Against the synthetic fixtures in tests/fixtures/fimea-basic-register: SIM-PKG-100 opens a case with field changes, SIM-PKG-300 a case for a package no longer present, the two SIM-PKG-200 records are ambiguous (and that package is unchanged), and SIM-PKG-500 changes with no record. To demo against a live Fimea release, add fictional records whose Pakkaustunnus is a real public package identifier from that release. Never add real patient data.",
+  "note": "Pakkaustunnus is the only match key. Against the synthetic fixtures in tests/fixtures/fimea-basic-register: SIM-PKG-100 opens a case with field changes, SIM-PKG-300 a case for a package no longer present, the two SIM-PKG-200 records are ambiguous (and that package is unchanged), and SIM-PKG-500 changes with no record. To demo against a live Fimea release, put fictional records with real public package identifiers in a separate file outside the repository and set SIMULATED_MEDICATION_RECORDS_PATH (see README); this file keeps SIM- identifiers. Never add real patient data.",
   "records": [
     {
       "record_id": "SIM-MED-100",

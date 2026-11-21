@@ -1,6 +1,7 @@
 """SQLite persistence for captures, review cases and case status events."""
 
 import json
+import threading
 from datetime import UTC, datetime
 from pathlib import Path
 
@@ -43,29 +44,37 @@ class PipelineStore:
         self._sessions: sessionmaker[Session] | None = None
         # Capture manifests are immutable, so their file lists are cached by release id.
         self._manifest_files: dict[str, tuple[tuple[str, Path], ...]] = {}
+        # The first requests to a new database can arrive together (a page loads
+        # several APIs at once); only one of them may create the schema.
+        self._init_lock = threading.Lock()
 
     def _session(self) -> Session:
         if self._sessions is None:
-            if self.database_url.startswith("sqlite:///"):
-                database_path = self.database_url.removeprefix("sqlite:///")
-                if database_path and database_path != ":memory:":
-                    Path(database_path).parent.mkdir(parents=True, exist_ok=True)
-            engine = create_engine(
-                self.database_url,
-                connect_args=(
-                    {"check_same_thread": False} if self.database_url.startswith("sqlite") else {}
-                ),
-            )
-            if self.database_url.startswith("sqlite"):
-
-                @event.listens_for(engine, "connect")
-                def _enable_foreign_keys(connection, _record):
-                    connection.execute("PRAGMA foreign_keys=ON")
-
-            Base.metadata.create_all(engine)
-            self._engine = engine
-            self._sessions = sessionmaker(engine, expire_on_commit=False)
+            with self._init_lock:
+                if self._sessions is None:
+                    self._open()
         return self._sessions()
+
+    def _open(self) -> None:
+        if self.database_url.startswith("sqlite:///"):
+            database_path = self.database_url.removeprefix("sqlite:///")
+            if database_path and database_path != ":memory:":
+                Path(database_path).parent.mkdir(parents=True, exist_ok=True)
+        engine = create_engine(
+            self.database_url,
+            connect_args=(
+                {"check_same_thread": False} if self.database_url.startswith("sqlite") else {}
+            ),
+        )
+        if self.database_url.startswith("sqlite"):
+
+            @event.listens_for(engine, "connect")
+            def _enable_foreign_keys(connection, _record):
+                connection.execute("PRAGMA foreign_keys=ON")
+
+        Base.metadata.create_all(engine)
+        self._engine = engine
+        self._sessions = sessionmaker(engine, expire_on_commit=False)
 
     def dispose(self) -> None:
         if self._engine is not None:
