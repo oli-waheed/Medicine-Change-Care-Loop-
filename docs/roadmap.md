@@ -15,7 +15,7 @@ amendment agreed by the team (Alison, Cassiy, Oli) before work starts.
 | 005 Fimea release check | Button and service that downloads and ingests the newest release | Approved |
 | 006 Medicine shortages | Daily download of Fimea's shortage file, Shortages page, update button | Approved |
 | 007 Care loop review and shortage cases | Recorded human review (three outcomes, initials, notes, reopen) and review cases from shortage changes | Approved |
-| 008 Labels for likely source clean-ups | Labels for spacing/case-only and active-substance-only changes, optional set-aside switch | Waiting for approval (T009) |
+| 008 Labels for likely source clean-ups | Labels for spacing/case-only and active-substance-only changes, optional set-aside switch | Approved |
 
 Real-data validation (`docs/validation/2026-11-21-real-release-comparison.md`)
 compared the 2026-10-06 and 2026-11-21 releases. Detection was correct, but:

@@ -59,3 +59,19 @@ These are genuine differences between the two files; none was produced by the co
 - Decide how to present formatting-only and source-restructuring differences (finding 3).
 - Repeat this check on later daily pairs (finding 4), then update the README's "remaining validation".
 - To see real changes as review cases, add a few fictional records with real package IDs from this comparison (for example 166122, 124752, 214959), as the README allows.
+
+## 7. Repeating this check
+
+`backend/tools/compare_releases.py` repeats sections 3 and 4 on any captured releases, using the app's current rules (VNR compared since T018, clean-up labels of feature 008). On the two releases above it reports, on 2026-11-21:
+
+| Check | Result |
+|---|---|
+| Release order (Ajopvm) | strictly increasing |
+| Pakkaustunnus repeated within a release | 0 |
+| Pakkaustunnus in both releases | 146,021 |
+| Changed packages | 2,050 (the 1,915 above plus 135 with only a VNR change) |
+| No longer present / new | 21 / 847 |
+| VNR gained / lost / changed | 160 / 92 / 17 |
+| Label: spacing or letter case only / active-substance fields only / none | 109 / 848 / 1,093 |
+
+The 113 formatting-only packages of finding 3 are 109 here, because four of them also changed VNR. Later pairs will be added as new reports when the daily update has collected them.

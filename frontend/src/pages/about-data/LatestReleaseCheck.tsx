@@ -101,9 +101,10 @@ export default function LatestReleaseCheck() {
       <h2 id="about-release-check">Fimea release updates</h2>
       <p>
         The backend downloads the latest Basic Register file from Fimea and
-        loads it, exactly as the daily scheduled workflow does. An unchanged
-        file is recognised and not stored twice; a newer release is compared
-        with the previous one. This takes about one to two minutes.
+        loads it once a day by itself (the daily automatic update). This button
+        does the same at once. An unchanged file is recognised and not stored
+        twice; a newer release is compared with the previous one. This takes
+        about one to two minutes.
       </p>
       <button
         type="button"

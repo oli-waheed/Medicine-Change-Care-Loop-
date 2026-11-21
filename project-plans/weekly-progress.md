@@ -68,19 +68,19 @@ Status on 2026-11-21.
 - **Validation** (21 Nov): two real Fimea releases (2026-10-06 and 2026-11-21) were compared. Change detection was correct (1,915 changed and 21 removed packages); 44 % of the changes were Fimea's own data clean-ups, and VNR changes were not detected. Report: `docs/validation/2026-11-21-real-release-comparison.md`.
 - **Feature 007** (21 Nov): pharmacists can record a review on a case (in progress, two reviewed outcomes, reopen) with initials and a note; changes in shortage data create review cases. Approved.
 - **Decisions** (21 Nov): T016, the backend's daily update is the only scheduler and the n8n workflow is switched off; T018, a VNR change now counts as a change.
-- **Feature 008** (21 Nov): labels for likely source clean-ups ("Spacing or letter case only", "Active-substance fields only") and an optional switch to set them aside. Waiting for approval.
-- **Other**: new gold logo; a fix for the error when a new database's first requests arrive together; GitHub Actions CI on every push; `docs/roadmap.md`, covering the course plan and a possible pharmacy direction.
+- **Feature 008** (21 Nov): labels for likely source clean-ups ("Spacing or letter case only", "Active-substance fields only") and an optional switch to set them aside. Approved after checking it on the real-data demo.
+- **Other**: navy and green colour palette; a comparison helper (`backend/tools/compare_releases.py`) for later real releases; new gold logo; a fix for the error when a new database's first requests arrive together; GitHub Actions CI on every push; `docs/roadmap.md`, covering the course plan and a possible pharmacy direction.
 
 ### Current Status
 
-- Features 001–007 are done and approved; 008 waits for approval (T009).
-- 306 backend and 96 frontend tests pass; every push is checked by CI.
+- Features 001–008 are done and approved.
+- 308 backend and 96 frontend tests pass; every push is checked by CI.
 - The app runs on simulated records. Real Fimea data is kept in a separate database that is not committed.
 
 ### Next Steps
 
-1. Approve feature 008 after trying it.
-2. Check the CI run on GitHub after the next push.
-3. Repeat the real-release comparison on later daily releases, then update the README's "remaining validation".
+1. Check the CI run on GitHub after the next push.
+2. When Fimea publishes the next release, run `backend/tools/compare_releases.py` and add the result to the validation report and the README's "remaining validation".
+3. Consider a faster catalogue (built once per release instead of after every restart).
 4. Discuss `docs/roadmap.md` as a team: whether the pharmacy direction (stock matching) belongs in the course, which would need a constitution amendment.
 5. Keep this log updated every week.

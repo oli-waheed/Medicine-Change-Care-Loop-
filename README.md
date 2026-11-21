@@ -249,6 +249,14 @@ The settings apply only to that window; a new window without them uses the test 
 
 The seed records match the synthetic test fixtures: `SIM-PKG-100` produces a case with several field changes and `SIM-PKG-300` a case for a package that is no longer present in the register. To see cases from live Fimea data, put fictional records whose `Pakkaustunnus` is a real public package identifier in a separate file outside the repository (for example `backend/data/real/real-demo-records.json`) and point `SIMULATED_MEDICATION_RECORDS_PATH` to it. Files in `backend/seed/` must keep `SIM-` identifiers; a test checks this. Cases are created when a newer release is compared, so load the older release first, then the newer one, into a new database (see [the validation report](docs/validation/2026-11-21-real-release-comparison.md)). Never add real patient data.
 
+To check the real releases the daily update has collected, run the comparison helper from the `backend` folder. It reads the stored files only, orders them by `Ajopvm` and compares the newest pair (`--pairs 3` for the newest three; about 40 seconds and 2 GB of memory per release):
+
+```powershell
+python tools\compare_releases.py data\real\source-releases --pairs 3 --out data\real\comparison.md
+```
+
+The report shows whether the release order is strictly increasing, whether any `Pakkaustunnus` repeats within a release, how many are in both releases, and the changed, removed and new packages, VNR changes and source clean-up labels.
+
 ### Frontend
 
 Open a second terminal and navigate to the frontend directory:
@@ -287,12 +295,12 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `306 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `308 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
-python -m ruff check src ..\tests
-python -m ruff format --check src ..\tests
+python -m ruff check src tools ..\tests
+python -m ruff format --check src tools ..\tests
 ```
 
 ### Frontend Tests
@@ -374,16 +382,16 @@ Medicine-Change-Care-Loop/
 | 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | done (approved 2026-11-21) |
 | 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | done (approved 2026-11-21); T016 and T018 decided 2026-11-21 |
 | 007 Recorded reviews and shortage review cases | [spec](specs/007-care-loop-review-and-shortage-cases/spec.md) | done (approved 2026-11-21) |
-| 008 Labels for likely source clean-ups | [spec](specs/008-source-cleanup-labels/spec.md) | T001–T008 done; T009 (approval) open |
+| 008 Labels for likely source clean-ups | [spec](specs/008-source-cleanup-labels/spec.md) | done (approved 2026-11-21) |
 
 The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update; feature 007 ([specs/007-care-loop-review-and-shortage-cases](specs/007-care-loop-review-and-shortage-cases/spec.md)) added recorded reviews and shortage review cases; feature 008 ([specs/008-source-cleanup-labels](specs/008-source-cleanup-labels/spec.md)) added labels for likely source clean-ups.
 
 Verification:
 
-- 306 backend tests and 96 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 308 backend tests and 96 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
-One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, which the daily update now collects, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
+One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Two real releases (2026-10-06 and 2026-11-21) were compared on 2026-11-21: the order was strictly increasing and no `Pakkaustunnus` repeated within a release ([validation report](docs/validation/2026-11-21-real-release-comparison.md)). Before relying on live Fimea data, the remaining validation is to repeat this on later releases, which the daily update collects, with `backend/tools/compare_releases.py`, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
 
 ## Academic Context
 
