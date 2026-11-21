@@ -1,5 +1,6 @@
 import { FIMEA_OPEN_DATA_URL, LICENCE_URL } from "../../app/Sidebar";
 import "./AboutDataPage.css";
+import LatestReleaseCheck from "./LatestReleaseCheck";
 
 // Restates the README "Data Source and Licence" section; adds no new claims.
 export default function AboutDataPage() {
@@ -47,6 +48,8 @@ export default function AboutDataPage() {
             </li>
           </ul>
         </section>
+
+        <LatestReleaseCheck />
 
         <section className="about-card" aria-labelledby="about-attribution">
           <h2 id="about-attribution">Attribution</h2>

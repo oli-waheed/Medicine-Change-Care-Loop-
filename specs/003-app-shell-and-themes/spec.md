@@ -14,6 +14,8 @@
 
 **Superseded in part by**: `specs/004-interactive-medicine-catalogue` — FR-001 and FR-002 (the sidebar also lists "Medicine Catalogue" at `/medicine-catalogue`) and FR-025 (the catalogue page's read-only search, filter and view controls).
 
+**Superseded in part by**: `specs/005-fimea-release-check` — FR-025 (About the Data adds the "Check for new Fimea release" button).
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Move around the review workspace (Priority: P1)

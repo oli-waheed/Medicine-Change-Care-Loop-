@@ -89,7 +89,14 @@ function fixture(id: string, removed: boolean): OpenReviewCase {
   };
 }
 
-const ALLOWED_BUTTONS = [/^Fictional Product \d+/, /^Menu$/, /^Sidebar$/];
+// Feature 005: About the Data offers one control that loads the latest Fimea
+// release, the same as the daily ingestion workflow; it never changes cases.
+const ALLOWED_BUTTONS = [
+  /^Fictional Product \d+/,
+  /^Menu$/,
+  /^Sidebar$/,
+  /^Check for new Fimea release$/,
+];
 // Feature 004: catalogue reading controls (open records, switch views, page).
 const CATALOGUE_BUTTONS = [
   /^Fictional Product /,

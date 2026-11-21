@@ -9,6 +9,7 @@ import pytest
 from src.api import source_release_ingestion
 from src.config import ApplicationConfig
 from src.main import app
+from src.workflows import ingest_release_file
 
 FIXTURE_DIR = Path(__file__).parents[2] / "fixtures" / "fimea-basic-register"
 
@@ -246,7 +247,8 @@ def test_temporary_file_is_removed_after_ingestion_exception(api, monkeypatch):
     monkeypatch.setattr(
         source_release_ingestion.tempfile, "NamedTemporaryFile", record_temporary_file
     )
-    monkeypatch.setattr(source_release_ingestion, "ingest_source_release", raise_ingestion_error)
+    # Feature 005: the endpoint's capture step lives in the shared ingest_release_file workflow.
+    monkeypatch.setattr(ingest_release_file, "ingest_source_release", raise_ingestion_error)
 
     with pytest.raises(RuntimeError, match="unexpected ingestion error"):
         _post_file()

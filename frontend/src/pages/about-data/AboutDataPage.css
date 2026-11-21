@@ -52,3 +52,80 @@
 .about-links a {
   font-weight: 600;
 }
+
+/* Feature 005: Fimea release updates */
+.release-check-button {
+  min-height: 2.6rem;
+  margin-top: 0.9rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--navy);
+  border-radius: 8px;
+  background: var(--navy);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.release-check-button:hover:not(:disabled) {
+  border-color: var(--color-accent-strong);
+  background: var(--color-accent-strong);
+}
+
+.release-check-button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.release-check-button:disabled {
+  border-color: var(--color-border-strong);
+  background: var(--color-surface-muted);
+  color: var(--color-text-muted);
+  cursor: progress;
+}
+
+.release-check-status:not(:empty) {
+  margin-top: 0.75rem;
+}
+
+.release-check-status p,
+.release-check-time {
+  color: var(--color-text-muted);
+}
+
+.release-check-status .release-check-error {
+  color: var(--error-text);
+}
+
+.release-check-outcome {
+  margin-top: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--color-border-strong);
+  border-radius: 8px;
+  background: var(--color-surface-muted);
+}
+
+.release-check-outcome--new {
+  border-left-color: var(--color-accent);
+  background: var(--color-accent-soft);
+}
+
+.release-check-outcome--failed {
+  border-color: var(--error-border);
+  border-left-color: var(--error-text);
+  background: var(--error-bg);
+}
+
+.release-check-outcome--failed p {
+  color: var(--error-text);
+}
+
+.release-check-title {
+  font-weight: 700;
+}
+
+.about-card .release-check-time {
+  margin-top: 0.6rem;
+  font-size: 0.875rem;
+}

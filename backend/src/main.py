@@ -3,6 +3,7 @@ import logging
 from fastapi import FastAPI
 
 from .api.change_processing_outcomes import router as change_processing_outcomes_router
+from .api.latest_release_check import router as latest_release_check_router
 from .api.medicine_catalogue import router as medicine_catalogue_router
 from .api.open_review_cases import router as open_review_cases_router
 from .api.source_release_ingestion import router as source_release_ingestion_router
@@ -35,6 +36,8 @@ app.include_router(change_processing_outcomes_router)
 app.include_router(source_release_ingestion_router)
 # Feature 004: read-only medicine catalogue over the active baseline.
 app.include_router(medicine_catalogue_router)
+# Feature 005: check Fimea for the latest release on request.
+app.include_router(latest_release_check_router)
 
 
 @app.get("/health")

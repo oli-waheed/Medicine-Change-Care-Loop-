@@ -84,6 +84,10 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         ("GET", "/api/medicine-catalogue/active-substances"),
         ("GET", "/api/medicine-catalogue/compare"),
         ("GET", "/api/medicine-catalogue/source"),
+        # Feature 005: check Fimea for the latest release (contracts/latest-release-check-api.md).
+        # It downloads and ingests exactly like POST /ingest; it never changes or closes cases.
+        ("GET", "/api/source-releases/latest-check"),
+        ("POST", "/api/source-releases/latest-check"),
     }
 
 

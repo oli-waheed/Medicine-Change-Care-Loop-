@@ -7,7 +7,7 @@ changes cases, outcomes or the baseline (FR-010).
 
 from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, FastAPI, HTTPException, Query, Request
 
 from ..schemas import medicine_catalogue as schema
 from ..services.medicine_catalogue import (
@@ -26,12 +26,17 @@ UNAVAILABLE = {
 MAX_PAGE_SIZE = 200
 
 
-def _service(request: Request) -> MedicineCatalogueService:
-    service = getattr(request.app.state, "medicine_catalogue", None)
-    if service is None or service.store is not request.app.state.store:
-        service = MedicineCatalogueService(request.app.state.store)
-        request.app.state.medicine_catalogue = service
+def catalogue_service(app: FastAPI) -> MedicineCatalogueService:
+    """The app's catalogue service, recreated when the store is replaced."""
+    service = getattr(app.state, "medicine_catalogue", None)
+    if service is None or service.store is not app.state.store:
+        service = MedicineCatalogueService(app.state.store)
+        app.state.medicine_catalogue = service
     return service
+
+
+def _service(request: Request) -> MedicineCatalogueService:
+    return catalogue_service(request.app)
 
 
 def _baseline(service: MedicineCatalogueService):

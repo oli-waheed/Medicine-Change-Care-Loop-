@@ -9,47 +9,12 @@ from typing import Annotated
 from fastapi import APIRouter, File, Form, HTTPException, Request, UploadFile
 
 from ..config import ApplicationConfig
-from ..services.ingest_source_release import (
-    IngestionOutcome,
-    ProcessingStatus,
-    ingest_source_release,
-    reload_captured_release,
-    source_order_key,
-    validate_release_metadata,
-)
 from ..services.pipeline_store import PipelineStore
-from ..workflows.ingestion_to_review import run_ingested_release_to_review
+from ..workflows.ingest_release_file import ingest_release_file
 
 router = APIRouter(prefix="/api/source-releases", tags=["source-releases"])
 
 _UPLOAD_CHUNK_SIZE = 1024 * 1024
-
-
-def _compare_with_baseline(
-    request: Request, store: PipelineStore, outcome: IngestionOutcome
-) -> tuple[tuple, tuple]:
-    """Return ``(review cases, matching outcomes)`` from comparing with the baseline.
-
-    Only releases with backend-derived (Ajopvm) chronology are compared, and only
-    when strictly newer than the baseline. Older, equal-dated and UNKNOWN-order
-    releases are recorded for traceability but never compared.
-    """
-    current_key = source_order_key(outcome.source_order)
-    if current_key is None:
-        return (), ()
-    baseline_row = store.comparison_baseline()
-    if baseline_row is None or baseline_row.source_order_key >= current_key:
-        return (), ()
-    baseline = reload_captured_release(baseline_row.capture_directory)
-    if baseline.processing_status is not ProcessingStatus.VALIDATED:
-        raise RuntimeError(f"Stored baseline no longer validates: {baseline.failure_detail}")
-    result = run_ingested_release_to_review(
-        baseline,
-        outcome,
-        tuple(request.app.state.medication_records),
-        open_cases=[],
-    )
-    return result.created_cases, result.outcomes
 
 
 @router.post("/ingest")
@@ -106,74 +71,21 @@ async def ingest_uploaded_source_release(
 
         store: PipelineStore = request.app.state.store
         try:
-            parsed_retrieved_at = validate_release_metadata(
-                source_name, release_reference, order_evidence, retrieved_at
+            ingested = ingest_release_file(
+                store=store,
+                config=config,
+                medication_records=tuple(request.app.state.medication_records),
+                path=temporary_path,
+                filename=filename,
+                checksum=digest.hexdigest(),
+                source_name=source_name,
+                release_reference=release_reference,
+                order_evidence=order_evidence,
+                retrieved_at=retrieved_at,
             )
         except ValueError as error:
             raise HTTPException(status_code=422, detail=str(error)) from error
-
-        # Identical content already captured (e.g. the unchanged daily Fimea file):
-        # keep the single stored copy and record only this retrieval.
-        existing = store.capture_with_identical_content(source_name, {digest.hexdigest()})
-        if existing is not None:
-            store.record_retrieval(existing, parsed_retrieved_at, release_reference)
-            return {
-                "processingStatus": existing.processing_status,
-                "chronologyStatus": (
-                    "AVAILABLE" if existing.source_order_key is not None else "UNAVAILABLE"
-                ),
-                "capturedReleaseReference": existing.release_id,
-                "failureDetail": existing.failure_detail,
-                "alreadyCaptured": True,
-            }
-
-        payload = {
-            "sourceName": source_name,
-            "sourceReleaseReference": release_reference,
-            "sourceOrder": order_evidence,
-            "retrievedAt": retrieved_at,
-            "files": [
-                {
-                    "name": filename,
-                    "checksum": digest.hexdigest(),
-                    "contentReference": str(temporary_path),
-                }
-            ],
-            "captureStatus": "COMPLETE",
-        }
-
-        try:
-            outcome = ingest_source_release(
-                payload,
-                storage_dir=config.source_release_storage_dir,
-            )
-        except ValueError as error:
-            raise HTTPException(
-                status_code=422,
-                detail=str(error),
-            ) from error
-
-        captured_reference = (
-            outcome.captured_release.release_id if outcome.captured_release is not None else None
-        )
-
-        if outcome.captured_release is not None:
-            if not store.is_known_release(captured_reference):
-                cases, processing_outcomes = (
-                    _compare_with_baseline(request, store, outcome)
-                    if outcome.processing_status is ProcessingStatus.VALIDATED
-                    else ((), ())
-                )
-                # Capture, cases and matching outcomes are written in one transaction.
-                store.record_ingestion(outcome, cases, processing_outcomes)
-
-        return {
-            "processingStatus": outcome.processing_status.value,
-            "chronologyStatus": outcome.chronology_status.value,
-            "capturedReleaseReference": captured_reference,
-            "failureDetail": outcome.failure_detail,
-            "alreadyCaptured": False,
-        }
+        return ingested.response
 
     finally:
         try:

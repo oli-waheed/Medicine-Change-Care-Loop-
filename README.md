@@ -26,6 +26,7 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Present before-and-after information and supporting source evidence, and show when that evidence is no longer available.
 - Review cases in a responsive workspace with a sidebar, case search and separate layouts for changed and removed packages (feature 003).
 - Browse a read-only Medicine Catalogue of the active validated release: search by name, package ID or VNR, filter by source fields, open product and package records with provenance, explore active substances and compare two products field by field (feature 004).
+- Check Fimea for a new release from About the Data with one button, which downloads and loads it like the daily workflow (feature 005).
 - Store an unchanged daily download only once, recording each retrieval time.
 - Provide APIs for retrieving open review cases and change processing outcomes.
 
@@ -102,6 +103,8 @@ Current API endpoints include:
 | GET | `/api/medicine-catalogue/active-substances` | Active substances with every occurrence in source order |
 | GET | `/api/medicine-catalogue/compare?productA=…&productB=…` | Source fields of two products side by side |
 | GET | `/api/medicine-catalogue/source` | Active catalogue release and record counts |
+| POST | `/api/source-releases/latest-check` | Start downloading and ingesting the latest Fimea release in the background |
+| GET | `/api/source-releases/latest-check` | Progress and outcome of that check |
 
 ### API Documentation
 
@@ -124,6 +127,8 @@ The workflow includes success and failure handling for download and upload opera
 The workflow configuration is available in:
 
 `workflow/n8n/fimea-basic-register-ingestion.json`
+
+To load the latest release by hand, press **Check for new Fimea release** on About the Data (feature 005). The backend downloads the same file from the same address and ingests it the same way; an unchanged file is only recorded as a new retrieval. A real release takes about one to two minutes.
 
 ## Data Source and Licence
 
@@ -194,7 +199,8 @@ Cases, case status events and the source-release capture history are stored in S
 | `DATABASE_URL` | `sqlite:///backend/data/medicine-change-care-loop.sqlite3` | SQLite database for cases, status events and capture history. |
 | `SOURCE_RELEASE_STORAGE_DIR` | `backend/data/source-releases` | Immutable raw-release captures. |
 | `SIMULATED_MEDICATION_RECORDS_PATH` | `backend/seed/simulated-medication-records.json` | Fictional medication records used for matching. Without this file no cases can be created. |
-| `MAX_SOURCE_RELEASE_UPLOAD_BYTES` | `262144000` | Upload size limit. |
+| `MAX_SOURCE_RELEASE_UPLOAD_BYTES` | `262144000` | Upload and download size limit. |
+| `FIMEA_RELEASE_URL` | `https://data.pilvi.fimea.fi/avoin-data/Perusrekisteri.xml` | Address used by "Check for new Fimea release" (the n8n workflow's address). |
 
 `backend/data/` is git-ignored. Delete it to start from an empty state; the schema is created automatically. The schema is not migrated automatically: after pulling a change to the case model, delete `backend/data/` once.
 
@@ -236,7 +242,7 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `227 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `236 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
@@ -252,7 +258,7 @@ From the frontend directory:
 npx vitest run
 ```
 
-Expected: `Tests  69 passed (69)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
+Expected: `Tests  75 passed (75)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
 
 Lint and format checks:
 
@@ -314,11 +320,11 @@ Medicine-Change-Care-Loop/
 
 All tasks of the feature specification (T001–T036 in [tasks.md](specs/001-ingestion-case-pipeline/tasks.md)) are implemented, and the specification lists no known gaps ([spec.md](specs/001-ingestion-case-pipeline/spec.md#implementation-status)).
 
-The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`.
+The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data.
 
 Verification:
 
-- 227 backend tests and 69 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 236 backend tests and 75 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
