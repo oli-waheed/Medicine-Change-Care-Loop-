@@ -35,7 +35,7 @@ describe("Application shell (feature 003)", () => {
   });
 
   describe("sidebar and navigation", () => {
-    it("shows the product name, three links and the attribution, with no theme switch", async () => {
+    it("shows the product name, four links and the attribution, with no theme switch", async () => {
       renderAt("/");
       await screen.findByText("There are no NEW review cases.");
       const sidebar = screen.getByRole("complementary", { name: "Sidebar" });
@@ -45,6 +45,7 @@ describe("Application shell (feature 003)", () => {
       expect(sidebarLinks().map((link) => link.textContent)).toEqual([
         "Open Review Cases",
         "Medicine Catalogue",
+        "Medicine Shortages",
         "About the Data",
       ]);
       expect(screen.queryByRole("switch")).toBeNull();
@@ -69,7 +70,7 @@ describe("Application shell (feature 003)", () => {
       expect(document.title).toBe(
         "Open Review Cases | Medicine Change Care Loop",
       );
-      const [cases, , about] = sidebarLinks();
+      const [cases, , , about] = sidebarLinks();
       expect(cases).toHaveAttribute("aria-current", "page");
       expect(about).not.toHaveAttribute("aria-current");
 
@@ -82,14 +83,14 @@ describe("Application shell (feature 003)", () => {
       ).toBeVisible();
       expect(window.location.pathname).toBe("/about-data");
       expect(document.title).toBe("About the Data | Medicine Change Care Loop");
-      expect(sidebarLinks()[2]).toHaveAttribute("aria-current", "page");
+      expect(sidebarLinks()[3]).toHaveAttribute("aria-current", "page");
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
     it("returns to the previous page with the browser back button", async () => {
       renderAt("/");
       await screen.findByText("There are no NEW review cases.");
-      fireEvent.click(sidebarLinks()[2]);
+      fireEvent.click(sidebarLinks()[3]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
       act(() => {
         window.history.replaceState(null, "", "/");
@@ -128,7 +129,7 @@ describe("Application shell (feature 003)", () => {
     it("leaves modified clicks to the browser", async () => {
       renderAt("/");
       await screen.findByText("There are no NEW review cases.");
-      fireEvent.click(sidebarLinks()[2], { ctrlKey: true });
+      fireEvent.click(sidebarLinks()[3], { ctrlKey: true });
       expect(window.location.pathname).toBe("/");
     });
   });
@@ -138,7 +139,7 @@ describe("Application shell (feature 003)", () => {
       renderAt("/");
       await screen.findByText("There are no NEW review cases.");
       expect(document.body).toHaveFocus();
-      fireEvent.click(sidebarLinks()[2]);
+      fireEvent.click(sidebarLinks()[3]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
       expect(screen.getByRole("main")).toHaveFocus();
     });

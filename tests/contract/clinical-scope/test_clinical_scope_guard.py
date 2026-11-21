@@ -88,6 +88,12 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         # It downloads and ingests exactly like POST /ingest; it never changes or closes cases.
         ("GET", "/api/source-releases/latest-check"),
         ("POST", "/api/source-releases/latest-check"),
+        # Feature 006: Fimea shortage data and the daily update (contracts/shortages-api.md).
+        # They store Fimea's shortage file and show it; they never change or close cases.
+        ("GET", "/api/shortages"),
+        ("GET", "/api/shortages/update"),
+        ("POST", "/api/shortages/update"),
+        ("GET", "/api/daily-updates"),
     }
 
 

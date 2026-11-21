@@ -38,10 +38,11 @@ def get_latest_release_check(request: Request) -> dict:
     return status_response(latest_release_check(request.app).status())
 
 
-@router.post("/latest-check", status_code=status.HTTP_202_ACCEPTED)
-def start_latest_release_check(request: Request) -> JSONResponse:
-    """Start a check; if one is already running, report it instead of starting another."""
-    app = request.app
+def start_latest_release_check(app: FastAPI):
+    """Start a check for ``app`` unless one runs. Returns ``(status, started)``.
+
+    Used by the button (``POST``) and by the daily automatic update (feature 006).
+    """
     config: ApplicationConfig = app.state.source_release_config
     store = app.state.store
     records = tuple(app.state.medication_records)
@@ -64,12 +65,18 @@ def start_latest_release_check(request: Request) -> JSONResponse:
     def warm_catalogue() -> None:
         catalogue_service(app).get_baseline()
 
-    current, started = latest_release_check(app).start(
+    return latest_release_check(app).start(
         url=config.fimea_release_url,
         max_bytes=config.max_source_release_upload_bytes,
         ingest=ingest,
         warm_catalogue=warm_catalogue,
     )
+
+
+@router.post("/latest-check", status_code=status.HTTP_202_ACCEPTED)
+def start_latest_release_check_endpoint(request: Request) -> JSONResponse:
+    """Start a check; if one is already running, report it instead of starting another."""
+    current, started = start_latest_release_check(request.app)
     return JSONResponse(
         status_code=status.HTTP_202_ACCEPTED,
         content={**status_response(current), "started": started},

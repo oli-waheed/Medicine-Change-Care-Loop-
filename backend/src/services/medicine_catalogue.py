@@ -1,8 +1,9 @@
 """Read access to the latest validated medicine catalogue release."""
 
+import logging
 from collections.abc import Iterable
 from dataclasses import dataclass, field
-from threading import RLock
+from threading import Lock, RLock, Thread
 
 from ..domain.medicine_snapshot import ActiveSubstanceFields, MedicineSnapshot
 from ..domain.source_field import SourceField, SourceFieldState
@@ -14,6 +15,8 @@ from ..services.ingest_source_release import (
 )
 from .detect_relevant_changes import _substance_identity, project_snapshot_fields
 from .pipeline_store import PipelineStore
+
+logger = logging.getLogger(__name__)
 
 # Fields a caller can require to be absent (missing, or no occurrences).
 ABSENCE_FIELDS = frozenset({"vnr", "atc", "form", "route", "available"})
@@ -51,10 +54,62 @@ class MedicineCatalogueService:
         self._lock = RLock()
         self._cached_release_id: str | None = None
         self._cached_ingestion: IngestionOutcome | None = None
+        self._vnr_index: tuple[str, dict[str, tuple[MedicineSnapshot, ...]]] | None = None
+        self._warm_lock = Lock()
+        self._warming: Thread | None = None
 
     @property
     def store(self) -> PipelineStore:
         return self._store
+
+    def cached_baseline(self) -> MedicineCatalogueBaseline | None:
+        """The active baseline if it is already in memory; never reconstructs.
+
+        Returns None while another thread is reconstructing it (feature 006 uses
+        this so the shortage list never waits for the catalogue).
+        """
+
+        capture = self._store.comparison_baseline()
+        if capture is None or not self._lock.acquire(blocking=False):
+            return None
+        try:
+            if self._cached_release_id != capture.release_id or self._cached_ingestion is None:
+                return None
+            return MedicineCatalogueBaseline(capture=capture, ingestion=self._cached_ingestion)
+        finally:
+            self._lock.release()
+
+    def warm_in_background(self) -> None:
+        """Reconstruct the baseline in a background thread, once at a time."""
+
+        with self._warm_lock:
+            if self._warming is not None and self._warming.is_alive():
+                return
+            self._warming = Thread(target=self._warm, name="catalogue-warm", daemon=True)
+            self._warming.start()
+
+    def _warm(self) -> None:
+        try:
+            self.get_baseline()
+        except Exception:  # noqa: BLE001 - the catalogue API reports the error itself
+            logger.exception("Catalogue baseline could not be prepared.")
+
+    def packages_by_vnr(
+        self, baseline: MedicineCatalogueBaseline
+    ) -> dict[str, tuple[MedicineSnapshot, ...]]:
+        """Packages of the baseline grouped by their VNR value (feature 006)."""
+
+        with self._lock:
+            if self._vnr_index is not None and self._vnr_index[0] == baseline.release_id:
+                return self._vnr_index[1]
+            grouped: dict[str, list[MedicineSnapshot]] = {}
+            for snapshot in baseline.snapshots:
+                vnr = snapshot.vnr_numero
+                if vnr.state is SourceFieldState.VALUE and vnr.value:
+                    grouped.setdefault(vnr.value, []).append(snapshot)
+            index = {key: tuple(value) for key, value in grouped.items()}
+            self._vnr_index = (baseline.release_id, index)
+            return index
 
     def get_baseline(self) -> MedicineCatalogueBaseline | None:
         """Return the latest validated baseline, or None when none exists."""

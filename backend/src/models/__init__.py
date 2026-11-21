@@ -89,3 +89,48 @@ class SourceReleaseRetrievalRow(Base):
     release_id: Mapped[str] = mapped_column(String(80), index=True)
     retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     source_release_reference: Mapped[dict[str, Any]] = mapped_column(JSON)
+
+
+# --- Feature 006: medicine shortages --------------------------------------------------
+
+
+class ShortageCaptureRow(Base):
+    """One immutable download of Fimea's shortage file (Shortages.txt), stored once by content."""
+
+    __tablename__ = "shortage_captures"
+
+    sequence: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    checksum: Mapped[str] = mapped_column(String(80), unique=True, index=True)
+    processing_status: Mapped[str] = mapped_column(String(20))
+    source_url: Mapped[str] = mapped_column(Text)
+    file_path: Mapped[str] = mapped_column(Text)
+    size_bytes: Mapped[int] = mapped_column(Integer)
+    record_count: Mapped[int | None] = mapped_column(Integer)
+    first_retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    last_retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    failure_detail: Mapped[str | None] = mapped_column(Text)
+
+
+class ShortageRetrievalRow(Base):
+    """Every download of the shortage file, including unchanged ones."""
+
+    __tablename__ = "shortage_retrievals"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    capture_sequence: Mapped[int] = mapped_column(
+        ForeignKey("shortage_captures.sequence"), index=True
+    )
+    retrieved_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+
+
+class DailyUpdateRunRow(Base):
+    """One run of the backend's daily automatic update (feature 006)."""
+
+    __tablename__ = "daily_update_runs"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
+    run_date: Mapped[str] = mapped_column(String(10), index=True)
+    trigger: Mapped[str] = mapped_column(String(20))
+    started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
+    outcome: Mapped[dict[str, Any] | None] = mapped_column(JSON)

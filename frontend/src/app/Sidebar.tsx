@@ -5,6 +5,7 @@ import {
   CatalogueIcon,
   ChevronIcon,
   DataIcon,
+  ShortageIcon,
 } from "./icons";
 import {
   NAVIGATION_ITEMS,
@@ -16,6 +17,7 @@ import {
 const ICONS = {
   "open-review-cases": CasesIcon,
   "medicine-catalogue": CatalogueIcon,
+  "medicine-shortages": ShortageIcon,
   "about-data": DataIcon,
 } as const;
 

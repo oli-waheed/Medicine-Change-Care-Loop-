@@ -13,7 +13,10 @@ from ..models import (
     Base,
     CaseStatusEventRow,
     ChangeProcessingOutcomeRow,
+    DailyUpdateRunRow,
     ReviewCaseRow,
+    ShortageCaptureRow,
+    ShortageRetrievalRow,
     SourceReleaseCaptureRow,
     SourceReleaseRetrievalRow,
 )
@@ -332,3 +335,98 @@ class PipelineStore:
             if results:
                 query = query.where(ChangeProcessingOutcomeRow.result.in_(sorted(results)))
             return [row.evidence_payload for row in session.scalars(query)]
+
+    # --- shortage captures (feature 006) -------------------------------------------
+
+    def shortage_capture_by_checksum(self, checksum: str) -> ShortageCaptureRow | None:
+        with self._session() as session:
+            return session.scalars(
+                select(ShortageCaptureRow).where(ShortageCaptureRow.checksum == checksum)
+            ).first()
+
+    def record_shortage_capture(self, row: ShortageCaptureRow) -> ShortageCaptureRow:
+        """Store a new capture and its first retrieval in one transaction."""
+        with self._session() as session, session.begin():
+            session.add(row)
+            session.flush()
+            session.add(
+                ShortageRetrievalRow(
+                    capture_sequence=row.sequence, retrieved_at=_as_utc(row.first_retrieved_at)
+                )
+            )
+        return row
+
+    def record_shortage_retrieval(
+        self, capture: ShortageCaptureRow, retrieved_at: datetime
+    ) -> ShortageCaptureRow:
+        """Record another download of content that is already captured."""
+        with self._session() as session, session.begin():
+            row = session.get(ShortageCaptureRow, capture.sequence)
+            row.last_retrieved_at = _as_utc(retrieved_at)
+            session.add(
+                ShortageRetrievalRow(
+                    capture_sequence=capture.sequence, retrieved_at=_as_utc(retrieved_at)
+                )
+            )
+        return row
+
+    def active_shortage_capture(self) -> ShortageCaptureRow | None:
+        """The validated capture retrieved most recently: what Fimea publishes now."""
+        with self._session() as session:
+            return session.scalars(
+                select(ShortageCaptureRow)
+                .where(ShortageCaptureRow.processing_status == "VALIDATED")
+                .order_by(
+                    ShortageCaptureRow.last_retrieved_at.desc(),
+                    ShortageCaptureRow.sequence.desc(),
+                )
+                .limit(1)
+            ).first()
+
+    def shortage_retrieval_count(self, capture_sequence: int) -> int:
+        with self._session() as session:
+            return len(
+                session.scalars(
+                    select(ShortageRetrievalRow.id).where(
+                        ShortageRetrievalRow.capture_sequence == capture_sequence
+                    )
+                ).all()
+            )
+
+    # --- daily automatic update runs (feature 006) -----------------------------------
+
+    def daily_update_run_on(self, run_date: str) -> DailyUpdateRunRow | None:
+        with self._session() as session:
+            return session.scalars(
+                select(DailyUpdateRunRow)
+                .where(
+                    DailyUpdateRunRow.run_date == run_date,
+                    DailyUpdateRunRow.trigger == "SCHEDULE",
+                )
+                .limit(1)
+            ).first()
+
+    def start_daily_update_run(
+        self, run_date: str, trigger: str, started_at: datetime
+    ) -> DailyUpdateRunRow:
+        row = DailyUpdateRunRow(run_date=run_date, trigger=trigger, started_at=_as_utc(started_at))
+        with self._session() as session, session.begin():
+            session.add(row)
+        return row
+
+    def finish_daily_update_run(
+        self, run: DailyUpdateRunRow, finished_at: datetime, outcome: dict
+    ) -> DailyUpdateRunRow:
+        with self._session() as session, session.begin():
+            row = session.get(DailyUpdateRunRow, run.id)
+            row.finished_at = _as_utc(finished_at)
+            row.outcome = outcome
+        return row
+
+    def latest_daily_update_run(self) -> DailyUpdateRunRow | None:
+        with self._session() as session:
+            return session.scalars(
+                select(DailyUpdateRunRow)
+                .order_by(DailyUpdateRunRow.started_at.desc(), DailyUpdateRunRow.id.desc())
+                .limit(1)
+            ).first()

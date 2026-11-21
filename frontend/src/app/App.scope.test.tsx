@@ -9,6 +9,7 @@ import App from "../App";
 import type { OpenReviewCase } from "../pages/open-review-cases/openReviewCases";
 import { CLINICAL_WORDS } from "../test/clinicalWords";
 import { catalogueFetch } from "../test/catalogueFixtures";
+import { shortageFetch } from "../test/shortageFixtures";
 
 function fixture(id: string, removed: boolean): OpenReviewCase {
   const source = {
@@ -122,19 +123,44 @@ const CATALOGUE_INPUTS = [
   "Search active substances",
 ];
 const CATALOGUE_SELECTS = ["On the market (Kaupan)", "Not present in source"];
+// Feature 006: the shortage list's search, status filter, paging and its one
+// Update button, which downloads Fimea's shortage file and changes no cases.
+const SHORTAGE_BUTTONS = [/^Update shortage data$/, /^(Previous|Next) page$/];
+const SHORTAGE_INPUTS = ["Search shortages"];
+const SHORTAGE_SELECTS = ["Status (Valid)"];
 const ALLOWED_LINKS: [string, string][] = [
   ["Skip to main content", "#main-content"],
   ["Open Review Cases", "/"],
   ["Medicine Catalogue", "/medicine-catalogue"],
+  ["Medicine Shortages", "/medicine-shortages"],
   ["About the Data", "/about-data"],
   ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
   ["CC BY 4.0 licence", "https://creativecommons.org/licenses/by/4.0/"],
   ["Fimea open data", "https://fimea.fi/en/about_us/open-data"],
 ];
 
-function expectOnlyAllowedControls(catalogue = false) {
-  const buttons = catalogue
-    ? [...ALLOWED_BUTTONS, ...CATALOGUE_BUTTONS]
+type Mode = "cases" | "catalogue" | "shortages";
+
+const MODE_CONTROLS: Record<
+  Exclude<Mode, "cases">,
+  { buttons: RegExp[]; inputs: string[]; selects: string[] }
+> = {
+  catalogue: {
+    buttons: CATALOGUE_BUTTONS,
+    inputs: CATALOGUE_INPUTS,
+    selects: CATALOGUE_SELECTS,
+  },
+  shortages: {
+    buttons: SHORTAGE_BUTTONS,
+    inputs: SHORTAGE_INPUTS,
+    selects: SHORTAGE_SELECTS,
+  },
+};
+
+function expectOnlyAllowedControls(mode: Mode = "cases") {
+  const controls = mode === "cases" ? null : MODE_CONTROLS[mode];
+  const buttons = controls
+    ? [...ALLOWED_BUTTONS, ...controls.buttons]
     : ALLOWED_BUTTONS;
   for (const button of screen.queryAllByRole("button", { hidden: true })) {
     const name = button.textContent?.trim() ?? "";
@@ -150,14 +176,14 @@ function expectOnlyAllowedControls(catalogue = false) {
       pair,
     );
   }
-  if (catalogue) {
-    // Catalogue fields only narrow what is read; nothing is ever submitted.
+  if (controls) {
+    // These fields only narrow what is read; nothing is ever submitted.
     for (const input of document.querySelectorAll("input")) {
       expect(["search", "text"]).toContain(input.getAttribute("type"));
-      expect(CATALOGUE_INPUTS).toContain(input.labels?.[0]?.textContent);
+      expect(controls.inputs).toContain(input.labels?.[0]?.textContent);
     }
     for (const select of document.querySelectorAll("select")) {
-      expect(CATALOGUE_SELECTS).toContain(select.labels?.[0]?.textContent);
+      expect(controls.selects).toContain(select.labels?.[0]?.textContent);
     }
     expect(document.querySelectorAll("textarea, form")).toHaveLength(0);
   } else {
@@ -175,13 +201,16 @@ describe("Application clinical scope (feature 003)", () => {
   let fetchMock: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
-    fetchMock = vi.fn(async (url: string) =>
+    fetchMock = vi.fn(async (url: string, init?: RequestInit) =>
       url.startsWith("/api/medicine-catalogue")
         ? catalogueFetch(url)
-        : {
-            ok: true,
-            json: async () => [fixture("100", false), fixture("300", true)],
-          },
+        : url.startsWith("/api/shortages") ||
+            url.startsWith("/api/daily-updates")
+          ? shortageFetch(url, init)
+          : {
+              ok: true,
+              json: async () => [fixture("100", false), fixture("300", true)],
+            },
     );
     vi.stubGlobal("fetch", fetchMock);
   });
@@ -236,14 +265,14 @@ describe("Application clinical scope (feature 003)", () => {
       name: "Medicine Catalogue",
     });
     await screen.findByText(/Showing 1–4 of 4 packages/);
-    expectOnlyAllowedControls(true);
+    expectOnlyAllowedControls("catalogue");
 
     fireEvent.click(screen.getByText("Filters"));
-    expectOnlyAllowedControls(true);
+    expectOnlyAllowedControls("catalogue");
 
     fireEvent.click(screen.getByRole("button", { name: /SIM-PKG-100/ }));
     await screen.findByRole("button", { name: "Open product SYN-PROD-100" });
-    expectOnlyAllowedControls(true);
+    expectOnlyAllowedControls("catalogue");
 
     fireEvent.click(
       screen.getByRole("button", { name: "Open product SYN-PROD-100" }),
@@ -252,18 +281,50 @@ describe("Application clinical scope (feature 003)", () => {
       await screen.findByRole("button", { name: "Add to comparison" }),
     );
     await screen.findByText("Product A");
-    expectOnlyAllowedControls(true);
+    expectOnlyAllowedControls("catalogue");
 
     fireEvent.click(screen.getByRole("button", { name: "Active substances" }));
     await screen.findByText("Aine=SIM-SA01");
     fireEvent.click(
       screen.getByRole("button", { name: "Show occurrences (3)" }),
     );
-    expectOnlyAllowedControls(true);
+    expectOnlyAllowedControls("catalogue");
 
     for (const [url, options] of fetchMock.mock.calls) {
       expect(String(url)).toMatch(/^\/api\/medicine-catalogue(\/|\?|$)/);
       expect(options?.method ?? "GET").toBe("GET");
     }
+  });
+
+  it("keeps Medicine Shortages to reading controls and its Update button", async () => {
+    window.history.replaceState(null, "", "/medicine-shortages");
+    render(<App />);
+    await screen.findByRole("heading", {
+      level: 1,
+      name: "Medicine Shortages",
+    });
+    await screen.findByText("Showing 1–3 of 3 shortages");
+    expectOnlyAllowedControls("shortages");
+
+    fireEvent.change(screen.getByRole("combobox", { name: "Status (Valid)" }), {
+      target: { value: "E" },
+    });
+    await screen.findByText("Showing 1–1 of 1 shortages");
+    expectOnlyAllowedControls("shortages");
+
+    // Reads are GETs; the only POST is the shortage download, and only on press.
+    for (const [url, options] of fetchMock.mock.calls) {
+      expect(String(url)).toMatch(/^\/api\/(shortages|daily-updates)(\?|$)/);
+      expect(options?.method ?? "GET").toBe("GET");
+    }
+    fireEvent.click(
+      screen.getByRole("button", { name: "Update shortage data" }),
+    );
+    await screen.findByText("Downloading Fimea’s shortage file…");
+    const posts = fetchMock.mock.calls.filter(
+      ([, options]) => options?.method === "POST",
+    );
+    expect(posts.map(([url]) => url)).toEqual(["/api/shortages/update"]);
+    expectOnlyAllowedControls("shortages");
   });
 });

@@ -3,8 +3,11 @@ import logging
 from fastapi import FastAPI
 
 from .api.change_processing_outcomes import router as change_processing_outcomes_router
+from .api.daily_updates import daily_update_lifespan
+from .api.daily_updates import router as daily_updates_router
 from .api.latest_release_check import router as latest_release_check_router
 from .api.medicine_catalogue import router as medicine_catalogue_router
+from .api.medicine_shortages import router as medicine_shortages_router
 from .api.open_review_cases import router as open_review_cases_router
 from .api.source_release_ingestion import router as source_release_ingestion_router
 from .config import ApplicationConfig
@@ -26,7 +29,8 @@ def _load_records(config: ApplicationConfig):
 
 _config = ApplicationConfig.from_environment()
 
-app = FastAPI(title="Medicine Change Care Loop")
+# Feature 006: the lifespan starts the daily automatic update.
+app = FastAPI(title="Medicine Change Care Loop", lifespan=daily_update_lifespan)
 app.state.source_release_config = _config
 # The database is opened lazily on first request, not at import time.
 app.state.store = PipelineStore(_config.database_url)
@@ -38,6 +42,9 @@ app.include_router(source_release_ingestion_router)
 app.include_router(medicine_catalogue_router)
 # Feature 005: check Fimea for the latest release on request.
 app.include_router(latest_release_check_router)
+# Feature 006: Fimea shortage data and the daily automatic update.
+app.include_router(medicine_shortages_router)
+app.include_router(daily_updates_router)
 
 
 @app.get("/health")

@@ -10,10 +10,11 @@ import {
 describe("navigation", () => {
   afterEach(() => window.history.replaceState(null, "", "/"));
 
-  it("offers exactly the three working pages", () => {
+  it("offers exactly the four working pages", () => {
     expect(NAVIGATION_ITEMS.map((item) => item.label)).toEqual([
       "Open Review Cases",
       "Medicine Catalogue",
+      "Medicine Shortages",
       "About the Data",
     ]);
   });
@@ -24,6 +25,7 @@ describe("navigation", () => {
     expect(pageForPath("/about-data/")).toBe("about-data");
     expect(pageForPath("/medicine-catalogue")).toBe("medicine-catalogue");
     expect(pageForPath("/medicine-catalogue/")).toBe("medicine-catalogue");
+    expect(pageForPath("/medicine-shortages")).toBe("medicine-shortages");
     expect(normalisePath("//")).toBe("/");
   });
 
@@ -39,6 +41,9 @@ describe("navigation", () => {
     );
     expect(documentTitle("about-data")).toBe(
       "About the Data | Medicine Change Care Loop",
+    );
+    expect(documentTitle("medicine-shortages")).toBe(
+      "Medicine Shortages | Medicine Change Care Loop",
     );
     expect(documentTitle("medicine-catalogue")).toBe(
       "Medicine Catalogue | Medicine Change Care Loop",

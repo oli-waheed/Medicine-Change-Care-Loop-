@@ -87,3 +87,12 @@ export function CatalogueIcon({ className }: IconProps) {
     </svg>
   );
 }
+
+export function ShortageIcon({ className }: IconProps) {
+  return (
+    <svg {...common} className={className}>
+      <path d="M12 3.5 21 19.5H3z" />
+      <path d="M12 10v4.5M12 17.2v.3" />
+    </svg>
+  );
+}

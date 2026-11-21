@@ -35,6 +35,10 @@ export default function AboutDataPage() {
             Medicines Agency Fimea, published as open data under the Creative
             Commons Attribution 4.0 (CC BY 4.0) licence.
           </p>
+          <p>
+            Medicine Shortages shows Fimea’s open-data shortage file
+            (Shortages.txt), published under the same licence.
+          </p>
           <ul className="about-links">
             <li>
               <a href={LICENCE_URL} rel="noreferrer">

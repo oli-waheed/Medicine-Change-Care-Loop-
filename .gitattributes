@@ -2,3 +2,5 @@
 *.png binary
 *.jpg binary
 *.ico binary
+# Feature 006: synthetic copies of Fimea's Shortages.txt keep its CRLF line endings.
+tests/fixtures/fimea-shortages/*.txt -text

@@ -1,11 +1,14 @@
 """Shared normalized fictional snapshots; XML normalization remains T022."""
 
+import os
 import sys
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
+# Feature 006: tests never start the daily automatic update (it would download from Fimea).
+os.environ["DAILY_UPDATE_TIME"] = "off"
 sys.path.insert(0, str(Path(__file__).parents[1] / "backend"))
 from src.domain.evidence import EvidenceClassification
 from src.domain.medicine_snapshot import (

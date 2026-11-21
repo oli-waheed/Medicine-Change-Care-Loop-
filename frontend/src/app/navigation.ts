@@ -1,7 +1,11 @@
 import { useSyncExternalStore, type MouseEvent } from "react";
 
 export type PageId =
-  "open-review-cases" | "medicine-catalogue" | "about-data" | "not-found";
+  | "open-review-cases"
+  | "medicine-catalogue"
+  | "medicine-shortages"
+  | "about-data"
+  | "not-found";
 
 export type NavigationItem = {
   page: Exclude<PageId, "not-found">;
@@ -18,12 +22,19 @@ export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     path: "/medicine-catalogue",
     label: "Medicine Catalogue",
   },
+  // Feature 006 (supersedes 003 FR-001/FR-002 in part).
+  {
+    page: "medicine-shortages",
+    path: "/medicine-shortages",
+    label: "Medicine Shortages",
+  },
   { page: "about-data", path: "/about-data", label: "About the Data" },
 ];
 
 export const PAGE_TITLES: Record<PageId, string> = {
   "open-review-cases": "Open Review Cases",
   "medicine-catalogue": "Medicine Catalogue",
+  "medicine-shortages": "Medicine Shortages",
   "about-data": "About the Data",
   "not-found": "Page not found",
 };
