@@ -9,6 +9,7 @@ from ..config import ApplicationConfig
 from ..services.daily_updates import DailyUpdateScheduler, local_now
 from ..services.latest_release_check import status_response
 from ..services.medicine_shortages import update_status_response
+from ..workflows.release_quality import backfill_quality_checks
 from .latest_release_check import latest_release_check, start_latest_release_check
 from .medicine_shortages import shortage_update, start_shortage_update
 
@@ -19,7 +20,7 @@ _WAIT_SECONDS = 30 * 60
 
 
 def run_daily_jobs(app: FastAPI) -> dict:
-    """Shortages first (small), then the Basic Register. Waits for both."""
+    """Shortages first (small), then the Basic Register, then missing quality checks."""
     update = shortage_update(app)
     start_shortage_update(app, trigger="SCHEDULE")
     shortages = update_status_response(update.wait(_WAIT_SECONDS))
@@ -28,7 +29,13 @@ def run_daily_jobs(app: FastAPI) -> dict:
     check = latest_release_check(app)
     check.wait(_WAIT_SECONDS)
     basic_register = status_response(check.status())
-    return {"shortages": shortages, "basicRegister": basic_register}
+    # Feature 010: check release pairs that have no quality check yet.
+    quality_checks = backfill_quality_checks(app.state.store)
+    return {
+        "shortages": shortages,
+        "basicRegister": basic_register,
+        "qualityChecksAdded": quality_checks,
+    }
 
 
 def utc_offset(moment) -> str:

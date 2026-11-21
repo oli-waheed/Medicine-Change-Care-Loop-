@@ -5,6 +5,7 @@ import {
   CatalogueIcon,
   ChevronIcon,
   DataIcon,
+  HistoryIcon,
   ShortageIcon,
 } from "./icons";
 import {
@@ -18,6 +19,7 @@ const ICONS = {
   "open-review-cases": CasesIcon,
   "medicine-catalogue": CatalogueIcon,
   "medicine-shortages": ShortageIcon,
+  "source-history": HistoryIcon,
   "about-data": DataIcon,
 } as const;
 

@@ -35,7 +35,7 @@ describe("Application shell (feature 003)", () => {
   });
 
   describe("sidebar and navigation", () => {
-    it("shows the product name, four links and the attribution, with no theme switch", async () => {
+    it("shows the product name, five links and the attribution, with no theme switch", async () => {
       renderAt("/");
       await screen.findByText("There are no open review cases.");
       const sidebar = screen.getByRole("complementary", { name: "Sidebar" });
@@ -46,6 +46,7 @@ describe("Application shell (feature 003)", () => {
         "Open Review Cases",
         "Medicine Catalogue",
         "Medicine Shortages",
+        "Source History",
         "About the Data",
       ]);
       expect(screen.queryByRole("switch")).toBeNull();
@@ -70,7 +71,7 @@ describe("Application shell (feature 003)", () => {
       expect(document.title).toBe(
         "Open Review Cases | Medicine Change Care Loop",
       );
-      const [cases, , , about] = sidebarLinks();
+      const [cases, , , , about] = sidebarLinks();
       expect(cases).toHaveAttribute("aria-current", "page");
       expect(about).not.toHaveAttribute("aria-current");
 
@@ -83,14 +84,14 @@ describe("Application shell (feature 003)", () => {
       ).toBeVisible();
       expect(window.location.pathname).toBe("/about-data");
       expect(document.title).toBe("About the Data | Medicine Change Care Loop");
-      expect(sidebarLinks()[3]).toHaveAttribute("aria-current", "page");
+      expect(sidebarLinks()[4]).toHaveAttribute("aria-current", "page");
       expect(fetchMock).toHaveBeenCalledTimes(1);
     });
 
     it("returns to the previous page with the browser back button", async () => {
       renderAt("/");
       await screen.findByText("There are no open review cases.");
-      fireEvent.click(sidebarLinks()[3]);
+      fireEvent.click(sidebarLinks()[4]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
       act(() => {
         window.history.replaceState(null, "", "/");
@@ -129,7 +130,7 @@ describe("Application shell (feature 003)", () => {
     it("leaves modified clicks to the browser", async () => {
       renderAt("/");
       await screen.findByText("There are no open review cases.");
-      fireEvent.click(sidebarLinks()[3], { ctrlKey: true });
+      fireEvent.click(sidebarLinks()[4], { ctrlKey: true });
       expect(window.location.pathname).toBe("/");
     });
   });
@@ -139,7 +140,7 @@ describe("Application shell (feature 003)", () => {
       renderAt("/");
       await screen.findByText("There are no open review cases.");
       expect(document.body).toHaveFocus();
-      fireEvent.click(sidebarLinks()[3]);
+      fireEvent.click(sidebarLinks()[4]);
       await screen.findByRole("heading", { level: 1, name: "About the Data" });
       expect(screen.getByRole("main")).toHaveFocus();
     });

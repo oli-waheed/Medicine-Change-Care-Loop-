@@ -137,3 +137,15 @@ class DailyUpdateRunRow(Base):
     started_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     outcome: Mapped[dict[str, Any] | None] = mapped_column(JSON)
+
+
+class ReleaseQualityCheckRow(Base):
+    """Automatic data-quality checks of one compared release pair (feature 010)."""
+
+    __tablename__ = "release_quality_checks"
+
+    check_id: Mapped[str] = mapped_column(String(80), primary_key=True)
+    prior_release_id: Mapped[str] = mapped_column(String(80), index=True)
+    current_release_id: Mapped[str] = mapped_column(String(80), index=True)
+    checked_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), index=True)
+    payload: Mapped[dict[str, Any]] = mapped_column(JSON)

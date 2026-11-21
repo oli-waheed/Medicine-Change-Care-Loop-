@@ -18,6 +18,7 @@ from ..services.ingest_source_release import (
     validate_release_metadata,
 )
 from ..services.pipeline_store import PipelineStore
+from ..services.release_quality_checks import build_quality_check
 from .ingestion_to_review import run_ingested_release_to_review
 
 
@@ -32,8 +33,8 @@ class IngestedFile:
 
 def _compare_with_baseline(
     store: PipelineStore, outcome: IngestionOutcome, medication_records: tuple
-) -> tuple[tuple, tuple]:
-    """Return ``(review cases, matching outcomes)`` from comparing with the baseline.
+) -> tuple[tuple, tuple, dict | None]:
+    """Return ``(review cases, matching outcomes, quality check)`` against the baseline.
 
     Only releases with backend-derived (Ajopvm) chronology are compared, and only
     when strictly newer than the baseline. Older, equal-dated and UNKNOWN-order
@@ -41,10 +42,10 @@ def _compare_with_baseline(
     """
     current_key = source_order_key(outcome.source_order)
     if current_key is None:
-        return (), ()
+        return (), (), None
     baseline_row = store.comparison_baseline()
     if baseline_row is None or baseline_row.source_order_key >= current_key:
-        return (), ()
+        return (), (), None
     baseline = reload_captured_release(baseline_row.capture_directory)
     if baseline.processing_status is not ProcessingStatus.VALIDATED:
         raise RuntimeError(f"Stored baseline no longer validates: {baseline.failure_detail}")
@@ -54,7 +55,15 @@ def _compare_with_baseline(
         medication_records,
         open_cases=[],
     )
-    return result.created_cases, result.outcomes
+    # Feature 010: check the pair's data quality with the same comparison.
+    quality_check = build_quality_check(
+        prior=baseline,
+        current=outcome,
+        prior_release_id=baseline_row.release_id,
+        current_release_id=outcome.captured_release.release_id,
+        comparison=result.comparison,
+    )
+    return result.created_cases, result.outcomes, quality_check
 
 
 def ingest_release_file(
@@ -116,13 +125,13 @@ def ingest_release_file(
     )
     cases: tuple = ()
     if outcome.captured_release is not None and not store.is_known_release(captured_reference):
-        cases, processing_outcomes = (
+        cases, processing_outcomes, quality_check = (
             _compare_with_baseline(store, outcome, medication_records)
             if outcome.processing_status is ProcessingStatus.VALIDATED
-            else ((), ())
+            else ((), (), None)
         )
-        # Capture, cases and matching outcomes are written in one transaction.
-        store.record_ingestion(outcome, cases, processing_outcomes)
+        # Capture, cases, matching outcomes and the quality check: one transaction.
+        store.record_ingestion(outcome, cases, processing_outcomes, quality_check)
 
     release = outcome.source_release
     return IngestedFile(

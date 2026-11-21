@@ -10,6 +10,7 @@ import type { OpenReviewCase } from "../pages/open-review-cases/openReviewCases"
 import { CLINICAL_WORDS } from "../test/clinicalWords";
 import { catalogueFetch } from "../test/catalogueFixtures";
 import { shortageFetch } from "../test/shortageFixtures";
+import sourceHistory from "../test/sourceHistoryResponse.json";
 
 function fixture(id: string, removed: boolean): OpenReviewCase {
   const source = {
@@ -137,6 +138,7 @@ const ALLOWED_LINKS: [string, string][] = [
   ["Open Review Cases", "/"],
   ["Medicine Catalogue", "/medicine-catalogue"],
   ["Medicine Shortages", "/medicine-shortages"],
+  ["Source History", "/source-history"],
   ["About the Data", "/about-data"],
   ["CC BY 4.0", "https://creativecommons.org/licenses/by/4.0/"],
   ["CC BY 4.0 licence", "https://creativecommons.org/licenses/by/4.0/"],
@@ -219,15 +221,17 @@ describe("Application clinical scope (feature 003)", () => {
 
   beforeEach(() => {
     fetchMock = vi.fn(async (url: string, init?: RequestInit) =>
-      url.startsWith("/api/medicine-catalogue")
-        ? catalogueFetch(url)
-        : url.startsWith("/api/shortages") ||
-            url.startsWith("/api/daily-updates")
-          ? shortageFetch(url, init)
-          : {
-              ok: true,
-              json: async () => [fixture("100", false), fixture("300", true)],
-            },
+      url.startsWith("/api/source-history")
+        ? { ok: true, json: async () => structuredClone(sourceHistory) }
+        : url.startsWith("/api/medicine-catalogue")
+          ? catalogueFetch(url)
+          : url.startsWith("/api/shortages") ||
+              url.startsWith("/api/daily-updates")
+            ? shortageFetch(url, init)
+            : {
+                ok: true,
+                json: async () => [fixture("100", false), fixture("300", true)],
+              },
     );
     vi.stubGlobal("fetch", fetchMock);
   });
@@ -311,6 +315,21 @@ describe("Application clinical scope (feature 003)", () => {
       expect(String(url)).toMatch(/^\/api\/medicine-catalogue(\/|\?|$)/);
       expect(options?.method ?? "GET").toBe("GET");
     }
+  });
+
+  it("keeps Source History to reading only, with one GET request", async () => {
+    window.history.replaceState(null, "", "/source-history");
+    render(<App />);
+    await screen.findByRole("heading", { level: 1, name: "Source History" });
+    await screen.findByText("Shortage files (2)");
+    expectOnlyAllowedControls();
+    expect(
+      document.querySelectorAll("input, select, textarea, form"),
+    ).toHaveLength(0);
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      "/api/source-history",
+    ]);
+    expect(fetchMock.mock.calls[0][1]?.method ?? "GET").toBe("GET");
   });
 
   it("keeps Medicine Shortages to reading controls and its Update button", async () => {

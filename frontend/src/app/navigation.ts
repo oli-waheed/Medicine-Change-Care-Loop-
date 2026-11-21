@@ -4,6 +4,7 @@ export type PageId =
   | "open-review-cases"
   | "medicine-catalogue"
   | "medicine-shortages"
+  | "source-history"
   | "about-data"
   | "not-found";
 
@@ -28,6 +29,8 @@ export const NAVIGATION_ITEMS: readonly NavigationItem[] = [
     path: "/medicine-shortages",
     label: "Medicine Shortages",
   },
+  // Feature 010: stored source files and release quality checks.
+  { page: "source-history", path: "/source-history", label: "Source History" },
   { page: "about-data", path: "/about-data", label: "About the Data" },
 ];
 
@@ -35,6 +38,7 @@ export const PAGE_TITLES: Record<PageId, string> = {
   "open-review-cases": "Open Review Cases",
   "medicine-catalogue": "Medicine Catalogue",
   "medicine-shortages": "Medicine Shortages",
+  "source-history": "Source History",
   "about-data": "About the Data",
   "not-found": "Page not found",
 };

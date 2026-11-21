@@ -97,6 +97,9 @@ def test_api_offers_no_operation_that_changes_or_closes_cases():
         # Feature 007: the one operation that changes a case, a pharmacist's review step
         # (contracts/review-api.md). The system never calls it.
         ("POST", "/api/review-cases/{case_id}/status-events"),
+        # Feature 010: read-only history of stored source files and release quality checks
+        # (contracts/source-history-api.md).
+        ("GET", "/api/source-history"),
     }
 
 

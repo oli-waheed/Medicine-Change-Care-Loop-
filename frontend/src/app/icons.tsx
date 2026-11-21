@@ -35,6 +35,16 @@ export function DataIcon({ className }: IconProps) {
   );
 }
 
+export function HistoryIcon({ className }: IconProps) {
+  return (
+    <svg {...common} className={className}>
+      <path d="M4 12a8 8 0 1 0 2.4-5.7" />
+      <path d="M4 4.5v3.8h3.8" />
+      <path d="M12 8v4.2l2.8 1.8" />
+    </svg>
+  );
+}
+
 export function MenuIcon({ className }: IconProps) {
   return (
     <svg {...common} className={className}>

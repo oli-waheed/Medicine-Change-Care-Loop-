@@ -10,11 +10,12 @@ import {
 describe("navigation", () => {
   afterEach(() => window.history.replaceState(null, "", "/"));
 
-  it("offers exactly the four working pages", () => {
+  it("offers exactly the five working pages", () => {
     expect(NAVIGATION_ITEMS.map((item) => item.label)).toEqual([
       "Open Review Cases",
       "Medicine Catalogue",
       "Medicine Shortages",
+      "Source History",
       "About the Data",
     ]);
   });
@@ -26,6 +27,7 @@ describe("navigation", () => {
     expect(pageForPath("/medicine-catalogue")).toBe("medicine-catalogue");
     expect(pageForPath("/medicine-catalogue/")).toBe("medicine-catalogue");
     expect(pageForPath("/medicine-shortages")).toBe("medicine-shortages");
+    expect(pageForPath("/source-history")).toBe("source-history");
     expect(normalisePath("//")).toBe("/");
   });
 

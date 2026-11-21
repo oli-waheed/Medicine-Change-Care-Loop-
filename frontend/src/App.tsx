@@ -6,6 +6,7 @@ import MedicineCataloguePage from "./pages/medicine-catalogue/MedicineCatalogueP
 import MedicineShortagesPage from "./pages/medicine-shortages/MedicineShortagesPage";
 import NotFoundPage from "./pages/not-found/NotFoundPage";
 import OpenReviewCasesPage from "./pages/open-review-cases/OpenReviewCasesPage";
+import SourceHistoryPage from "./pages/source-history/SourceHistoryPage";
 
 function App() {
   const page = pageForPath(useCurrentPath());
@@ -19,6 +20,7 @@ function App() {
       {page === "open-review-cases" && <OpenReviewCasesPage />}
       {page === "medicine-catalogue" && <MedicineCataloguePage />}
       {page === "medicine-shortages" && <MedicineShortagesPage />}
+      {page === "source-history" && <SourceHistoryPage />}
       {page === "about-data" && <AboutDataPage />}
       {page === "not-found" && <NotFoundPage />}
     </AppShell>

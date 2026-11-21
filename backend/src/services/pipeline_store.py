@@ -16,6 +16,7 @@ from ..models import (
     CaseStatusEventRow,
     ChangeProcessingOutcomeRow,
     DailyUpdateRunRow,
+    ReleaseQualityCheckRow,
     ReviewCaseRow,
     ShortageCaptureRow,
     ShortageRetrievalRow,
@@ -147,6 +148,7 @@ class PipelineStore:
         outcome: IngestionOutcome,
         cases: tuple[ReviewCase, ...] = (),
         processing_outcomes: tuple[ChangeProcessingOutcome, ...] = (),
+        quality_check: dict | None = None,
     ) -> tuple[ReviewCase, ...]:
         """Record a capture, its new cases and its matching outcomes in one transaction.
 
@@ -179,6 +181,8 @@ class PipelineStore:
                 )
             inserted = self._insert_cases(session, cases)
             self._insert_outcomes(session, processing_outcomes)
+            if quality_check is not None:
+                self._insert_quality_check(session, quality_check)
             return inserted
 
     def add_cases(self, cases: tuple[ReviewCase, ...]) -> tuple[ReviewCase, ...]:
@@ -466,6 +470,75 @@ class PipelineStore:
             if results:
                 query = query.where(ChangeProcessingOutcomeRow.result.in_(sorted(results)))
             return [row.evidence_payload for row in session.scalars(query)]
+
+    # --- release quality checks and source history (feature 010) --------------------
+
+    @staticmethod
+    def _insert_quality_check(session: Session, payload: dict) -> bool:
+        if session.get(ReleaseQualityCheckRow, payload["checkId"]) is not None:
+            return False
+        session.add(
+            ReleaseQualityCheckRow(
+                check_id=payload["checkId"],
+                prior_release_id=payload["priorReleaseId"],
+                current_release_id=payload["currentReleaseId"],
+                checked_at=_as_utc(datetime.fromisoformat(payload["checkedAt"])),
+                payload=payload,
+            )
+        )
+        return True
+
+    def record_quality_check(self, payload: dict) -> bool:
+        """Store a check once per release pair; returns False if it already exists."""
+        with self._session() as session, session.begin():
+            return self._insert_quality_check(session, payload)
+
+    def has_quality_check(self, check_id: str) -> bool:
+        with self._session() as session:
+            return session.get(ReleaseQualityCheckRow, check_id) is not None
+
+    def quality_check_payloads(self) -> list[dict]:
+        """Stored checks, newest pair first."""
+        with self._session() as session:
+            rows = session.scalars(
+                select(ReleaseQualityCheckRow).order_by(ReleaseQualityCheckRow.checked_at.desc())
+            ).all()
+            return [row.payload for row in rows]
+
+    def compared_release_pairs(
+        self,
+    ) -> list[tuple[SourceReleaseCaptureRow, SourceReleaseCaptureRow]]:
+        """Consecutive validated releases by Ajopvm, oldest pair first.
+
+        These are the pairs whose data quality is checked. For releases loaded in
+        date order they are also the pairs the ingestion compared. Of releases
+        with the same Ajopvm only the first capture counts, as for the baseline.
+        """
+        rows = [
+            row
+            for row in self.captures()
+            if row.processing_status == ProcessingStatus.VALIDATED.value
+            and row.source_order_key is not None
+        ]
+        rows.sort(key=lambda row: (row.source_order_key, row.sequence))
+        ordered: list[SourceReleaseCaptureRow] = []
+        for row in rows:
+            if ordered and ordered[-1].source_order_key == row.source_order_key:
+                continue  # the first capture of a date stays the baseline
+            ordered.append(row)
+        return list(zip(ordered, ordered[1:], strict=False))
+
+    def capture_files(self, row: SourceReleaseCaptureRow) -> tuple[tuple[str, Path], ...]:
+        """``(checksum, raw file path)`` of a capture's files, from its manifest."""
+        return self._capture_files(row)
+
+    def shortage_captures(self) -> list[ShortageCaptureRow]:
+        with self._session() as session:
+            return list(
+                session.scalars(
+                    select(ShortageCaptureRow).order_by(ShortageCaptureRow.sequence.desc())
+                )
+            )
 
     # --- shortage captures (feature 006) -------------------------------------------
 

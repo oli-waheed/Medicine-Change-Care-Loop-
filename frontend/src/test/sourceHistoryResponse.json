@@ -1,0 +1,214 @@
+{
+  "basicRegister": [
+    {
+      "releaseId": "sha256-d9ed6c0508ce12de447ae9cc5164d238714c762a99a93988dbb1f92f27261ee5",
+      "releaseDate": "2099-01-10",
+      "dateEvidence": "VERIFIED",
+      "processingStatus": "VALIDATED",
+      "failureDetail": null,
+      "fileName": "Perusrekisteri.xml",
+      "checksum": "a944330b3dcd8ca578247c22b053593bee97d54472548369df5eb01734987310",
+      "sizeBytes": 5463,
+      "evidenceAvailable": true,
+      "firstRetrievedAt": "2099-01-11T06:00:00+00:00",
+      "lastRetrievedAt": "2099-01-11T06:00:00+00:00",
+      "retrievalCount": 1,
+      "isCatalogueRelease": true
+    },
+    {
+      "releaseId": "sha256-27d08820cabb32f6d3a80a11b3ccca77aaae26f16fa85130b14f4b238805d31d",
+      "releaseDate": "2099-01-03",
+      "dateEvidence": "VERIFIED",
+      "processingStatus": "VALIDATED",
+      "failureDetail": null,
+      "fileName": "Perusrekisteri.xml",
+      "checksum": "0d6e8049c9406ec8db0258535efbdfddb84908420c6588805843f8e20963e9ed",
+      "sizeBytes": 5463,
+      "evidenceAvailable": true,
+      "firstRetrievedAt": "2099-01-05T06:00:00+00:00",
+      "lastRetrievedAt": "2099-01-06T06:00:00+00:00",
+      "retrievalCount": 2,
+      "isCatalogueRelease": false
+    },
+    {
+      "releaseId": "sha256-70bc9f33b69b6ef13ec9e130a3795638b01dc009d7eb960017d2e8f5b034f95c",
+      "releaseDate": "2099-01-02",
+      "dateEvidence": "VERIFIED",
+      "processingStatus": "VALIDATED",
+      "failureDetail": null,
+      "fileName": "Perusrekisteri.xml",
+      "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+      "sizeBytes": 5331,
+      "evidenceAvailable": true,
+      "firstRetrievedAt": "2099-01-04T06:00:00+00:00",
+      "lastRetrievedAt": "2099-01-04T06:00:00+00:00",
+      "retrievalCount": 1,
+      "isCatalogueRelease": false
+    }
+  ],
+  "qualityChecks": [
+    {
+      "checkId": "QC-307a0bd03cdb06ad102ac00e9874193b33ba158a",
+      "priorReleaseId": "sha256-27d08820cabb32f6d3a80a11b3ccca77aaae26f16fa85130b14f4b238805d31d",
+      "currentReleaseId": "sha256-d9ed6c0508ce12de447ae9cc5164d238714c762a99a93988dbb1f92f27261ee5",
+      "priorReleaseDate": "2099-01-03",
+      "currentReleaseDate": "2099-01-10",
+      "checkedAt": "2026-11-21T15:45:25.272519+00:00",
+      "overall": "PASSED",
+      "counts": {
+        "priorPackages": 4,
+        "currentPackages": 4,
+        "inBoth": 4,
+        "changed": 0,
+        "noLongerPresent": 0,
+        "new": 0,
+        "vnrGained": 0,
+        "vnrLost": 0,
+        "vnrChanged": 0,
+        "formattingOnly": 0,
+        "activeSubstanceOnly": 0,
+        "unlabelled": 0,
+        "sharedVnrs": 0
+      },
+      "checks": [
+        {
+          "id": "RELEASE_ORDER",
+          "label": "Release order",
+          "status": "PASSED",
+          "detail": "Ajopvm 2099-01-03 \u2192 2099-01-10, read from each file."
+        },
+        {
+          "id": "UNIQUE_PACKAGE_IDS",
+          "label": "Package IDs unique within each release",
+          "status": "PASSED",
+          "detail": "No Pakkaustunnus repeats; a repeat would have rejected the release."
+        },
+        {
+          "id": "PACKAGE_IDS_KEPT",
+          "label": "Package IDs kept",
+          "status": "PASSED",
+          "detail": "4 of 4 package IDs of the prior release are still present (100.00 %); limit 99%."
+        },
+        {
+          "id": "PACKAGES_REMOVED",
+          "label": "Packages no longer present",
+          "status": "PASSED",
+          "detail": "0 packages (0.00 %); limit 1%."
+        },
+        {
+          "id": "PACKAGES_CHANGED",
+          "label": "Packages with changed fields",
+          "status": "PASSED",
+          "detail": "0 packages (0.00 %); limit 10%."
+        },
+        {
+          "id": "SOURCE_CLEANUPS",
+          "label": "Likely source clean-ups",
+          "status": "INFO",
+          "detail": "0 of 0 changed packages carry a clean-up label (\u2013)."
+        },
+        {
+          "id": "SHARED_VNRS",
+          "label": "VNRs shared by several packages",
+          "status": "INFO",
+          "detail": "0 VNRs belong to more than one package in the current release; Medicine Shortages lists every such package."
+        }
+      ]
+    },
+    {
+      "checkId": "QC-0b8756775c4454177ea808a9484e6930d9284f9f",
+      "priorReleaseId": "sha256-70bc9f33b69b6ef13ec9e130a3795638b01dc009d7eb960017d2e8f5b034f95c",
+      "currentReleaseId": "sha256-27d08820cabb32f6d3a80a11b3ccca77aaae26f16fa85130b14f4b238805d31d",
+      "priorReleaseDate": "2099-01-02",
+      "currentReleaseDate": "2099-01-03",
+      "checkedAt": "2026-11-21T15:45:25.253308+00:00",
+      "overall": "ATTENTION",
+      "counts": {
+        "priorPackages": 4,
+        "currentPackages": 4,
+        "inBoth": 4,
+        "changed": 3,
+        "noLongerPresent": 0,
+        "new": 0,
+        "vnrGained": 0,
+        "vnrLost": 0,
+        "vnrChanged": 0,
+        "formattingOnly": 1,
+        "activeSubstanceOnly": 1,
+        "unlabelled": 1,
+        "sharedVnrs": 0
+      },
+      "checks": [
+        {
+          "id": "RELEASE_ORDER",
+          "label": "Release order",
+          "status": "PASSED",
+          "detail": "Ajopvm 2099-01-02 \u2192 2099-01-03, read from each file."
+        },
+        {
+          "id": "UNIQUE_PACKAGE_IDS",
+          "label": "Package IDs unique within each release",
+          "status": "PASSED",
+          "detail": "No Pakkaustunnus repeats; a repeat would have rejected the release."
+        },
+        {
+          "id": "PACKAGE_IDS_KEPT",
+          "label": "Package IDs kept",
+          "status": "PASSED",
+          "detail": "4 of 4 package IDs of the prior release are still present (100.00 %); limit 99%."
+        },
+        {
+          "id": "PACKAGES_REMOVED",
+          "label": "Packages no longer present",
+          "status": "PASSED",
+          "detail": "0 packages (0.00 %); limit 1%."
+        },
+        {
+          "id": "PACKAGES_CHANGED",
+          "label": "Packages with changed fields",
+          "status": "ATTENTION",
+          "detail": "3 packages (75.00 %); limit 10%."
+        },
+        {
+          "id": "SOURCE_CLEANUPS",
+          "label": "Likely source clean-ups",
+          "status": "INFO",
+          "detail": "2 of 3 changed packages carry a clean-up label (66.67 %)."
+        },
+        {
+          "id": "SHARED_VNRS",
+          "label": "VNRs shared by several packages",
+          "status": "INFO",
+          "detail": "0 VNRs belong to more than one package in the current release; Medicine Shortages lists every such package."
+        }
+      ]
+    }
+  ],
+  "uncheckedPairs": [],
+  "shortageFiles": [
+    {
+      "checksum": "sha256-ce06507c76357e2006eab87943348c72f6759aca08eb4d43ad41835253da53cc",
+      "processingStatus": "VALIDATED",
+      "failureDetail": null,
+      "recordCount": 2,
+      "sizeBytes": 292,
+      "evidenceAvailable": true,
+      "firstRetrievedAt": "2099-01-11T05:00:00+00:00",
+      "lastRetrievedAt": "2099-01-11T05:00:00+00:00",
+      "retrievalCount": 1,
+      "isActive": true
+    },
+    {
+      "checksum": "sha256-96a1bed9d4a2600d70f609b55e450aa306bef0692624f5c786ac3affb0b6bc37",
+      "processingStatus": "VALIDATED",
+      "failureDetail": null,
+      "recordCount": 3,
+      "sizeBytes": 388,
+      "evidenceAvailable": true,
+      "firstRetrievedAt": "2099-01-04T05:00:00+00:00",
+      "lastRetrievedAt": "2099-01-05T05:00:00+00:00",
+      "retrievalCount": 2,
+      "isActive": false
+    }
+  ]
+}

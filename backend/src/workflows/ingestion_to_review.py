@@ -70,6 +70,27 @@ def run_ingestion_to_review(
     return IngestionToReviewResult(comparison, created, outcomes)
 
 
+def source_order_evidence(
+    prior: IngestionOutcome, current: IngestionOutcome
+) -> SourceOrderEvidence | None:
+    """Verified order of two releases from their own Ajopvm, or None when unknown."""
+    prior_key = source_order_key(prior.source_order)
+    current_key = source_order_key(current.source_order)
+    if prior_key is None or current_key is None:
+        return None
+    return SourceOrderEvidence(
+        prior_release=prior.source_release,
+        current_release=current.source_release,
+        prior_order=prior_key,
+        current_order=current_key,
+        classification=EvidenceClassification.VERIFIED,
+        basis=(
+            f"{SOURCE_ORDER_BASIS} Prior Ajopvm {prior.source_order.value}; "
+            f"current Ajopvm {current.source_order.value}."
+        ),
+    )
+
+
 def run_ingested_release_to_review(
     prior: IngestionOutcome,
     current: IngestionOutcome,
@@ -86,27 +107,11 @@ def run_ingested_release_to_review(
     if prior.source_release is None or current.source_release is None:
         raise ValueError("Comparison requires exactly one normalized source file per release.")
 
-    order = None
-    prior_key = source_order_key(prior.source_order)
-    current_key = source_order_key(current.source_order)
-    if prior_key is not None and current_key is not None:
-        order = SourceOrderEvidence(
-            prior_release=prior.source_release,
-            current_release=current.source_release,
-            prior_order=prior_key,
-            current_order=current_key,
-            classification=EvidenceClassification.VERIFIED,
-            basis=(
-                f"{SOURCE_ORDER_BASIS} Prior Ajopvm {prior.source_order.value}; "
-                f"current Ajopvm {current.source_order.value}."
-            ),
-        )
-
     return run_ingestion_to_review(
         prior.snapshots,
         current.snapshots,
         medication_records,
-        order=order,
+        order=source_order_evidence(prior, current),
         open_cases=open_cases,
         created_at=created_at,
     )
