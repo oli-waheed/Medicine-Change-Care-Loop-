@@ -15,7 +15,7 @@ Trailing slashes are ignored. Sidebar links update the address without reloading
 
 ## Theme
 
-Light only (`color-scheme: light`). Palette: navy #102D3B, teal #176B65, pale mint #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35 (fills and accent bars only), error #B74747. No dark theme, no theme switch.
+Light only (`color-scheme: light`). Palette: navy #102D3B, teal #176B65, pale mint #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35 (fills and accent bars only), error #B74747. No dark theme, no theme switch. *(Palette revised 2026-11-21 at Oli's request: navy #014178, pharmacy green #2DAF35 for stripes and markers, darker green #1C7F27 for text, buttons and focus; page background, surface, amber and error unchanged. See the comment in `frontend/src/index.css`.)*
 
 ## Sidebar
 

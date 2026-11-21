@@ -125,7 +125,7 @@ On a tablet the sidebar collapses to an icon rail that can be expanded; on a pho
 
 **Visual design**
 
-- **FR-009**: The application MUST use a light theme only, with the handoff palette: navy #102D3B, teal #176B65, pale mint #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35 and error #B74747, and Inter or the system sans-serif. Monospace MUST be used only for identifiers, checksums, file names, record locators and field paths. There MUST be no dark theme and no theme switch, and the page MUST stay readable when the OS or browser requests dark colours.
+- **FR-009**: The application MUST use a light theme only, with the handoff palette: navy #102D3B, teal #176B65, pale mint #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35 and error #B74747, and Inter or the system sans-serif. *(Palette revised 2026-11-21 at Oli's request: navy #014178, pharmacy green #2DAF35 for stripes and markers, darker green #1C7F27 for text, buttons and focus; page background, surface, amber and error unchanged. See the comment in `frontend/src/index.css`.)* Monospace MUST be used only for identifiers, checksums, file names, record locators and field paths. There MUST be no dark theme and no theme switch, and the page MUST stay readable when the OS or browser requests dark colours.
 - **FR-010**: Text MUST meet WCAG 2.2 AA contrast (4.5:1 normal, 3:1 large); focus indicators, the selected-case indication and state-label borders MUST meet 3:1. Where amber does not reach these ratios, it MUST be used only as a fill or accent next to text and borders that do. Every state distinction MUST remain recognisable without colour.
 
 **Responsive layout and keyboard access**

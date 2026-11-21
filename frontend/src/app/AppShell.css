@@ -19,7 +19,8 @@
   padding: 0.5rem 1rem;
   background: var(--sidebar-bg);
   color: var(--sidebar-text);
-  border-bottom: 1px solid var(--sidebar-border);
+  /* Navy with a green edge: the two colours of the palette together. */
+  border-bottom: 3px solid var(--green);
 }
 
 .app-topbar-brand {
@@ -46,7 +47,7 @@
 }
 
 .app-menu-toggle:hover {
-  background: var(--sidebar-current-bg);
+  background: var(--sidebar-hover-bg);
 }
 
 .app-menu-toggle[aria-expanded="true"] {
@@ -115,6 +116,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
+  /* Navy with a green edge: the two colours of the palette together. */
+  border-top: 4px solid var(--green);
   padding: 1.25rem 0.9rem 1rem;
 }
 
@@ -157,23 +160,28 @@
   align-items: center;
   gap: 0.7rem;
   min-height: 44px;
-  padding: 0.55rem 0.75rem;
-  border-radius: 8px;
+  padding: 0.55rem 0.9rem;
+  border-radius: 999px;
   color: var(--sidebar-text);
   font-weight: 550;
   text-decoration: none;
 }
 
 .sidebar-link:hover {
-  background: var(--sidebar-current-bg);
+  background: var(--sidebar-hover-bg);
   color: var(--sidebar-text);
 }
 
+/* The current page: a white pill on the navy sidebar. */
 .sidebar-link--current {
   background: var(--sidebar-current-bg);
   color: var(--sidebar-current-text);
   font-weight: 700;
-  box-shadow: inset 3px 0 0 var(--sidebar-current-text);
+  box-shadow: 0 1px 3px rgb(0 0 0 / 18%);
+}
+
+.sidebar-link--current .sidebar-link-icon {
+  color: var(--green-strong);
 }
 
 .sidebar-link--current:hover {
@@ -201,7 +209,7 @@
 }
 
 .sidebar-attribution a {
-  color: var(--sidebar-current-text);
+  color: var(--sidebar-link);
   font-weight: 650;
 }
 
@@ -307,7 +315,7 @@
   }
 
   .sidebar-rail-toggle:hover {
-    background: var(--sidebar-current-bg);
+    background: var(--sidebar-hover-bg);
   }
 
   .sidebar-rail-toggle[aria-expanded="true"] svg {

@@ -14,20 +14,20 @@
 }
 
 .shortage-update-button {
-  min-height: 2.6rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--navy);
-  border-radius: 8px;
-  background: var(--navy);
-  color: #ffffff;
+  min-height: 2.75rem;
+  padding: 0.5rem 1.4rem;
+  border: 1px solid var(--action-bg);
+  border-radius: var(--action-radius);
+  background: var(--action-bg);
+  color: var(--action-text);
   font: inherit;
-  font-weight: 650;
+  font-weight: 700;
   cursor: pointer;
 }
 
 .shortage-update-button:hover:not(:disabled) {
-  border-color: var(--color-accent-strong);
-  background: var(--color-accent-strong);
+  border-color: var(--action-hover-bg);
+  background: var(--action-hover-bg);
 }
 
 .shortage-update-button:focus-visible {

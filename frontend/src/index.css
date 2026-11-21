@@ -1,57 +1,68 @@
 /*
- * Design tokens for Medicine Change Care Loop (feature 003).
- * Approved handoff: light theme only; navy #102D3B, teal #176B65, pale mint
- * #E8F3EF, page background #F3F6F7, surface #FFFFFF, amber #D69B35, error
- * #B74747; Inter / system sans-serif; monospace only for identifiers,
- * checksums and technical evidence.
+ * Design tokens for Medicine Change Care Loop (feature 003, colours revised
+ * 2026-11-21). Light theme only. Palette: health-information navy #014178,
+ * pharmacy green #2DAF35, the logo's gold, page background #F3F6F7, surface
+ * #FFFFFF, amber #D69B35, error #B74747; Inter / system sans-serif; monospace
+ * only for identifiers, checksums and technical evidence.
+ *
+ * Bright green #2DAF35 has only 2.9:1 contrast with white, so it is used for
+ * stripes and markers only. Text, buttons and focus rings use the darker
+ * #1C7F27 (5.1:1 with white). Green marks actions and "current" source
+ * values; it never signals a clinical judgement.
  */
 
 :root {
   /* Light only. Keeps the page readable when the OS requests dark colours. */
   color-scheme: light;
 
-  /* Handoff palette */
-  --navy: #102d3b;
-  --teal: #176b65;
-  --mint: #e8f3ef;
+  /* Palette */
+  --navy: #014178;
+  --navy-deep: #01325d;
+  --green: #2daf35;
+  --green-strong: #1c7f27;
+  --green-deep: #146c25;
+  --teal: #1c7f27;
+  --mint: #eaf6eb;
   --amber: #d69b35;
   --error: #b74747;
 
   /* Surfaces */
   --color-bg: #f3f6f7;
   --color-surface: #ffffff;
-  --color-surface-muted: #eef3f4;
-  --color-border: #d5dfe2;
-  --color-border-strong: #71858e;
+  --color-surface-muted: #eef3f8;
+  --color-border: #d3deea;
+  --color-border-strong: #6c8299;
 
   /* Text */
-  --color-heading: #102d3b;
-  --color-text: #1f3a47;
-  --color-text-muted: #536a75;
+  --color-heading: #013a6b;
+  --color-text: #1d3550;
+  --color-text-muted: #4f6478;
 
   /* Brand */
-  --color-accent: #176b65;
-  --color-accent-strong: #12544f;
-  --color-accent-soft: #e8f3ef;
-  --color-accent-border: #176b65;
-  --color-focus: #176b65;
+  --color-accent: #1c7f27;
+  --color-accent-strong: #146c25;
+  --color-accent-soft: #eaf6eb;
+  --color-accent-border: #1c7f27;
+  --color-focus: #1c7f27;
 
   /* Sidebar */
-  --sidebar-bg: #102d3b;
-  --sidebar-text: #e8f0f2;
-  --sidebar-muted: #a9bec6;
-  --sidebar-border: #224655;
-  --sidebar-current-bg: #17414f;
-  --sidebar-current-text: #8fe0d4;
-  --sidebar-focus: #8fe0d4;
+  --sidebar-bg: #014178;
+  --sidebar-text: #ffffff;
+  --sidebar-muted: #bcd2e6;
+  --sidebar-border: #1d5a91;
+  --sidebar-current-bg: #ffffff;
+  --sidebar-hover-bg: #0b5594;
+  --sidebar-link: #8be391;
+  --sidebar-current-text: #014178;
+  --sidebar-focus: #8be391;
 
   /* Prior (before) and current (after) values */
   --before-bg: #fbf1f1;
   --before-border: #ddb0b0;
   --before-label: #8f3434;
-  --after-bg: #e8f3ef;
-  --after-border: #9ccbbf;
-  --after-label: #12544f;
+  --after-bg: #eaf6eb;
+  --after-border: #9fd3a4;
+  --after-label: #146c25;
 
   /* Value states */
   --state-missing-bg: #eef1f3;
@@ -68,20 +79,20 @@
   --state-unavailable-text: #7a2348;
 
   /* Change indicators (source-data presence only) */
-  --change-added-bg: #e8f3ef;
-  --change-added-border: #176b65;
-  --change-added-text: #12544f;
+  --change-added-bg: #eaf6eb;
+  --change-added-border: #1c7f27;
+  --change-added-text: #146c25;
   --change-removed-bg: #fbf1f1;
   --change-removed-border: #9a3b3b;
   --change-removed-text: #8f3434;
-  --change-changed-bg: #eef3f4;
+  --change-changed-bg: #eef3f8;
   --change-changed-border: #536a75;
   --change-changed-text: #33475b;
 
   /* Evidence classifications */
-  --class-verified-bg: #e8f3ef;
-  --class-verified-border: #176b65;
-  --class-verified-text: #12544f;
+  --class-verified-bg: #eaf6eb;
+  --class-verified-border: #1c7f27;
+  --class-verified-text: #146c25;
   --class-inferred-bg: #e7eff9;
   --class-inferred-border: #2f62b3;
   --class-inferred-text: #1d4a8f;
@@ -107,15 +118,21 @@
   --error-border: #b74747;
   --error-text: #8f3434;
 
-  /* Status */
-  --status-bg: #e8f3ef;
-  --status-border: #176b65;
-  --status-text: #12544f;
+  /* Actions: one primary-button style for every action, whatever it records. */
+  --action-bg: #1c7f27;
+  --action-hover-bg: #146c25;
+  --action-text: #ffffff;
+  --action-radius: 999px;
 
-  --shadow-card: 0 1px 2px rgb(16 45 59 / 6%), 0 4px 16px rgb(16 45 59 / 5%);
+  /* Status */
+  --status-bg: #eaf6eb;
+  --status-border: #1c7f27;
+  --status-text: #146c25;
+
+  --shadow-card: 0 1px 2px rgb(1 65 120 / 6%), 0 4px 16px rgb(1 65 120 / 5%);
   --shadow-drawer:
-    0 0 0 1px rgb(16 45 59 / 10%), 0 18px 48px rgb(16 45 59 / 30%);
-  --scrim: rgb(8 24 32 / 55%);
+    0 0 0 1px rgb(1 65 120 / 10%), 0 18px 48px rgb(1 50 93 / 30%);
+  --scrim: rgb(1 30 56 / 55%);
 
   font-family:
     Inter,
