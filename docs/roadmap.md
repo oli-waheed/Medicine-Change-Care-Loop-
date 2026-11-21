@@ -16,6 +16,7 @@ amendment agreed by the team (Alison, Cassiy, Oli) before work starts.
 | 006 Medicine shortages | Daily download of Fimea's shortage file, Shortages page, update button | Approved |
 | 007 Care loop review and shortage cases | Recorded human review (three outcomes, initials, notes, reopen) and review cases from shortage changes | Approved |
 | 008 Labels for likely source clean-ups | Labels for spacing/case-only and active-substance-only changes, optional set-aside switch | Approved |
+| 009 Faster, lighter catalogue | Reading a real release in about 12 s and 400 MB instead of 33 s and 2.3 GB | Waiting for approval (T006) |
 
 Real-data validation (`docs/validation/2026-11-21-real-release-comparison.md`)
 compared the 2026-10-06 and 2026-11-21 releases. Detection was correct, but:

@@ -9,7 +9,7 @@ The report answers the README's remaining validation questions: is the release
 order strictly increasing, is every Pakkaustunnus unique within a release and
 present in both releases of a pair, and what kinds of changes were found.
 
-Usage, from the backend folder (each release takes about 40 s and 2 GB of memory):
+Usage, from the backend folder (each release takes about 15 s):
 
     python tools\compare_releases.py data\real\source-releases
     python tools\compare_releases.py data\real\source-releases --pairs 3 --out report.md
