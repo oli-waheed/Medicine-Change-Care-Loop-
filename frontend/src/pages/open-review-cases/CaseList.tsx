@@ -1,4 +1,7 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
+import { NewBadge } from "../../app/NewSinceVisit";
+import { isNewSince } from "../../app/lastVisit";
+import { usePreviousVisit } from "../../app/useLastVisit";
 import { STATUS_LABELS, type ReviewCase } from "./openReviewCases";
 import {
   CLEANUP_LABELS,
@@ -48,6 +51,7 @@ export default function CaseList({
 }) {
   const reviewedId = useId();
   const cleanupId = useId();
+  const previousVisit = usePreviousVisit();
   const [query, setQuery] = useState("");
   // Feature 008: off by default; the reviewer chooses to set labelled cases aside.
   const [hideCleanups, setHideCleanups] = useState(false);
@@ -149,6 +153,7 @@ export default function CaseList({
               <span className="case-list-warning">Evidence unavailable</span>
             )}
             <CleanupBadge reviewCase={reviewCase} />
+            {isNewSince(previousVisit, reviewCase.createdAt) && <NewBadge />}
             <span
               className={`case-list-status case-status--${reviewCase.status.toLowerCase()}`}
             >

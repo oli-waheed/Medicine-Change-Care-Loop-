@@ -1,0 +1,47 @@
+/* Feature 012: "What's new since your last visit" */
+.new-since-visit {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.8rem;
+  margin: 0 0 1rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-left: 4px solid var(--green);
+  border-radius: 8px;
+  background: var(--color-surface);
+  color: var(--color-text);
+}
+
+.new-since-visit button {
+  min-height: 2.25rem;
+  padding: 0.2rem 0.9rem;
+  border: 1px solid var(--navy);
+  border-radius: 999px;
+  background: var(--color-surface);
+  color: var(--navy);
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.new-since-visit button:hover {
+  background: var(--color-surface-muted);
+}
+
+.new-since-visit button:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
+}
+
+.new-badge {
+  display: inline-block;
+  justify-self: start;
+  padding: 0.05rem 0.5rem;
+  border-radius: 999px;
+  background: var(--green-strong);
+  color: #ffffff;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+}

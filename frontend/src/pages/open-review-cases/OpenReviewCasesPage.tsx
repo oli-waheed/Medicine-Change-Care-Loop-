@@ -7,6 +7,9 @@ import {
   isReviewed,
   type ReviewCase,
 } from "./openReviewCases";
+import NewSinceVisit from "../../app/NewSinceVisit";
+import { isNewSince } from "../../app/lastVisit";
+import { usePreviousVisit } from "../../app/useLastVisit";
 import CaseDetail from "./CaseDetail";
 import CaseList from "./CaseList";
 import "./OpenReviewCasesPage.css";
@@ -65,6 +68,11 @@ export default function OpenReviewCasesPage() {
   }
 
   const selectedCase = cases.find((item) => item.caseId === selectedId);
+  // Feature 012: cases created since this browser's previous visit.
+  const previousVisit = usePreviousVisit();
+  const newCount = cases.filter((item) =>
+    isNewSince(previousVisit, item.createdAt),
+  ).length;
 
   return (
     <div className="open-cases-page">
@@ -103,6 +111,9 @@ export default function OpenReviewCasesPage() {
       <p className="review-recorded" role="status">
         {recorded ?? ""}
       </p>
+      {!loading && !error && (
+        <NewSinceVisit count={newCount} noun={["case is", "cases are"]} />
+      )}
       {!loading && !error && cases.length === 0 && (
         <div className="empty-state">
           <p>

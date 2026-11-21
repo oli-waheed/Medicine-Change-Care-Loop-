@@ -6,6 +6,9 @@ import { SourceValueDisplay } from "../open-review-cases/evidence/SourceValueDis
 import { formatTimestamp } from "../open-review-cases/timestamp";
 import { useDebouncedValue } from "../medicine-catalogue/useCatalogueRequest";
 import ShortageUpdatePanel from "./ShortageUpdatePanel";
+import { NewBadge } from "../../app/NewSinceVisit";
+import { isDateOnOrAfterVisit } from "../../app/lastVisit";
+import { usePreviousVisit } from "../../app/useLastVisit";
 import {
   ShortageError,
   fetchDailyUpdates,
@@ -143,6 +146,8 @@ export default function MedicineShortagesPage() {
   const [query, setQuery] = useState("");
   const [valid, setValid] = useState("");
   const [page, setPage] = useState(1);
+  // Feature 012: rows whose "Updated" date is on or after the previous visit.
+  const previousVisit = usePreviousVisit();
   const [version, setVersion] = useState(0);
   const [answer, setAnswer] = useState<Answer | null>(null);
   const [daily, setDaily] = useState<DailyUpdates | null>(null);
@@ -338,6 +343,10 @@ export default function MedicineShortagesPage() {
                       </td>
                       <td className="shortage-date">
                         <Published value={shortage.updated} />
+                        {isDateOnOrAfterVisit(
+                          previousVisit,
+                          shortage.updated,
+                        ) && <NewBadge label="Since last visit" />}
                       </td>
                       <td>
                         <Published value={shortage.company} />

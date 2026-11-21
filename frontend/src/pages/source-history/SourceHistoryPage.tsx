@@ -1,4 +1,7 @@
 import { useEffect, useState } from "react";
+import NewSinceVisit, { NewBadge } from "../../app/NewSinceVisit";
+import { isNewSince } from "../../app/lastVisit";
+import { usePreviousVisit } from "../../app/useLastVisit";
 import TimestampDisplay from "../open-review-cases/evidence/TimestampDisplay";
 import {
   fetchSourceHistory,
@@ -92,6 +95,7 @@ function FileFacts({
 
 function CheckCard({ check }: { check: QualityCheck }) {
   const c = check.counts;
+  const isNew = isNewSince(usePreviousVisit(), check.checkedAt);
   return (
     <article
       className={`history-card check-card check-card--${check.overall.toLowerCase()}`}
@@ -101,6 +105,7 @@ function CheckCard({ check }: { check: QualityCheck }) {
         <h3>
           {check.priorReleaseDate} → {check.currentReleaseDate}
         </h3>
+        {isNew && <NewBadge />}
         <span
           className={`check-status check-status--${check.overall.toLowerCase()}`}
         >
@@ -165,6 +170,7 @@ function CheckCard({ check }: { check: QualityCheck }) {
 }
 
 function ReleaseCard({ release }: { release: StoredRelease }) {
+  const isNew = isNewSince(usePreviousVisit(), release.firstRetrievedAt);
   return (
     <article
       className="history-card"
@@ -172,6 +178,7 @@ function ReleaseCard({ release }: { release: StoredRelease }) {
     >
       <header className="history-card-heading">
         <h3>{release.releaseDate ?? "No verified release date"}</h3>
+        {isNew && <NewBadge />}
         {release.isCatalogueRelease && (
           <span className="history-badge">Catalogue release</span>
         )}
@@ -205,6 +212,7 @@ function ReleaseCard({ release }: { release: StoredRelease }) {
 }
 
 function ShortageFileCard({ file }: { file: StoredShortageFile }) {
+  const isNew = isNewSince(usePreviousVisit(), file.firstRetrievedAt);
   return (
     <article
       className="history-card"
@@ -216,6 +224,7 @@ function ShortageFileCard({ file }: { file: StoredShortageFile }) {
             ? "Shortage file"
             : `${number.format(file.recordCount)} shortages`}
         </h3>
+        {isNew && <NewBadge />}
         {file.isActive && <span className="history-badge">Shown now</span>}
         {file.processingStatus !== "VALIDATED" && (
           <span className="history-badge history-badge--warning">
@@ -245,6 +254,18 @@ function ShortageFileCard({ file }: { file: StoredShortageFile }) {
 export default function SourceHistoryPage() {
   const [history, setHistory] = useState<SourceHistory | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const previousVisit = usePreviousVisit();
+  const newCount = history
+    ? history.qualityChecks.filter((item) =>
+        isNewSince(previousVisit, item.checkedAt),
+      ).length +
+      history.basicRegister.filter((item) =>
+        isNewSince(previousVisit, item.firstRetrievedAt),
+      ).length +
+      history.shortageFiles.filter((item) =>
+        isNewSince(previousVisit, item.firstRetrievedAt),
+      ).length
+    : 0;
 
   useEffect(() => {
     const controller = new AbortController();
@@ -286,6 +307,7 @@ export default function SourceHistoryPage() {
 
       {history && (
         <>
+          <NewSinceVisit count={newCount} noun={["item is", "items are"]} />
           <section className="history-section" aria-labelledby="history-checks">
             <h2 id="history-checks">Release checks</h2>
             <p className="history-intro">

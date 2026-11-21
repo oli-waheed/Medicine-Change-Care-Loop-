@@ -102,6 +102,8 @@ const ALLOWED_BUTTONS = [
   /^Mark in progress$/,
   /^Reviewed – (no action|follow-up) needed$/,
   /^Reopen$/,
+  // Feature 012: clears the "new since last visit" marks in this browser only.
+  /^Mark all as seen$/,
 ];
 // Feature 004: catalogue reading controls (open records, switch views, page).
 const CATALOGUE_BUTTONS = [
