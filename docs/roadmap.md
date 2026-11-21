@@ -35,7 +35,8 @@ These fit the current constitution and use simulated records only.
    **Label source noise**: mark changes that come only from Fimea's own data
    clean-ups (field restructuring, whitespace, case) so reviewers can set them
    aside. This must come before any pilot, or pharmacists get flooded.
-4. **Keep the weekly progress log current** (`docs/development-notes`).
+4. ~~Update the weekly progress log~~ Brought up to date on 2026-11-21.
+   **Keep the weekly progress log current** (`project-plans/weekly-progress.md`).
 5. ~~Continuous integration~~ Done: `.github/workflows/ci.yml` (2026-11-21).
    **Continuous integration**: run backend and frontend tests and linters on
    every push.
