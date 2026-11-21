@@ -3,6 +3,7 @@
 from ..domain.detected_change import PackageChangeKind
 from ..domain.review_case import ReviewCase
 from ..domain.source_field import SourceField
+from ..services.source_cleanup_labels import with_cleanup_labels
 
 
 def _field(value: SourceField):
@@ -93,6 +94,8 @@ def open_review_case_payload(case: ReviewCase):
 def with_evidence_availability(payload: dict, available_checksums: set[str]) -> dict:
     """Return a copy of a stored case view with its current evidence availability.
 
+    Release cases also get their source clean-up labels (feature 008).
+
     A source is available while a raw capture file with its checksum is still
     stored. If either source is gone, the case is reported as UNAVAILABLE so it is
     not presented as fully verified evidence.
@@ -109,4 +112,5 @@ def with_evidence_availability(payload: dict, available_checksums: set[str]) -> 
         if all(source["evidenceAvailable"] for source in result["sources"].values())
         else "UNAVAILABLE"
     )
-    return result
+    # Feature 008: labels for likely source clean-ups, worked out when read.
+    return with_cleanup_labels(result)

@@ -27,7 +27,12 @@ export type FieldChange = {
   field: string;
   before: SourceField[];
   after: SourceField[];
+  // Feature 008: the values differ only in spaces or letter case.
+  formattingOnly?: boolean;
 };
+
+// Feature 008: a label for likely source clean-ups; it never hides a value.
+export type CleanupLabel = "FORMATTING_ONLY" | "ACTIVE_SUBSTANCE_ONLY";
 
 // Feature 007: NEW is set by the system; the other three only by a reviewer.
 export type CaseStatus =
@@ -67,6 +72,7 @@ export type OpenReviewCase = {
     kind: ChangeKind;
     detectedAt: string;
     changes: FieldChange[];
+    cleanupLabel?: CleanupLabel | null;
     // Only for NO_LONGER_PRESENT: the package as it was in the prior release.
     lastKnownFields: { field: string; values: SourceField[] }[] | null;
   };

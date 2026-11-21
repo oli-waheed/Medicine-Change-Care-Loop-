@@ -3,7 +3,12 @@ import {
   isShortageCase,
   type ReviewCase,
 } from "./openReviewCases";
-import { caseVariant, evidenceUnavailable } from "./changeSummary";
+import {
+  CLEANUP_LABELS,
+  caseVariant,
+  cleanupLabel,
+  evidenceUnavailable,
+} from "./changeSummary";
 import EvidenceClassificationLabel from "./evidence/EvidenceClassificationLabel";
 import TimestampDisplay from "./evidence/TimestampDisplay";
 import ProvenancePanel from "./ProvenancePanel";
@@ -30,6 +35,7 @@ export default function CaseDetail({
   onRecorded: (updated: ReviewCase, label: string) => void;
 }) {
   const variant = caseVariant(reviewCase);
+  const cleanup = cleanupLabel(reviewCase);
   return (
     <article
       className={`case-evidence case-evidence--${variant}`}
@@ -54,6 +60,16 @@ export default function CaseDetail({
           </span>
         </div>
       </header>
+
+      {cleanup && (
+        <p className="cleanup-notice" role="note">
+          <strong>
+            Likely source clean-up: {CLEANUP_LABELS[cleanup].badge}.
+          </strong>{" "}
+          {CLEANUP_LABELS[cleanup].explanation} The label only describes the
+          difference and never changes the case's status.
+        </p>
+      )}
 
       {evidenceUnavailable(reviewCase) && (
         <p className="evidence-unavailable" role="status">

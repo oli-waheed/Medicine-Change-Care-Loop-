@@ -15,6 +15,9 @@ function FieldChangeRow({ change }: { change: FieldChange }) {
         <span className={`change-indicator change-indicator--${indicator}`}>
           {CHANGE_INDICATOR_LABELS[indicator]}
         </span>
+        {change.formattingOnly && (
+          <span className="formatting-only">Spacing or letter case only</span>
+        )}
       </div>
       <div className="before-after">
         <div className="before-after-side before-after-side--before">

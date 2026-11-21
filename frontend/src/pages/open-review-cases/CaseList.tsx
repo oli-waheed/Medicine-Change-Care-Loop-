@@ -1,8 +1,10 @@
 import { useId, useRef, useState, type KeyboardEvent } from "react";
 import { STATUS_LABELS, type ReviewCase } from "./openReviewCases";
 import {
+  CLEANUP_LABELS,
   caseVariant,
   changeSummary,
+  cleanupLabel,
   evidenceUnavailable,
 } from "./changeSummary";
 
@@ -21,6 +23,14 @@ function matchesSearch(reviewCase: ReviewCase, query: string): boolean {
   return words.every((word) => haystack.includes(word));
 }
 
+function CleanupBadge({ reviewCase }: { reviewCase: ReviewCase }) {
+  const label = cleanupLabel(reviewCase);
+  if (label === null) return null;
+  return (
+    <span className="case-list-cleanup">{CLEANUP_LABELS[label].badge}</span>
+  );
+}
+
 const QUEUE_KEYS = new Set(["ArrowDown", "ArrowUp", "Home", "End"]);
 
 export default function CaseList({
@@ -37,13 +47,21 @@ export default function CaseList({
   onIncludeReviewedChange: (include: boolean) => void;
 }) {
   const reviewedId = useId();
+  const cleanupId = useId();
   const [query, setQuery] = useState("");
+  // Feature 008: off by default; the reviewer chooses to set labelled cases aside.
+  const [hideCleanups, setHideCleanups] = useState(false);
   const searchId = useId();
   const listRef = useRef<HTMLDivElement>(null);
-  const visible = cases.filter((reviewCase) =>
-    matchesSearch(reviewCase, query),
+  const labelledCount = cases.filter(
+    (reviewCase) => cleanupLabel(reviewCase) !== null,
+  ).length;
+  const visible = cases.filter(
+    (reviewCase) =>
+      matchesSearch(reviewCase, query) &&
+      !(hideCleanups && cleanupLabel(reviewCase) !== null),
   );
-  const filtering = query.trim() !== "";
+  const filtering = query.trim() !== "" || hideCleanups;
 
   // Arrow keys, Home and End move focus through the queue; Enter or Space
   // selects the focused case.
@@ -94,6 +112,17 @@ export default function CaseList({
         />
         <label htmlFor={reviewedId}>Show reviewed cases</label>
       </div>
+      {labelledCount > 0 && (
+        <div className="case-reviewed-toggle">
+          <input
+            id={cleanupId}
+            type="checkbox"
+            checked={hideCleanups}
+            onChange={(event) => setHideCleanups(event.target.checked)}
+          />
+          <label htmlFor={cleanupId}>Set aside likely source clean-ups</label>
+        </div>
+      )}
       <p className="case-search-status" role="status">
         {filtering ? `Showing ${visible.length} of ${cases.length}` : ""}
       </p>
@@ -119,6 +148,7 @@ export default function CaseList({
             {evidenceUnavailable(reviewCase) && (
               <span className="case-list-warning">Evidence unavailable</span>
             )}
+            <CleanupBadge reviewCase={reviewCase} />
             <span
               className={`case-list-status case-status--${reviewCase.status.toLowerCase()}`}
             >
@@ -127,7 +157,11 @@ export default function CaseList({
           </button>
         ))}
         {filtering && visible.length === 0 && (
-          <p className="case-search-empty">No cases match this search.</p>
+          <p className="case-search-empty">
+            {query.trim() !== ""
+              ? "No cases match this search."
+              : "Every case shown here is a likely source clean-up."}
+          </p>
         )}
       </div>
     </nav>

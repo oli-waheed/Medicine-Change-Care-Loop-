@@ -192,10 +192,12 @@ function expectOnlyAllowedControls(mode: Mode = "cases") {
     expect(document.querySelectorAll("textarea, form")).toHaveLength(0);
   } else {
     // The case search, and (feature 007) the "Show reviewed cases" switch and
-    // the reviewer's initials and note. Never a select or a form.
+    // the reviewer's initials and note, and (feature 008) the switch that sets
+    // labelled source clean-ups aside. Never a select or a form.
     const allowed = [
       ["search", "Search cases"],
       ["checkbox", "Show reviewed cases"],
+      ["checkbox", "Set aside likely source clean-ups"],
       ["text", "Your initials"],
     ];
     for (const input of document.querySelectorAll("input")) {

@@ -3,6 +3,8 @@
 **Status:** Approved specification (requested and approved by Oli on 2026-11-21: ideas 1b and 1a, three review outcomes, reopening with a note, first shortage file as baseline)
 **Branch:** feature/care-loop-review-and-shortage-cases
 
+**Superseded in part by:** `specs/008-source-cleanup-labels` (one more case-list control, "Set aside likely source clean-ups").
+
 **Supersedes in part:**
 - `specs/001-ingestion-case-pipeline`: NEW stops being the only case status; a pharmacist can record a review (§4, FR-001–FR-010). Later releases still never change or close a case.
 - `specs/003-app-shell-and-themes` FR-025 and `specs/002` FR-010: the case page gets review controls (three outcome buttons and a note field), the first form controls on that page.

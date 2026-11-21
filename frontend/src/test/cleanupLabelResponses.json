@@ -1,0 +1,395 @@
+[
+  {
+    "caseId": "CASE-0ff450d054891adab7faa83ae620afe472d7f5143547c506cb415143cd5d90f7",
+    "createdAt": "2026-11-21T13:49:23.155887+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-500",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-8500",
+      "personReference": "SIM-PERSON-8500",
+      "medicineDisplay": "Fictional Product Blue (large pack)"
+    },
+    "changeSet": {
+      "changeSetId": "12baa6be598d9fea3b696eb9cc0db75bbc6bee153440e717b95957101e10f363",
+      "kind": "FIELDS_CHANGED",
+      "detectedAt": "2026-11-21T13:49:23.154389+00:00",
+      "changes": [
+        {
+          "changeId": "2cf4ace9d17ee13ac3b36a30d52257e6e3db21268144f80388293bff493b51b8",
+          "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/JakamatonVahvuus",
+          "before": [
+            {
+              "state": "value",
+              "value": "synthetic amount B",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "synthetic amount B (split)",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": false
+        },
+        {
+          "changeId": "ea860ae06a45c5e231f42edecc6157877b832800a1a219dcf8c5f61627a5764c",
+          "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Maara",
+          "before": [
+            {
+              "state": "value",
+              "value": "2.0",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "2.00",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": false
+        },
+        {
+          "changeId": "39c0d26a53c0d1328e920ee2a0e9fc1b1c3ccaca5c2fd490e26b6ec05fecd954",
+          "field": "Pakkaus/Pakkauskoko",
+          "before": [
+            {
+              "state": "value",
+              "value": "50",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "55",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": false
+        }
+      ],
+      "lastKnownFields": null,
+      "cleanupLabel": null
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "fileName": "current-release.xml",
+        "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+        "recordIdentifier": "SIM-PKG-500",
+        "recordLocator": "/Perusrekisteri/Pakkaus[4]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T06:00:00+00:00",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-03",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-003",
+          "attributes": {}
+        },
+        "fileName": "cleanup-release.xml",
+        "checksum": "0d6e8049c9406ec8db0258535efbdfddb84908420c6588805843f8e20963e9ed",
+        "recordIdentifier": "SIM-PKG-500",
+        "recordLocator": "/Perusrekisteri/Pakkaus[4]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-05T06:00:00+00:00",
+        "evidenceAvailable": true
+      }
+    },
+    "sourceOrder": {
+      "prior": 20990102,
+      "current": 20990103,
+      "basis": "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. Caller-declared order and retrieval timestamps were not used. Prior Ajopvm 2099-01-02; current Ajopvm 2099-01-03.",
+      "evidenceClass": "VERIFIED"
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-0ff450d054891adab7faa83ae620afe472d7f5143547c506cb415143cd5d90f7",
+      "caseId": "CASE-0ff450d054891adab7faa83ae620afe472d7f5143547c506cb415143cd5d90f7",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:49:23.155887+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-0ff450d054891adab7faa83ae620afe472d7f5143547c506cb415143cd5d90f7",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:49:23.155887+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "caseType": "RELEASE",
+    "evidenceAvailability": "AVAILABLE"
+  },
+  {
+    "caseId": "CASE-545e3d1ad119f91ec8a886c510c334bc75608bb6c0d00604839bb546b53514a6",
+    "createdAt": "2026-11-21T13:49:23.155887+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-200",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-8200",
+      "personReference": "SIM-PERSON-8200",
+      "medicineDisplay": "Fictional Product Blue"
+    },
+    "changeSet": {
+      "changeSetId": "e1b7d921e8a9000ee2722b5bad3320d079263604817632436d7ea3044816d0cc",
+      "kind": "FIELDS_CHANGED",
+      "detectedAt": "2026-11-21T13:49:23.154389+00:00",
+      "changes": [
+        {
+          "changeId": "1af66942a28dd47dd3434fc1d9deb1913f29dec4283e87ce967b72fef921cdd4",
+          "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/JakamatonVahvuus",
+          "before": [
+            {
+              "state": "value",
+              "value": "synthetic amount B",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "synthetic amount B (split)",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": false
+        },
+        {
+          "changeId": "16008fa2834c224be909d796eb1d7327837c296f1f84c434bf8f5da64ba3f6d8",
+          "field": "Laakeaine/VaikuttavaAine[Aine=SIM-SB01]/Maara",
+          "before": [
+            {
+              "state": "value",
+              "value": "2.0",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "2.00",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": false
+        }
+      ],
+      "lastKnownFields": null,
+      "cleanupLabel": "ACTIVE_SUBSTANCE_ONLY"
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "fileName": "current-release.xml",
+        "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+        "recordIdentifier": "SIM-PKG-200",
+        "recordLocator": "/Perusrekisteri/Pakkaus[2]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T06:00:00+00:00",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-03",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-003",
+          "attributes": {}
+        },
+        "fileName": "cleanup-release.xml",
+        "checksum": "0d6e8049c9406ec8db0258535efbdfddb84908420c6588805843f8e20963e9ed",
+        "recordIdentifier": "SIM-PKG-200",
+        "recordLocator": "/Perusrekisteri/Pakkaus[2]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-05T06:00:00+00:00",
+        "evidenceAvailable": true
+      }
+    },
+    "sourceOrder": {
+      "prior": 20990102,
+      "current": 20990103,
+      "basis": "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. Caller-declared order and retrieval timestamps were not used. Prior Ajopvm 2099-01-02; current Ajopvm 2099-01-03.",
+      "evidenceClass": "VERIFIED"
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-545e3d1ad119f91ec8a886c510c334bc75608bb6c0d00604839bb546b53514a6",
+      "caseId": "CASE-545e3d1ad119f91ec8a886c510c334bc75608bb6c0d00604839bb546b53514a6",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:49:23.155887+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-545e3d1ad119f91ec8a886c510c334bc75608bb6c0d00604839bb546b53514a6",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:49:23.155887+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "caseType": "RELEASE",
+    "evidenceAvailability": "AVAILABLE"
+  },
+  {
+    "caseId": "CASE-e8c8075fa8c0fb2e634d1cb2328e883020cbec817d2356e7304746e095c64b9c",
+    "createdAt": "2026-11-21T13:49:23.155887+00:00",
+    "status": "NEW",
+    "medicineIdentifier": "SIM-PKG-100",
+    "identifierGranularity": "package",
+    "matchedRecord": {
+      "recordId": "SIM-MED-8100",
+      "personReference": "SIM-PERSON-8100",
+      "medicineDisplay": "Fictional Product Amber"
+    },
+    "changeSet": {
+      "changeSetId": "277fc5b498cbf8f3f192b50026b4ab6e98e353c20ca8d2dda097cfe48a539fed",
+      "kind": "FIELDS_CHANGED",
+      "detectedAt": "2026-11-21T13:49:23.154389+00:00",
+      "changes": [
+        {
+          "changeId": "7b3db2d9e79b2482507c72b7784ab66e06a112ce3b5930482ae7f1db47884b4d",
+          "field": "Laakevalmiste/Kauppanimi",
+          "before": [
+            {
+              "state": "value",
+              "value": "Fictional Product Amber Revised",
+              "attributes": {}
+            }
+          ],
+          "after": [
+            {
+              "state": "value",
+              "value": "Fictional  product AMBER revised ",
+              "attributes": {}
+            }
+          ],
+          "formattingOnly": true
+        }
+      ],
+      "lastKnownFields": null,
+      "cleanupLabel": "FORMATTING_ONLY"
+    },
+    "sources": {
+      "prior": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-02",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-002",
+          "attributes": {}
+        },
+        "fileName": "current-release.xml",
+        "checksum": "93cdf06cd6d44c7a4bc994bdc1693a0efe96c0503e26f5d9019034b4b40a8bf4",
+        "recordIdentifier": "SIM-PKG-100",
+        "recordLocator": "/Perusrekisteri/Pakkaus[1]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-04T06:00:00+00:00",
+        "evidenceAvailable": true
+      },
+      "current": {
+        "sourceName": "Fimea Basic Register",
+        "releaseDate": {
+          "state": "value",
+          "value": "2099-01-03",
+          "attributes": {}
+        },
+        "releaseReference": {
+          "state": "value",
+          "value": "SIM-2099-003",
+          "attributes": {}
+        },
+        "fileName": "cleanup-release.xml",
+        "checksum": "0d6e8049c9406ec8db0258535efbdfddb84908420c6588805843f8e20963e9ed",
+        "recordIdentifier": "SIM-PKG-100",
+        "recordLocator": "/Perusrekisteri/Pakkaus[1]",
+        "fieldReference": null,
+        "evidenceClass": "VERIFIED",
+        "note": "Source-data difference only; cross-release key stability is not established generally.",
+        "retrievedAt": "2099-01-05T06:00:00+00:00",
+        "evidenceAvailable": true
+      }
+    },
+    "sourceOrder": {
+      "prior": 20990102,
+      "current": 20990103,
+      "basis": "Ajopvm (dataset run date, xs:date) read from each release's Versiotiedot. Caller-declared order and retrieval timestamps were not used. Prior Ajopvm 2099-01-02; current Ajopvm 2099-01-03.",
+      "evidenceClass": "VERIFIED"
+    },
+    "evidenceClass": "VERIFIED",
+    "initialStatusEvent": {
+      "eventId": "EVENT-e8c8075fa8c0fb2e634d1cb2328e883020cbec817d2356e7304746e095c64b9c",
+      "caseId": "CASE-e8c8075fa8c0fb2e634d1cb2328e883020cbec817d2356e7304746e095c64b9c",
+      "fromStatus": null,
+      "toStatus": "NEW",
+      "occurredAt": "2026-11-21T13:49:23.155887+00:00"
+    },
+    "statusHistory": [
+      {
+        "eventId": "EVENT-e8c8075fa8c0fb2e634d1cb2328e883020cbec817d2356e7304746e095c64b9c",
+        "fromStatus": null,
+        "toStatus": "NEW",
+        "occurredAt": "2026-11-21T13:49:23.155887+00:00",
+        "reviewerInitials": null,
+        "note": null
+      }
+    ],
+    "caseType": "RELEASE",
+    "evidenceAvailability": "AVAILABLE"
+  }
+]

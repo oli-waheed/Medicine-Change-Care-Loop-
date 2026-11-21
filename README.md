@@ -31,6 +31,7 @@ The project focuses on traceability, evidence quality, and pharmacist-led review
 - Check Fimea for a new release from About the Data with one button, which downloads and loads it like the daily workflow (feature 005).
 - See the medicine shortages reported to Fimea, matched to catalogue packages by VNR, on a Medicine Shortages page with an update button; the backend updates the shortage data and the Basic Register automatically every day (feature 006).
 - Record a pharmacist's review on any case (In progress, Reviewed – no action needed, Reviewed – follow-up needed, or reopen), with initials, a note and a kept history; and create review cases when a shortage starts, changes or ends for a package of a simulated record (feature 007).
+- See at a glance which cases are likely Fimea data clean-ups ("Spacing or letter case only", "Active-substance fields only") and set them aside for the moment if you choose; nothing is hidden or closed automatically (feature 008).
 - Store an unchanged daily download only once, recording each retrieval time.
 - Provide APIs for review cases and review steps, change processing outcomes, the medicine catalogue, shortage data and the update status.
 
@@ -71,7 +72,7 @@ A source-data change does not automatically mean that there is a clinically sign
 
 The frontend is a light-themed review workspace in the approved navy and teal design. A sidebar holds the project logo (a gold bird, crescent and bowl of Hygieia, `frontend/src/assets/brand-logo.png`) and product name, links to the four pages, the Fimea attribution with the CC BY 4.0 licence link, and the application version once `frontend/package.json` has a real version (the placeholder `0.0.0` is hidden). The sidebar is persistent from 1024 px wide, collapses to an icon rail with a **Sidebar** toggle on tablets, and opens from a **Menu** button on phones.
 
-- **Open Review Cases** (`/`): a searchable case queue (by medicine name, identifier, change summary or status; arrow keys move between cases) and the selected case. Release and shortage cases share the queue. Each case has a **Review** section: the reviewer's initials, a note, the steps allowed from the current status, and the case's history. Reviewed cases leave the queue and are shown with **Show reviewed cases** (feature 007).
+- **Open Review Cases** (`/`): a searchable case queue (by medicine name, identifier, change summary or status; arrow keys move between cases) and the selected case. Release and shortage cases share the queue. Each case has a **Review** section: the reviewer's initials, a note, the steps allowed from the current status, and the case's history. Reviewed cases leave the queue and are shown with **Show reviewed cases** (feature 007). Likely source clean-ups carry a label, and **Set aside likely source clean-ups** takes them out of the list until you turn it off (feature 008).
 - **Medicine Catalogue** (`/medicine-catalogue`): packages, products and active substances of the active validated release as the source records them; search, filters, package and product records with provenance, and a two-product comparison (feature 004).
 - **Medicine Shortages** (`/medicine-shortages`): the shortages in Fimea's open shortage file, in the file's order and as published, with the matching catalogue packages by VNR; search, a status filter, the **Update shortage data** button and the daily update's last run (feature 006).
 - **About the Data** (`/about-data`): simulated records, the Fimea data sources and licence, attribution, limitations, and the **Check for new Fimea release** button (feature 005).
@@ -282,7 +283,7 @@ From the project root:
 python -m pytest
 ```
 
-Expected: `289 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
+Expected: `306 passed`. Lint and format checks run from the `backend` folder, where Ruff's settings live:
 
 ```powershell
 cd backend
@@ -298,7 +299,7 @@ From the frontend directory:
 npx vitest run
 ```
 
-Expected: `Tests  91 passed (91)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
+Expected: `Tests  96 passed (96)`. (`npm run test` without arguments stays in watch mode; in PowerShell, `npm run test -- --run` may not pass `--run` through, so `npx vitest run` is the reliable form.)
 
 Lint and format checks:
 
@@ -369,12 +370,13 @@ Medicine-Change-Care-Loop/
 | 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | done (approved 2026-11-21) |
 | 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | done (approved 2026-11-21); T016 and T018 decided 2026-11-21 |
 | 007 Recorded reviews and shortage review cases | [spec](specs/007-care-loop-review-and-shortage-cases/spec.md) | done (approved 2026-11-21) |
+| 008 Labels for likely source clean-ups | [spec](specs/008-source-cleanup-labels/spec.md) | T001–T008 done; T009 (approval) open |
 
-The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update; feature 007 ([specs/007-care-loop-review-and-shortage-cases](specs/007-care-loop-review-and-shortage-cases/spec.md)) added recorded reviews and shortage review cases.
+The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update; feature 007 ([specs/007-care-loop-review-and-shortage-cases](specs/007-care-loop-review-and-shortage-cases/spec.md)) added recorded reviews and shortage review cases; feature 008 ([specs/008-source-cleanup-labels](specs/008-source-cleanup-labels/spec.md)) added labels for likely source clean-ups.
 
 Verification:
 
-- 289 backend tests and 91 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
+- 306 backend tests and 96 frontend tests pass. They include guards that keep all test and demo data simulated and that keep the view and workflow free of clinical decisions.
 - The end-to-end acceptance run passed all 10 steps; the results are recorded in [quickstart.md](specs/001-ingestion-case-pipeline/quickstart.md#acceptance-results-t034).
 
 One real Basic Register release (2026-10-06) and one real shortage file (2026-11-20) have been loaded and checked ([004 research.md](specs/004-interactive-medicine-catalogue/research.md), [006 spec.md](specs/006-medicine-shortages/spec.md)). Before relying on live Fimea data, the remaining validation is to confirm the `Ajopvm` release order and `Pakkaustunnus` stability on several real daily downloads, which the daily update now collects, and to check the current Fimea XSD ([research.md](specs/001-ingestion-case-pipeline/research.md)).
