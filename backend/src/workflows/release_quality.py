@@ -12,7 +12,7 @@ from ..services.detect_relevant_changes import detect_relevant_changes
 from ..services.ingest_source_release import ProcessingStatus, reload_captured_release
 from ..services.package_history import build_package_history, pair_id
 from ..services.pipeline_store import PipelineStore
-from ..services.release_quality_checks import build_quality_check, check_id
+from ..services.release_quality_checks import CHECK_VERSION, build_quality_check, check_id
 from .ingestion_to_review import source_order_evidence
 
 logger = logging.getLogger(__name__)
@@ -25,7 +25,9 @@ def backfill_release_pairs(store: PipelineStore, *, limit: int = 3) -> dict[str,
     """
     incomplete = []
     for prior, current in store.compared_release_pairs():
-        needs_check = not store.has_quality_check(check_id(prior.release_id, current.release_id))
+        needs_check = not store.has_quality_check(
+            check_id(prior.release_id, current.release_id), CHECK_VERSION
+        )
         needs_history = not store.has_package_history(pair_id(prior.release_id, current.release_id))
         if needs_check or needs_history:
             incomplete.append((prior, current, needs_check, needs_history))

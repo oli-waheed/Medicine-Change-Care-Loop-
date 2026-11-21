@@ -117,6 +117,10 @@ describe("Medicine Shortages (feature 006)", () => {
       screen.getByText(/Dates and status are the company’s report to Fimea/),
     ).toBeVisible();
     expect(screen.getByText(/does not point to other products/)).toBeVisible();
+    // Feature 014: not being listed is never shown as being available.
+    expect(
+      screen.getByText(/not listed here is not shown to be available/),
+    ).toBeVisible();
   });
 
   it("searches and filters through the API", async () => {

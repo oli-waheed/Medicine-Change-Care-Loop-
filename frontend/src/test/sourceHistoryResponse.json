@@ -49,11 +49,12 @@
   "qualityChecks": [
     {
       "checkId": "QC-307a0bd03cdb06ad102ac00e9874193b33ba158a",
+      "version": 2,
       "priorReleaseId": "sha256-27d08820cabb32f6d3a80a11b3ccca77aaae26f16fa85130b14f4b238805d31d",
       "currentReleaseId": "sha256-d9ed6c0508ce12de447ae9cc5164d238714c762a99a93988dbb1f92f27261ee5",
       "priorReleaseDate": "2099-01-03",
       "currentReleaseDate": "2099-01-10",
-      "checkedAt": "2026-11-21T15:45:25.272519+00:00",
+      "checkedAt": "2026-11-21T16:16:59.003260+00:00",
       "overall": "PASSED",
       "counts": {
         "priorPackages": 4,
@@ -102,6 +103,18 @@
           "detail": "0 packages (0.00 %); limit 10%."
         },
         {
+          "id": "FIELD_COMPLETENESS",
+          "label": "Field completeness",
+          "status": "PASSED",
+          "detail": "No tracked field lost more than 2 percentage points (largest drop 0.00 points, Vahvuus)."
+        },
+        {
+          "id": "SOURCE_STRUCTURE",
+          "label": "Source structure",
+          "status": "PASSED",
+          "detail": "44 element paths; declares no schema; same as the prior release."
+        },
+        {
           "id": "SOURCE_CLEANUPS",
           "label": "Likely source clean-ups",
           "status": "INFO",
@@ -113,15 +126,64 @@
           "status": "INFO",
           "detail": "0 VNRs belong to more than one package in the current release; Medicine Shortages lists every such package."
         }
-      ]
+      ],
+      "completeness": [
+        {
+          "field": "VNR-numero",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Kauppanimi",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Vahvuus",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Laakemuoto",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "ATC-koodi",
+          "prior": 75.0,
+          "current": 75.0
+        },
+        {
+          "field": "Pakkauskokoteksti",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Kaupan",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Active substance",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Authorisation or registration",
+          "prior": 100.0,
+          "current": 100.0
+        }
+      ],
+      "upToDate": true
     },
     {
       "checkId": "QC-0b8756775c4454177ea808a9484e6930d9284f9f",
+      "version": 2,
       "priorReleaseId": "sha256-70bc9f33b69b6ef13ec9e130a3795638b01dc009d7eb960017d2e8f5b034f95c",
       "currentReleaseId": "sha256-27d08820cabb32f6d3a80a11b3ccca77aaae26f16fa85130b14f4b238805d31d",
       "priorReleaseDate": "2099-01-02",
       "currentReleaseDate": "2099-01-03",
-      "checkedAt": "2026-11-21T15:45:25.253308+00:00",
+      "checkedAt": "2026-11-21T16:16:58.981339+00:00",
       "overall": "ATTENTION",
       "counts": {
         "priorPackages": 4,
@@ -170,6 +232,18 @@
           "detail": "3 packages (75.00 %); limit 10%."
         },
         {
+          "id": "FIELD_COMPLETENESS",
+          "label": "Field completeness",
+          "status": "PASSED",
+          "detail": "No tracked field lost more than 2 percentage points (largest drop 0.00 points, Vahvuus)."
+        },
+        {
+          "id": "SOURCE_STRUCTURE",
+          "label": "Source structure",
+          "status": "PASSED",
+          "detail": "44 element paths; declares no schema; same as the prior release."
+        },
+        {
           "id": "SOURCE_CLEANUPS",
           "label": "Likely source clean-ups",
           "status": "INFO",
@@ -181,7 +255,55 @@
           "status": "INFO",
           "detail": "0 VNRs belong to more than one package in the current release; Medicine Shortages lists every such package."
         }
-      ]
+      ],
+      "completeness": [
+        {
+          "field": "VNR-numero",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Kauppanimi",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Vahvuus",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Laakemuoto",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "ATC-koodi",
+          "prior": 75.0,
+          "current": 75.0
+        },
+        {
+          "field": "Pakkauskokoteksti",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Kaupan",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Active substance",
+          "prior": 100.0,
+          "current": 100.0
+        },
+        {
+          "field": "Authorisation or registration",
+          "prior": 100.0,
+          "current": 100.0
+        }
+      ],
+      "upToDate": true
     }
   ],
   "uncheckedPairs": [],

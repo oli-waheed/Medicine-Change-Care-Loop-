@@ -25,8 +25,99 @@ from .source_cleanup_labels import CleanupLabel, cleanup_label
 MIN_PACKAGE_IDS_KEPT = 0.99
 MAX_PACKAGES_REMOVED = 0.01
 MAX_PACKAGES_CHANGED = 0.10
+# Feature 014: a field's share of packages with a value may fall this much at most.
+MAX_COMPLETENESS_DROP = 0.02
 
 VNR_FIELD = "Pakkaus/VNR-numero"
+
+
+# Feature 014: fields whose completeness (share of packages with a value) is tracked.
+COMPLETENESS_FIELDS = (
+    ("VNR-numero", lambda s: s.vnr_numero),
+    ("Kauppanimi", lambda s: s.product.kauppanimi),
+    ("Vahvuus", lambda s: s.product.vahvuus),
+    ("Laakemuoto", lambda s: s.product.laakemuoto),
+    ("ATC-koodi", lambda s: s.product.atc_koodi),
+    ("Pakkauskokoteksti", lambda s: s.package.pakkauskoko_teksti),
+    ("Kaupan", lambda s: s.package.availability.kaupan),
+    ("Active substance", lambda s: s.active_substances),
+    ("Authorisation or registration", lambda s: s.authorizations),
+)
+
+
+def _present(value) -> bool:
+    if isinstance(value, tuple):
+        return len(value) > 0
+    # A code-table field can carry its text in attributes with an empty value.
+    return value.state is SourceFieldState.VALUE or (
+        value.state is SourceFieldState.EMPTY and bool(value.attributes)
+    )
+
+
+def completeness(snapshots) -> dict[str, float]:
+    """Share of packages (0–1) that have each tracked field."""
+    total = len(snapshots)
+    return {
+        name: (sum(1 for s in snapshots if _present(get(s))) / total if total else 0.0)
+        for name, get in COMPLETENESS_FIELDS
+    }
+
+
+def _structure_check(prior_release, current_release) -> dict:
+    before = {path for path, _ in prior_release.structure}
+    after = {path for path, _ in current_release.structure}
+    added, removed = sorted(after - before), sorted(before - after)
+    schema_changed = prior_release.schema_location != current_release.schema_location
+    parts = [
+        f"{len(after)} element paths",
+        f"declares {current_release.schema_location or 'no schema'}",
+    ]
+    if schema_changed:
+        parts.append(f"was {prior_release.schema_location or 'no schema'}")
+    if added:
+        parts.append("new: " + ", ".join(added[:5]) + (" …" if len(added) > 5 else ""))
+    if removed:
+        parts.append("gone: " + ", ".join(removed[:5]) + (" …" if len(removed) > 5 else ""))
+    if not (added or removed or schema_changed):
+        parts.append("same as the prior release")
+    return {
+        "id": "SOURCE_STRUCTURE",
+        "label": "Source structure",
+        "status": "ATTENTION" if added or removed or schema_changed else "PASSED",
+        "detail": "; ".join(parts) + ".",
+    }
+
+
+def _completeness_check(prior_shares: dict, current_shares: dict) -> dict:
+    drops = sorted(
+        ((prior_shares[name] - current_shares[name], name) for name in prior_shares),
+        reverse=True,
+    )
+    worst_drop, worst = drops[0]
+    if worst_drop > MAX_COMPLETENESS_DROP:
+        detail = (
+            f"{worst} is present in {current_shares[worst]:.2%} of packages, "
+            f"down from {prior_shares[worst]:.2%}; limit a drop of "
+            f"{100 * MAX_COMPLETENESS_DROP:.0f} percentage points."
+        )
+        status = "ATTENTION"
+    else:
+        detail = (
+            f"No tracked field lost more than {100 * MAX_COMPLETENESS_DROP:.0f} percentage "
+            f"points (largest drop {100 * max(worst_drop, 0):.2f} points, {worst})."
+        )
+        status = "PASSED"
+    return {
+        "id": "FIELD_COMPLETENESS",
+        "label": "Field completeness",
+        "status": status,
+        "detail": detail,
+    }
+
+
+# Version 2 (feature 014) added field completeness and source structure. Stored
+# checks of an older version are made again by the daily update's backfill.
+CHECK_VERSION = 2
 
 
 def check_id(prior_release_id: str, current_release_id: str) -> str:
@@ -82,6 +173,8 @@ def build_quality_check(
                 vnr["gained" if has and not had else "lost" if had and not has else "changed"] += 1
     vnr_owners = Counter(s.vnr_numero.value for s in current.snapshots if s.vnr_numero.value)
     shared_vnrs = sum(1 for count in vnr_owners.values() if count > 1)
+    prior_shares = completeness(prior.snapshots)
+    current_shares = completeness(current.snapshots)
     cleanups = labels[CleanupLabel.FORMATTING_ONLY] + labels[CleanupLabel.ACTIVE_SUBSTANCE_ONLY]
     prior_date = prior.source_order.value
     current_date = current.source_order.value
@@ -130,6 +223,8 @@ def build_quality_check(
                 f"limit {MAX_PACKAGES_CHANGED:.0%}."
             ),
         },
+        _completeness_check(prior_shares, current_shares),
+        _structure_check(prior.source_release, current.source_release),
         {
             "id": "SOURCE_CLEANUPS",
             "label": "Likely source clean-ups",
@@ -151,6 +246,7 @@ def build_quality_check(
     ]
     return {
         "checkId": check_id(prior_release_id, current_release_id),
+        "version": CHECK_VERSION,
         "priorReleaseId": prior_release_id,
         "currentReleaseId": current_release_id,
         "priorReleaseDate": prior_date,
@@ -173,4 +269,13 @@ def build_quality_check(
             "sharedVnrs": shared_vnrs,
         },
         "checks": checks,
+        # Feature 014: share of packages (in %) with each tracked field.
+        "completeness": [
+            {
+                "field": name,
+                "prior": round(100 * prior_shares[name], 2),
+                "current": round(100 * current_shares[name], 2),
+            }
+            for name, _ in COMPLETENESS_FIELDS
+        ],
     }

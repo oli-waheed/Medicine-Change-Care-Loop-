@@ -27,6 +27,7 @@
 }
 
 .history-card {
+  min-width: 0;
   padding: 1.1rem 1.25rem;
   border: 1px solid var(--color-border);
   border-radius: 12px;
@@ -92,6 +93,7 @@
 }
 
 .check-list li {
+  overflow-wrap: anywhere;
   display: grid;
   grid-template-columns: 6.5rem minmax(0, 1fr);
   align-items: baseline;
@@ -158,7 +160,46 @@
 
 @media (max-width: 520px) {
   .check-list li {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.2rem;
   }
+}
+
+/* Feature 014: field completeness */
+.history-completeness {
+  width: 100%;
+  max-width: 34rem;
+  margin: 0 0 1rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.history-completeness caption {
+  margin-bottom: 0.35rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  font-weight: 650;
+  text-align: left;
+}
+
+.history-completeness th,
+.history-completeness td {
+  padding: 0.3rem 0.5rem;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  text-align: left;
+}
+
+.history-completeness thead th {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+}
+
+.history-completeness td {
+  font-variant-numeric: tabular-nums;
+}
+
+.history-table-wrap {
+  max-width: 100%;
+  overflow-x: auto;
 }

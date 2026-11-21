@@ -1,6 +1,6 @@
 """Source release identity and provenance for the Fimea Basic Register."""
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime
 
 from ..source_field import SourceField
@@ -34,3 +34,8 @@ class SourceRelease:
     provenance: SourceProvenance
     kkera: SourceField
     kattavuus: SourceField
+    # Feature 014: what the document itself looks like, for the release quality
+    # checks. Not part of the release's identity, so excluded from comparisons.
+    # ``structure`` holds every element path with its number of occurrences.
+    schema_location: str | None = field(default=None, compare=False)
+    structure: tuple[tuple[str, int], ...] = field(default=(), compare=False)

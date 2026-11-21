@@ -26,6 +26,10 @@ export type QualityCheck = {
     sharedVnrs: number;
   };
   checks: { id: string; label: string; status: CheckStatus; detail: string }[];
+  // Feature 014: share of packages (%) with each tracked field.
+  completeness?: { field: string; prior: number; current: number }[];
+  version?: number;
+  upToDate?: boolean;
 };
 
 export type StoredRelease = {

@@ -181,3 +181,70 @@ def test_shortage_files_are_listed_newest_first(client, isolated_app):
     assert first["lastRetrievedAt"].startswith("2099-01-04T06:00")
     assert newest["processingStatus"] == "VALIDATED" and newest["evidenceAvailable"] is True
     assert newest["recordCount"] > 0 and newest["sizeBytes"] > 0
+
+
+# --- Feature 014: field completeness, source structure, check versions -----------
+
+
+def test_completeness_and_structure_are_checked(client):
+    current = (RELEASES / "current-release.xml").read_bytes()
+    _upload(client, "current-release.xml", 4)
+    later = current.replace(b"<Ajopvm>2099-01-02</Ajopvm>", b"<Ajopvm>2099-01-09</Ajopvm>")
+    _upload(client, "same-content-later-date.xml", 9, later)
+    (check,) = client.get(HISTORY).json()["qualityChecks"]
+    assert check["version"] == 2 and check["upToDate"] is True
+    statuses = _checks(check)
+    assert statuses["FIELD_COMPLETENESS"] == "PASSED"
+    assert statuses["SOURCE_STRUCTURE"] == "PASSED"
+    structure = next(c for c in check["checks"] if c["id"] == "SOURCE_STRUCTURE")
+    assert "same as the prior release" in structure["detail"]
+    vnr = next(row for row in check["completeness"] if row["field"] == "VNR-numero")
+    assert vnr == {"field": "VNR-numero", "prior": 100.0, "current": 100.0}
+
+
+def test_a_new_element_and_lost_values_need_attention(client):
+    current = (RELEASES / "current-release.xml").read_bytes()
+    _upload(client, "current-release.xml", 4)
+    changed = (
+        current.replace(b"<Ajopvm>2099-01-02</Ajopvm>", b"<Ajopvm>2099-01-09</Ajopvm>")
+        .replace(b"<VNR-numero>SIM-VNR-100</VNR-numero>", b"")
+        .replace(b"<VNR-numero>SIM-VNR-200</VNR-numero>", b"")
+        .replace(
+            b"<Pakkaustunnus>SIM-PKG-400</Pakkaustunnus>",
+            b"<Pakkaustunnus>SIM-PKG-400</Pakkaustunnus><UusiKentta>x</UusiKentta>",
+        )
+    )
+    _upload(client, "changed-structure.xml", 9, changed)
+    (check,) = client.get(HISTORY).json()["qualityChecks"]
+    statuses = _checks(check)
+    assert statuses["FIELD_COMPLETENESS"] == "ATTENTION"
+    assert statuses["SOURCE_STRUCTURE"] == "ATTENTION"
+    details = {c["id"]: c["detail"] for c in check["checks"]}
+    assert (
+        "VNR-numero is present in 50.00% of packages, down from 100.00%"
+        in details["FIELD_COMPLETENESS"]
+    )
+    assert "new: Perusrekisteri/Pakkaus/UusiKentta" in details["SOURCE_STRUCTURE"]
+    assert "gone:" not in details["SOURCE_STRUCTURE"]
+    assert check["overall"] == "ATTENTION"
+
+
+def test_checks_of_an_older_version_are_made_again(client, isolated_app):
+    _upload(client, "prior-release.xml", 3)
+    _upload(client, "current-release.xml", 4)
+    store = isolated_app.state.store
+    (check,) = client.get(HISTORY).json()["qualityChecks"]
+    old = {key: value for key, value in check.items() if key not in {"version", "upToDate"}}
+    old["checks"] = [c for c in old["checks"] if c["id"] != "SOURCE_STRUCTURE"]
+    old.pop("completeness")
+    from src.models import ReleaseQualityCheckRow
+
+    with store._session() as session, session.begin():
+        session.get(ReleaseQualityCheckRow, check["checkId"]).payload = old
+    (stale,) = client.get(HISTORY).json()["qualityChecks"]
+    assert stale["upToDate"] is False
+
+    assert backfill_quality_checks(store) == 1
+    assert backfill_quality_checks(store) == 0
+    (fresh,) = client.get(HISTORY).json()["qualityChecks"]
+    assert fresh["upToDate"] is True and "SOURCE_STRUCTURE" in _checks(fresh)

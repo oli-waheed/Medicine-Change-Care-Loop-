@@ -9,7 +9,7 @@ from pathlib import Path
 from fastapi import APIRouter, Request
 
 from ..services.pipeline_store import PipelineStore, _as_utc
-from ..services.release_quality_checks import check_id
+from ..services.release_quality_checks import CHECK_VERSION, check_id
 
 router = APIRouter(prefix="/api/source-history", tags=["source-history"])
 
@@ -83,7 +83,12 @@ def _shortage_files(store: PipelineStore) -> list[dict]:
 @router.get("")
 def get_source_history(request: Request) -> dict:
     store: PipelineStore = request.app.state.store
-    checks = store.quality_check_payloads()
+    # Feature 014: a check made by an older version is marked; the daily update
+    # makes it again with the current checks.
+    checks = [
+        {**check, "upToDate": check.get("version", 1) >= CHECK_VERSION}
+        for check in store.quality_check_payloads()
+    ]
     checked = {item["checkId"] for item in checks}
     unchecked = [
         {

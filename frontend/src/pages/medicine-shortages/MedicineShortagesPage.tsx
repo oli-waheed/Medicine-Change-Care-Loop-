@@ -225,6 +225,13 @@ export default function MedicineShortagesPage() {
         the end date is an estimate. This page lists packages only and does not
         point to other products.
       </p>
+      {/* Feature 014: absence from the list is not evidence of availability. */}
+      <p className="catalogue-notice shortage-not-listed">
+        A medicine that is not listed here is not shown to be available. The
+        file contains only the shortages that marketing authorisation holders
+        have reported to Fimea, by VNR. It says nothing about a pharmacy’s own
+        stock or a wholesaler’s deliveries.
+      </p>
 
       {error?.code === "SHORTAGES_UNAVAILABLE" && (
         <div

@@ -116,6 +116,12 @@ function CheckCard({ check }: { check: QualityCheck }) {
         Checked{" "}
         <TimestampDisplay value={check.checkedAt} fallback={check.checkedAt} />
       </p>
+      {check.upToDate === false && (
+        <p className="history-note">
+          Made by an earlier version of the checks. The next daily update checks
+          this pair again with the current checks.
+        </p>
+      )}
       <ul className="check-list">
         {check.checks.map((item) => (
           <li key={item.id}>
@@ -130,6 +136,31 @@ function CheckCard({ check }: { check: QualityCheck }) {
           </li>
         ))}
       </ul>
+      {check.completeness && (
+        <div className="history-table-wrap">
+          <table className="history-completeness">
+            <caption>
+              Packages with each field (prior → current release)
+            </caption>
+            <thead>
+              <tr>
+                <th scope="col">Field</th>
+                <th scope="col">Prior</th>
+                <th scope="col">Current</th>
+              </tr>
+            </thead>
+            <tbody>
+              {check.completeness.map((row) => (
+                <tr key={row.field}>
+                  <th scope="row">{row.field}</th>
+                  <td>{row.prior.toFixed(2)} %</td>
+                  <td>{row.current.toFixed(2)} %</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
       <dl className="history-facts">
         <div>
           <dt>Packages</dt>

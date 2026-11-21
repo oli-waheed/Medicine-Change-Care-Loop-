@@ -50,6 +50,39 @@ describe("Source History (feature 010)", () => {
     expect(document.body.textContent ?? "").not.toMatch(CLINICAL_WORDS);
   });
 
+  it("shows field completeness and marks checks made by an earlier version", async () => {
+    serve({
+      ...HISTORY,
+      qualityChecks: [
+        HISTORY.qualityChecks[0],
+        {
+          ...HISTORY.qualityChecks[1],
+          upToDate: false,
+          completeness: undefined,
+        },
+      ],
+    });
+    render(<SourceHistoryPage />);
+    const current = await screen.findByRole("article", {
+      name: "Check of 2099-01-03 to 2099-01-10",
+    });
+    const table = within(current).getByRole("table", {
+      name: "Packages with each field (prior → current release)",
+    });
+    const vnr = within(table)
+      .getAllByRole("row")
+      .find((row) => row.textContent?.startsWith("VNR-numero"))!;
+    expect(vnr).toHaveTextContent("VNR-numero100.00 %100.00 %");
+    expect(within(current).getByText(/Source structure\./)).toBeVisible();
+    expect(within(current).queryByText(/earlier version/)).toBeNull();
+
+    const older = screen.getByRole("article", {
+      name: "Check of 2099-01-02 to 2099-01-03",
+    });
+    expect(within(older).getByText(/Made by an earlier version/)).toBeVisible();
+    expect(within(older).queryByRole("table")).toBeNull();
+  });
+
   it("lists stored releases newest first with downloads and checksums", async () => {
     serve(HISTORY);
     render(<SourceHistoryPage />);

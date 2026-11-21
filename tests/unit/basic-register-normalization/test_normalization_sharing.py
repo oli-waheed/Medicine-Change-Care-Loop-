@@ -89,3 +89,25 @@ def test_wrong_root_and_missing_version_are_rejected():
         _normalize(b"<Other><Versiotiedot/></Other>")
     with pytest.raises(ValueError, match="Exactly one Versiotiedot"):
         _normalize(b"<Perusrekisteri></Perusrekisteri>")
+
+
+def test_document_structure_is_recorded_but_not_part_of_identity():
+    """Feature 014: element paths and the declared schema, for the quality checks."""
+    from dataclasses import replace
+
+    content = (FIXTURES / "current-release.xml").read_bytes()
+    release, _ = _normalize(content)
+    structure = dict(release.structure)
+    assert structure["Perusrekisteri/Pakkaus"] == 4
+    assert structure["Perusrekisteri/Pakkaus/Kaupanolo/Kaupan"] == 4
+    assert structure["Perusrekisteri/Versiotiedot/Ajopvm"] == 1
+    assert release.schema_location is None  # the synthetic files declare none
+    declared = content.replace(
+        b"<Perusrekisteri>",
+        b'<Perusrekisteri xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" '
+        b'xsi:noNamespaceSchemaLocation="Perusrekisteri_Fimea_2022.xsd">',
+    )
+    with_schema, _ = _normalize(declared)
+    assert with_schema.schema_location == "Perusrekisteri_Fimea_2022.xsd"
+    assert with_schema == release  # identity is the source metadata, not the shape
+    assert replace(release, structure=()) == release

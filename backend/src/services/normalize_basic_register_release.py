@@ -5,6 +5,7 @@ source ordering and ingestion status belong to the subsequent ingestion tasks.
 """
 
 import io
+from collections import Counter
 from datetime import datetime
 from pathlib import Path
 from xml.etree import ElementTree as ET
@@ -82,6 +83,15 @@ _PACKAGE_FIELDS = (
 )
 _AVAILABILITY_FIELDS = ("Kaupan", "Kauppaantulopaiva", "Kaupastapoistumispaiva")
 _BRANCHES = frozenset(branch.value for branch in AuthorizationBranch)
+_SCHEMA_LOCATION = "{http://www.w3.org/2001/XMLSchema-instance}noNamespaceSchemaLocation"
+
+
+def _count_paths(element: ET.Element, prefix: str, counts: Counter) -> None:
+    """Count every element path under a top-level record (feature 014)."""
+    path = f"{prefix}/{element.tag}"
+    counts[path] += 1
+    for child in element:
+        _count_paths(child, path, counts)
 
 
 def normalize_basic_register_release(
@@ -179,16 +189,20 @@ def normalize_basic_register_release(
 
     depth = 0
     root = None
+    schema_location = None
+    structure: Counter = Counter()
     for event, element in ET.iterparse(io.BytesIO(content), events=("start", "end")):
         if event == "start":
             if depth == 0:
                 root, root_tag = element, element.tag
+                schema_location = element.get(_SCHEMA_LOCATION)
             depth += 1
             continue
         depth -= 1
         if depth != 1:
             continue
         tag = element.tag
+        _count_paths(element, root.tag, structure)
         if tag == "Pakkaus":
             packages.append(package_record(element))
         elif tag == "Laakevalmiste":
@@ -214,6 +228,8 @@ def normalize_basic_register_release(
         provenance=SourceProvenance(
             "Fimea Basic Register", file_name, checksum, retrieved_at=retrieved_at
         ),
+        schema_location=schema_location,
+        structure=tuple(sorted(structure.items())),
     )
     for tag in ("Laakevalmiste", "Laakeaine"):
         if tag in index_errors:

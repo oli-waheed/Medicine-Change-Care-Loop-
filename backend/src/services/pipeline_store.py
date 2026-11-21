@@ -480,8 +480,14 @@ class PipelineStore:
 
     @staticmethod
     def _insert_quality_check(session: Session, payload: dict) -> bool:
-        if session.get(ReleaseQualityCheckRow, payload["checkId"]) is not None:
-            return False
+        existing = session.get(ReleaseQualityCheckRow, payload["checkId"])
+        if existing is not None:
+            # Feature 014: a check of an older version is replaced by a newer one.
+            if existing.payload.get("version", 1) >= payload.get("version", 1):
+                return False
+            existing.checked_at = _as_utc(datetime.fromisoformat(payload["checkedAt"]))
+            existing.payload = payload
+            return True
         session.add(
             ReleaseQualityCheckRow(
                 check_id=payload["checkId"],
@@ -498,9 +504,11 @@ class PipelineStore:
         with self._session() as session, session.begin():
             return self._insert_quality_check(session, payload)
 
-    def has_quality_check(self, check_id: str) -> bool:
+    def has_quality_check(self, check_id: str, version: int = 1) -> bool:
+        """True if the pair has a stored check of at least ``version``."""
         with self._session() as session:
-            return session.get(ReleaseQualityCheckRow, check_id) is not None
+            row = session.get(ReleaseQualityCheckRow, check_id)
+            return row is not None and row.payload.get("version", 1) >= version
 
     def quality_check_payloads(self) -> list[dict]:
         """Stored checks, newest pair first."""
