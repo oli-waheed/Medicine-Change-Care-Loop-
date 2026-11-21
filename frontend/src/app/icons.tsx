@@ -1,4 +1,6 @@
 // Small inline icons; decorative only (the visible text names each item).
+import brandLogo from "../assets/brand-logo.png";
+
 type IconProps = { className?: string };
 
 const common = {
@@ -41,33 +43,17 @@ export function MenuIcon({ className }: IconProps) {
   );
 }
 
+// The project logo (bird, crescent and bowl of Hygieia), background removed.
 export function BrandMark({ className }: IconProps) {
   return (
-    <svg
-      width={32}
-      height={32}
-      viewBox="0 0 32 32"
+    <img
+      src={brandLogo}
+      width={48}
+      height={48}
+      alt=""
       aria-hidden="true"
-      focusable={false}
       className={className}
-    >
-      <rect width="32" height="32" rx="8" fill="#0f766e" />
-      <path
-        d="M16 8.5v15M8.5 16h15"
-        stroke="#ffffff"
-        strokeWidth="3.2"
-        strokeLinecap="round"
-      />
-      <circle
-        cx="16"
-        cy="16"
-        r="10.5"
-        fill="none"
-        stroke="#7ff0dd"
-        strokeWidth="1.4"
-        opacity="0.7"
-      />
-    </svg>
+    />
   );
 }
 
