@@ -220,7 +220,7 @@ describe("Medicine Shortages (feature 006)", () => {
     await loaded();
     expect(
       await screen.findByText(
-        /Updates automatically every day at 06:00 \(EET\) while the backend runs/,
+        /Updates automatically every day at 06:00 \(UTC\+02:00\) while the backend runs/,
       ),
     ).toBeVisible();
     expect(

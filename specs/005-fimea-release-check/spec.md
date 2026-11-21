@@ -3,6 +3,8 @@
 **Status:** Approved specification (requested by Oli on 2026-11-21: button on About the Data, delivered as a Spec Kit feature)
 **Branch:** feature/fimea-release-check
 
+**Superseded in part by:** `specs/006-medicine-shortages` — §2 "Out of scope: Scheduling": the backend now also runs this check once a day (feature 006). The n8n workflow is no longer the only automatic route.
+
 **Supersedes in part:** `specs/003-app-shell-and-themes` FR-025 (About the Data adds one button, "Check for new Fimea release"). No case actions, forms or clinical wording are added, and the rest of features 003 and 004 stays in force. Feature 004's out-of-scope item "Source ingestion or upload from the catalogue" is unchanged: the button is not on the catalogue page.
 
 ## 1. Objective

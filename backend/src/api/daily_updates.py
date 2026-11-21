@@ -32,6 +32,12 @@ def run_daily_jobs(app: FastAPI) -> dict:
     return {"shortages": shortages, "basicRegister": basic_register}
 
 
+def utc_offset(moment) -> str:
+    """The machine's offset as "UTC+02:00"; time-zone names differ between systems."""
+    offset = moment.strftime("%z") or "+0000"
+    return f"UTC{offset[:3]}:{offset[3:]}"
+
+
 def _time(value):
     if value is None:
         return None
@@ -45,7 +51,7 @@ def get_daily_updates(request: Request) -> dict:
     return {
         "enabled": config.daily_update_time is not None,
         "time": config.daily_update_time,
-        "timeZone": local_now().tzname(),
+        "timeZone": utc_offset(local_now()),
         "lastRun": (
             {
                 "date": run.run_date,

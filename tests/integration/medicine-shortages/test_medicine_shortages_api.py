@@ -11,7 +11,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from src.api.daily_updates import run_daily_jobs
+from src.api.daily_updates import run_daily_jobs, utc_offset
 from src.config import DEFAULT_FIMEA_SHORTAGES_URL, ApplicationConfig, parse_daily_update_time
 from src.services.daily_updates import DailyUpdateScheduler
 from src.services.latest_release_check import DownloadError, LatestReleaseCheck
@@ -312,6 +312,10 @@ def test_daily_update_time_setting():
     assert parse_daily_update_time(None) is None
     with pytest.raises(ValueError, match="HH:MM"):
         parse_daily_update_time("25:00")
+    # The page shows the machine's offset, not a system-specific zone name (T017).
+    assert utc_offset(datetime.fromisoformat("2099-01-05T06:00:00+02:00")) == "UTC+02:00"
+    assert utc_offset(datetime.fromisoformat("2099-01-05T06:00:00-05:30")) == "UTC-05:30"
+    assert utc_offset(datetime(2099, 1, 5, tzinfo=UTC)) == "UTC+00:00"
     # Built directly (as in tests) there is no daily update.
     assert ApplicationConfig(Path("x"), 1).daily_update_time is None
 

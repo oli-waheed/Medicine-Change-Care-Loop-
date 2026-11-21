@@ -1,6 +1,6 @@
 # Feature 005: Tasks
 
-**Status (2026-11-21)**: T001–T012 done; T013 is the user's approval and commit. Convergence (Phase 2) found one LOW spec-text item, T014.
+**Status (2026-11-21)**: All tasks done. T013 approved by Oli on 2026-11-21; the convergence item T014 is resolved.
 
 - Backend: shared `ingest_release_file()` used by the upload endpoint and the check; `LatestReleaseCheck` service; `GET`/`POST /api/source-releases/latest-check`; `FIMEA_RELEASE_URL`. 9 new integration tests; full backend suite 236 passed; Ruff check and format clean.
 - Frontend: "Fimea release updates" on About the Data. 6 new tests; 75 frontend tests passed; TypeScript, Oxlint, Prettier and build clean.
@@ -30,6 +30,6 @@ Real-data evidence: on the user's computer the app downloaded Fimea's release of
 
 Requirements: FR-001–FR-010 and acceptance criteria 1–6 are met; no code gaps. One finding, in the spec text:
 
-- [ ] T014 F1 (spec §2 "Out of scope", LOW): "Scheduling (the n8n workflow remains the daily, automatic route)" is superseded by feature 006, which added the backend's daily update using this check. Add a "Superseded in part by `specs/006-medicine-shortages`" note to the spec header.
+- [x] T014 F1 (spec §2 "Out of scope", LOW): "Scheduling (the n8n workflow remains the daily, automatic route)" is superseded by feature 006, which added the backend's daily update using this check. Add a "Superseded in part by `specs/006-medicine-shortages`" note to the spec header. *(Done: spec header.)*
 
 Related, outside this feature's code: the "table already exists" error when several first requests reach a new database was fixed in `31e58fe` (`PipelineStore`, test `tests/unit/test_pipeline_store_first_use.py`).

@@ -189,7 +189,7 @@
   "/api/daily-updates": {
     "enabled": true,
     "time": "06:00",
-    "timeZone": "EET",
+    "timeZone": "UTC+02:00",
     "lastRun": {
       "date": "2099-01-05",
       "trigger": "SCHEDULE",

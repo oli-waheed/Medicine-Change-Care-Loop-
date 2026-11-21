@@ -65,7 +65,7 @@ Query: `q` (product name, VNR or company; case-insensitive, contains), `valid` (
 
 ```json
 {
-  "enabled": true, "time": "06:00", "timeZone": "EET",
+  "enabled": true, "time": "06:00", "timeZone": "UTC+02:00",
   "lastRun": { "date": "2026-11-21", "trigger": "SCHEDULE", "startedAt": "…", "finishedAt": "…",
                "outcome": { "shortages": UpdateStatus, "basicRegister": CheckStatus } }
 }

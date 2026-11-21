@@ -361,8 +361,8 @@ Medicine-Change-Care-Loop/
 | 002 Case review readability | [spec](specs/002-case-review-readability/spec.md) | done |
 | 003 Application shell | [spec](specs/003-app-shell-and-themes/spec.md) | done |
 | 004 Interactive Medicine Catalogue | [spec](specs/004-interactive-medicine-catalogue/spec.md) | T001–T060 done |
-| 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | T001–T012 done; T013 (approval) open |
-| 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | T001–T014 done; T015 (approval) open |
+| 005 Check for a new Fimea release | [spec](specs/005-fimea-release-check/spec.md) | done (approved 2026-11-21) |
+| 006 Medicine shortages and daily update | [spec](specs/006-medicine-shortages/spec.md) | done (approved 2026-11-21); open decisions: T016 scheduler, T018 VNR comparison |
 
 The implementation includes source-release ingestion, source-data normalization, evidence preservation, change detection per package, matching outcomes, review-case generation, backend API endpoints, an n8n ingestion workflow, and a frontend review workspace. Feature 002 ([specs/002-case-review-readability](specs/002-case-review-readability/spec.md)) improved the readability of the review page; feature 003 ([specs/003-app-shell-and-themes](specs/003-app-shell-and-themes/spec.md)) added the application shell, About the Data, case search and separate review layouts; feature 004 ([specs/004-interactive-medicine-catalogue](specs/004-interactive-medicine-catalogue/spec.md)) added the read-only Medicine Catalogue and its API under `/api/medicine-catalogue`; feature 005 ([specs/005-fimea-release-check](specs/005-fimea-release-check/spec.md)) added "Check for new Fimea release" on About the Data; feature 006 ([specs/006-medicine-shortages](specs/006-medicine-shortages/spec.md)) added Medicine Shortages and the daily automatic update.
 
